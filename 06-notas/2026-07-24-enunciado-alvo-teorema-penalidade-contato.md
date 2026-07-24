@@ -30,6 +30,35 @@ OBRIGATÓRIA antes da prova [NÃO VERIFICADO]: checar se Kristiansen–Hogan/Jef
 Hairer) já cobrem a face com lado identicamente nulo — as ferramentas vivem lá; a
 aplicação a relu + a lei do resíduo não foram encontradas publicadas na busca.
 
+**CHECK DE PRIOR ART DE T2 (2026-07-24, 4 leitores; fichas em 04-literatura,
+aresta pws-entrada-saida-t2):**
+1. **A lei ∫R dt = 0 é CLÁSSICA e tem nome** — é a função de entrada–saída /
+   Pontryagin delay (De Maesschalck–Schecter, arXiv:1511.01815, eq. 1.4 é
+   exatamente ela; nossa variável rápida cai no caso linear deles com 1/β de
+   pequeno parâmetro). [RESULTADO 2024-26, lido]. A contribuição NÃO é a lei —
+   é onde ela aparece. Rebaixar qualquer linguagem de "lei nova" nos drafts.
+2. **O caso lado-identicamente-nulo está explicitamente EM ABERTO**: Jeffrey 2016
+   (exit from sliding) exige folds genéricos — fora de escopo; Guglielmi–Hairer
+   (limit-reg, lido integral) têm a lei integral num caso degenerado VIZINHO
+   (dupla tangência isolada, ambos os campos ≠ 0) e declaram que os casos
+   não-genéricos "have not been investigated". A ferramenta para atacá-lo existe:
+   Kristiansen, "Blowup for flat slow manifolds" (arXiv:1603.01821, Nonlinearity
+   2017) — variedades lentas exponencialmente achatadas sob regularização tanh,
+   exatamente nosso objeto [NÃO VERIFICADO além do abstract].
+3. **A ponte para ReLU/dying-neurons/treino NÃO EXISTE em lugar nenhum** (16
+   buscas). Nem a versão não-autônoma com forcing R(t) acoplado (vizinho mais
+   próximo: Sensi–Desroches–Rodrigues 2023, input dependente do tempo, só abstract).
+4. **Consistência teoria↔nossos números**: Guglielmi–Hairer preveem saída
+   independente da regularização em codim-1 — bate com nossa independência de β
+   em 4 décadas (0.2%).
+
+**T2 REENQUADRADO (honesto):** não é lei nova; é (i) teorema de caso aberto —
+entrada–saída sobre variedade exponencialmente plana com forcing não-autônomo
+(ferramentas: Kristiansen + DM-S + Sensi), e (ii) PRIMEIRA aplicação da caixa
+entrada–saída/PWS a treino de redes, com corolário físico verificado (ressurreição
+atrasada pela história do resíduo). É exatamente "abrir a caixa": importar, com
+teorema de cola onde a literatura declarou lacuna.
+
 O enunciado original abaixo fica como registro histórico do ciclo (não editar).
 
 ---
