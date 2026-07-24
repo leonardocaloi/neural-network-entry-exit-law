@@ -67,3 +67,15 @@ CONGELADO após t*, que zera flutuação e isola back-reaction).
 `05-experimentos/p5-relu-morte-v2/results/`: runs.jsonl (2700 runs), analise.json,
 falsificacao-p1-p2.png, run-confirmatoria-log.txt. Análise 100% pré-registrada;
 nenhuma estatística pós-hoc entrou no veredito.
+
+## ERRATA (2026-07-24, preditor do v3)
+
+A interpretação acima ("a reabertura estocástica é MECANISMO DE PRIMEIRA ORDEM")
+está **REFUTADA em nível de teoria**: o modelo reduzido 2.0 (cronograma OU exato,
+sem parâmetro livre) prevê p(captura) quase idêntico ao determinístico
+(diferenças ≤0.013 — o smear preserva a média, como o parecer M3 do v2 já havia
+calculado) e taxa de tardias 0.1–1.5% vs ~13.8% observado — insuficiente por uma
+ordem de grandeza. O candidato dominante passa a ser o que esta nota listava
+como "adicional": **back-reaction de A** (ativações transitórias de A seguram o
+resíduo compartilhado, retardando o ajuste de B — sinal correto para AMBOS os
+efeitos). O ciclo v3 testa o modelo 3.0 (acoplado) em vez do 2.0.
