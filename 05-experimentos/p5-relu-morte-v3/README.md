@@ -37,23 +37,36 @@ motivação exploratória — nunca alvo). Braços: relu (9 células) + nulo (me
 seeds) + **B-CONGELADO** (3 células da coluna alvo-0.5: B congelado em
 $t_{freeze} = 25000$ passos, cronograma constante dali em diante — o separador).
 
-## Predições (congelar números via `preditor_v3.py` antes do commit)
+## Números congelados do preditor (modelo 3.0; 2.0 mantido como referência)
 
-- **P-1' (lei de corrida estocástica).** $p(\text{captura})$ por célula prevista
-  pelo modelo 2.0. Régua idêntica ao v2 (captura operacional, censura = não
-  captura). **MATA:** ≥3 células válidas com $|z|>1.96$ OU ≥8 desvios de mesmo
-  sinal — os MESMOS critérios que mataram o v1: o modelo 2.0 enfrenta
-  exatamente o teste que o antecessor reprovou, com dados novos.
-- **P-2' (capturas tardias — de falsificador a predição).** O modelo 2.0 prevê
-  taxa NÃO-nula de capturas com $\tau_1 > \tau_{zero}^{det}$ (janela
-  determinística fechada; $\tau_{zero}$ congelados do v2). **MATA:**
-  $|z|>1.96$ no agregado pooled (aprox. normal da Poisson-binomial por célula).
-- **P-3' (braço separador).** Nas células B-congeladas, o cronograma é constante
-  pós-freeze (valor estocástico do instante do freeze, modelado pelo OU até
-  $t_{freeze}$): captura exatamente integrável. **MATA:** ≥2 de 3 células
-  congeladas com $|z|>1.96$. Desvio AQUI (sem flutuação) implica back-reaction —
-  o desfecho é informativo nos dois sentidos e nenhum confirma a conjectura
-  gratuitamente.
+O 3.0 fecha em média 52% do gap do v2 (faixa 0.15–0.67 por célula) e multiplica
+tardias ~10× sobre o 2.0 — mas NÃO fecha tudo (resíduo +0.02..+0.16 contra os
+dados VELHOS, que são motivação exploratória). Consequência de desenho honesto: um
+MATA binário de P-1' contra dados novos seria quase-decidível (o vício que
+reprovou v1 e o desenho-v2-original). Estrutura final:
+
+- **P-1' (ESTIMAÇÃO, não MATA):** resíduo $p_{obs} - p_{3.0}$ por célula com CI
+  95% (IQM/bootstrap sobre as células) — atribuição quantitativa: quanto da
+  anomalia do v2 a back-reaction carrega em dados virgens. Pré-declarado: se o
+  CI do resíduo médio excluir 0 por cima, o 3.0 é insuficiente
+  ([FALSIFICADO-como-suficiente], esperado); se incluir 0, o 3.0 basta
+  (surpresa registrável).
+- **P-2' (ESTIMAÇÃO — corrigido pelo 3º parecer):** o revisor calculou z
+  esperado 5.4 contra dados velhos (quase-decidível — tardias vêm da MESMA
+  física subprevista de P-1'); vira estimação do resíduo de taxa-tardia por
+  célula + CI, tratamento idêntico a P-1'.
+- **P-3' (MATA binário — CONTRASTE PAREADO, corrigido pelo 3º parecer):** como
+  92–96% das capturas ocorrem ANTES do freeze, o nível absoluto do braço
+  congelado herda o viés do 3.0. O teste correto cancela o viés comum: o
+  contraste pareado por seed $(\text{livre} - \text{congelado})$ observado vs.
+  previsto pelo 3.0 (0.053/0.042/0.043 por célula) — isola o canal de
+  reabertura PÓS-freeze, que o freeze mata por construção. Seeds ampliados nas
+  3 células pareadas (1000–1449, N=450) e MATA no POOLED (1350 pares):
+  $|z|>1.96$. **Potência registrada:** MDE ≈ 0.053 a 80% (conservador, sem
+  crédito de pareamento); por célula é descritivo.
+- **P-1' (CI honesto):** o CI propaga o SE binomial por célula (~0.033 em
+  N=150) além do bootstrap sobre 9 células (n=9 admitido como limitação);
+  pré-declarado que "3.0-INSUFICIENTE" é o desfecho esperado.
 
 Instrumento (não-predição): censura = BM exato (como v2); >30% ⟹ célula
 inválida; <7 válidas ⟹ inconclusivo.

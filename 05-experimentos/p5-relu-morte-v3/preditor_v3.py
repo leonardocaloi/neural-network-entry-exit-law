@@ -86,30 +86,57 @@ class Canon:
         face = np.where((self.tau[i] * f) < N_PASSOS, self.face[i], -1)
         return np.where(face == -1, N_PASSOS, tau), face
 
-# ---------- excursao 1D com cronograma amostrado ---------------------------------
-def excursao(tau, face, R, T, seed):
-    """R: (n_blocos, m, N). Cada walker usa SEU cronograma. Retorna capturas."""
+# ---------- excursao 1D ACOPLADA aos modos de B (modelo 3.0) --------------------
+def amostra_C(tau, T, rng, cap_t=None):
+    """C(tau) exato por walker: media deterministica + ruido acumulado do OU.
+    cap_t: teto de evolucao (freeze)."""
+    t_eff = tau if cap_t is None else np.minimum(tau, cap_t)
+    c0 = (B_INIT - P_STAR) @ V
+    a_t = (1.0 - ETA_B * lam)[None, :] ** t_eff[:, None]
+    a2 = (1.0 - ETA_B * lam) ** 2
+    var_t = 2 * ETA_B * T * (1 - a2[None, :] ** t_eff[:, None]) / (1 - a2)[None, :]
+    return c0[None, :] * a_t + rng.standard_normal((len(tau), 2)) * np.sqrt(var_t)
+
+def excursao_acoplada(tau, face, T, seed, freeze=None):
+    """Modelo 3.0: x (normal de A) acoplado aos modos C de B. Sem parametro livre:
+    o acoplamento e a projecao modal exata da contribuicao relu(z_A) = x*||n_j||
+    no gradiente de B. freeze: B congelado (sem OU nem acoplamento) apos t_freeze."""
     rng = np.random.default_rng(seed)
     m = len(tau); sigma = np.sqrt(2 * ETA * T)
     sigx = np.sqrt(N * T) / NORMA
+    XB = np.vstack([X, np.ones(N)])
+    coup = np.array([ETA_B * COARSE * (NORMA[j] / N) * (V.T @ XB[:, j])
+                     for j in range(N)])          # (N_faces, 2) por bloco
+    sd_blk = np.sqrt(var_mode(T))
     x = np.zeros(m); cap = np.zeros(m, bool)
     ativo = face >= 0
     t_loc = np.zeros(m, np.int64)
-    nb = R.shape[0]
+    C = amostra_C(tau, T, rng, cap_t=freeze)
     while ativo.any():
         ids = np.nonzero(ativo)[0]
-        ruido = rng.standard_normal((len(ids), 1000)) * sigma
-        for s in range(1000):
-            kb = np.minimum((tau[ids] + t_loc[ids]) // COARSE, nb - 1)
-            rj = R[kb, ids, face[ids]]
-            xst = np.maximum(rj, 0.0) / NORMA[face[ids]]   # R>0 = empuxo p/ fora
+        pB = C[ids] @ V.T + P_STAR
+        rj = Y[face[ids]] - np.einsum('ij,ji->i', pB, XB[:, face[ids]])
+        xst = np.maximum(rj, 0.0) / NORMA[face[ids]]
+        ruido = rng.standard_normal((len(ids), COARSE)) * sigma
+        xbar = np.zeros(len(ids))
+        for s in range(COARSE):
             drift = -RHO[face[ids]] * (x[ids] - xst) * (x[ids] > 0)
             x[ids] = x[ids] + drift + ruido[:, s]
+            xbar += np.maximum(x[ids], 0.0)
             lim = sigx[face[ids]]
             pega = (x[ids] >= FRAC_CAPTURA * xst) & (xst >= SIG_MIN_CAPTURA * lim)
             cap[ids] |= pega
-            t_loc[ids] += 1
-        fim = cap[ids] | (tau[ids] + t_loc[ids] >= N_PASSOS) | (t_loc[ids] >= W_LOCAL)
+        xbar /= COARSE
+        t_loc[ids] += COARSE
+        # evolucao de C no bloco: OU + acoplamento (salvo congelados)
+        t_glob = tau[ids] + t_loc[ids]
+        livre = np.ones(len(ids), bool) if freeze is None else (t_glob < freeze)
+        Ci = C[ids]
+        Ci[livre] = (Ci[livre] * A_MODE[None, :]
+                     + rng.standard_normal((livre.sum(), 2)) * sd_blk[None, :]
+                     - xbar[livre, None] * coup[face[ids]][livre])
+        C[ids] = Ci
+        fim = cap[ids] | (t_glob >= N_PASSOS) | (t_loc[ids] >= W_LOCAL)
         ativo[ids[fim]] = False
     return cap
 
@@ -118,14 +145,15 @@ if __name__ == "__main__":
     M = 12_000
     cone = Canon()
     print(f"canonico: censura={np.mean(cone.face==-1):.3f}, face1={np.mean(cone.face==1):.3f}")
-    out = {"constantes": {**CFG2["constantes"], "SEEDS_V3": [1000, 1149],
+    out = {"modelo": "3.0-acoplado (back-reaction)",
+           "referencia_2_0": "config_v3_modelo2_ref.json",
+           "constantes": {**CFG2["constantes"], "SEEDS_V3": [1000, 1149],
                           "T_FREEZE": T_FREEZE, "COARSE": COARSE,
                           "TAU_ZERO_DET": TAU_ZERO_DET, "M_PREDITOR": M},
            "celulas": [], "congeladas": []}
     for d0, T, alvo in CELULAS:
         tau, face = cone.amostra(d0, T, M, int(d0 * 1e4) + int(T * 1e7))
-        R = cronogramas(T, M, N_PASSOS, 7 + int(T * 1e6))
-        cap = excursao(tau, face, R, T, 11 + int(d0 * 1e5))
+        cap = excursao_acoplada(tau, face, T, 11 + int(d0 * 1e5))
         p = float(cap.mean()); se = float(np.sqrt(p * (1 - p) / M))
         tard = (face == 1) & (tau > TAU_ZERO_DET[f"{T:g}"]) & cap
         n_f1 = max(int(((face == 1)).sum()), 1)
@@ -135,8 +163,8 @@ if __name__ == "__main__":
                                "taxa_tardia_face1": taxa_tardia})
         print(f"  T={T} d0={d0:.3f}: p={p:.3f}±{se:.3f}  tardias/face1={taxa_tardia:.3f}")
         if abs(alvo - 0.5) < 1e-9:               # braco B-congelado
-            Rf = cronogramas(T, M, N_PASSOS, 13 + int(T * 1e6), freeze=T_FREEZE)
-            capf = excursao(tau, face, Rf, T, 17 + int(d0 * 1e5))
+            capf = excursao_acoplada(tau, face, T, 17 + int(d0 * 1e5),
+                                     freeze=T_FREEZE)
             pf = float(capf.mean())
             out["congeladas"].append({"d0": d0, "T": T, "p_captura": pf,
                                       "se": float(np.sqrt(pf * (1 - pf) / M))})

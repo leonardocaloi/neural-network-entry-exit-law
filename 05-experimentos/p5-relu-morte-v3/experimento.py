@@ -189,16 +189,21 @@ def confirmatoria():
     cfg = carrega_config()
     n_passos = cfg["constantes"]["N_PASSOS"]
     s0, s1 = cfg["constantes"]["SEEDS_V3"]
-    seeds = list(range(s0, s1 + 1))
+    e0, e1 = cfg["constantes"]["SEEDS_EXT"]
+    seeds_base = list(range(s0, s1 + 1))
+    seeds_ext = list(range(e0, e1 + 1))
     os.makedirs("results", exist_ok=True)
     runs = []
     with open("results/runs.jsonl", "w") as fh:
         for cel in cfg["celulas"]:
+            pareada = abs(cel.get("alvo", 0) - 0.5) < 1e-9
             bracos = [("relu", grad_relu_lote, None), ("nulo", grad_nulo_lote, None)]
-            if abs(cel.get("alvo", 0) - 0.5) < 1e-9:
+            if pareada:
                 bracos.append(("congelado", grad_relu_lote,
                                cfg["constantes"]["T_FREEZE"]))
             for braco, gfl, frz in bracos:
+                seeds = seeds_ext if (pareada and braco in ("relu", "congelado")) \
+                    else seeds_base
                 trajs = roda_lote(seeds, cel["T"], cel["d0"], gfl, n_passos,
                                   freeze=frz)
                 for seed, tr in zip(seeds, trajs):
@@ -241,55 +246,72 @@ def analise(runs, cfg):
                              "p_obs": p_obs, "p_pred": p_pred, "z": float(z),
                              "rejeita": rejeita, "censura_obs": cens,
                              "celula_valida": valida})
-    mesmo_sinal = max(np.sum(np.array(desvios) > 0), np.sum(np.array(desvios) < 0)) \
-        if desvios else 0
-    n_validas = sum(c.get("celula_valida", False) for c in A["celulas"])
-    if n_validas < 7:
-        A["P1_veredito"] = "INCONCLUSIVO-INSTRUMENTO"     # <7 de 9 celulas validas
+    # P-1' (v3): ESTIMACAO do residuo p_obs - p_3.0 (atribuicao de mecanismo)
+    residuos = [c["p_obs"] - c["p_pred"] for c in A["celulas"]
+                if c.get("celula_valida")]
+    rng_b = np.random.default_rng(4242)
+    if len(residuos) >= 7:
+        meds = [float(np.mean(rng_b.choice(residuos, len(residuos))))
+                for _ in range(10_000)]
+        ci = [float(np.percentile(meds, 2.5)), float(np.percentile(meds, 97.5))]
+        A["P1_residuo"] = {"medio": float(np.mean(residuos)), "ci95": ci,
+                           "por_celula": residuos}
+        if ci[0] > 0:
+            A["P1_veredito"] = "3.0-INSUFICIENTE (residuo positivo; esperado)"
+        elif ci[1] < 0:
+            A["P1_veredito"] = "3.0-SOBREPREVE (surpresa)"
+        else:
+            A["P1_veredito"] = "3.0-SUFICIENTE (surpresa registravel)"
     else:
-        A["P1_veredito"] = ("FALHA"
-                            if (A["n_rejeicoes_P1"] >= cfg["constantes"]["P1_MIN_REJEICOES"]
-                                or mesmo_sinal >= cfg["constantes"]["P1_MIN_MESMO_SINAL"])
-                            else "PASSA")
-    A["P1_mesmo_sinal"] = int(mesmo_sinal)
-    A["P1_celulas_validas"] = int(n_validas)
+        A["P1_veredito"] = "INCONCLUSIVO-INSTRUMENTO"
 
-    # P-2' (v3): capturas TARDIAS — de falsificador (v1: E=0) a predicao (modelo 2.0)
+    # P-2' (v3, ESTIMACAO pos-3o-parecer): residuo de taxa-tardia por celula + CI
     tz = cfg["constantes"]["TAU_ZERO_DET"]
-    obs_t, exp_t, var_t = 0, 0.0, 0.0
-    det2 = []
+    resid_t = []
     for cel in cfg["celulas"]:
         rs = [r for r in runs if r["braco"] == "relu" and r["T"] == cel["T"]
               and r["d0"] == cel["d0"] and not r["censurada"] and r["face1"] == 1]
-        n1 = len(rs)
+        if len(rs) < 30:
+            continue
         tzT = tz[f"{cel['T']:g}"]
-        k = sum(1 for r in rs if r["capturada"] and r["tau1"] > tzT)
-        p_t = cel["taxa_tardia_face1"]
-        obs_t += k; exp_t += n1 * p_t; var_t += n1 * p_t * (1 - p_t)
-        det2.append({"T": cel["T"], "d0": cel["d0"], "n_face1": n1,
-                     "tardias_obs": k, "tardias_esp": n1 * p_t})
-    z2 = (obs_t - exp_t) / np.sqrt(max(var_t, 1e-9))
-    A["P2_tardias"] = {"obs": obs_t, "esp": float(exp_t), "z": float(z2),
-                       "celulas": det2}
-    A["P2_veredito"] = "FALHA" if abs(z2) > 1.96 else "PASSA"
+        obs = np.mean([bool(r["capturada"]) and r["tau1"] > tzT for r in rs])
+        resid_t.append(float(obs - cel["taxa_tardia_face1"]))
+    rng_b = np.random.default_rng(4243)
+    meds = [float(np.mean(rng_b.choice(resid_t, len(resid_t))))
+            for _ in range(10_000)]
+    A["P2_residuo_tardias"] = {"medio": float(np.mean(resid_t)),
+                               "ci95": [float(np.percentile(meds, 2.5)),
+                                        float(np.percentile(meds, 97.5))],
+                               "por_celula": resid_t}
 
-    # P-3' (v3): braco B-CONGELADO (separador de back-reaction)
-    det3, rej3 = [], 0
+    # P-3' (v3, CONTRASTE PAREADO pos-3o-parecer): (livre - congelado) por seed,
+    # pooled nas 3 celulas, vs contraste previsto pelo 3.0
+    difs, pred_difs = [], []
+    det3 = []
     for cel in cfg["congeladas"]:
-        rs = [r for r in runs if r["braco"] == "congelado" and r["T"] == cel["T"]
-              and r["d0"] == cel["d0"]]
-        n = len(rs)
-        if n == 0:
-            det3.append({"T": cel["T"], "sem_dados": True}); continue
-        p_obs = sum(r.get("capturada", False) for r in rs) / n
-        se = np.sqrt(max(cel["p_captura"] * (1 - cel["p_captura"]), 1e-9) / n)
-        z3 = (p_obs - cel["p_captura"]) / se
-        r3 = bool(abs(z3) > 1.96)
-        rej3 += int(r3)
-        det3.append({"T": cel["T"], "d0": cel["d0"], "n": n, "p_obs": p_obs,
-                     "p_pred": cel["p_captura"], "z": float(z3), "rejeita": r3})
-    A["P3_congelado"] = {"celulas": det3, "n_rejeicoes": rej3}
-    A["P3_veredito"] = "FALHA" if rej3 >= 2 else "PASSA"
+        livre = {r["seed"]: bool(r.get("capturada", False)) for r in runs
+                 if r["braco"] == "relu" and r["T"] == cel["T"]
+                 and r["d0"] == cel["d0"]}
+        cong = {r["seed"]: bool(r.get("capturada", False)) for r in runs
+                if r["braco"] == "congelado" and r["T"] == cel["T"]
+                and r["d0"] == cel["d0"]}
+        comuns = sorted(set(livre) & set(cong))
+        d = [int(livre[sd]) - int(cong[sd]) for sd in comuns]
+        p_free = next(c["p_captura"] for c in cfg["celulas"]
+                      if c["T"] == cel["T"] and c["d0"] == cel["d0"])
+        pd = p_free - cel["p_captura"]
+        difs.extend(d); pred_difs.extend([pd] * len(d))
+        det3.append({"T": cel["T"], "n_pares": len(d),
+                     "contraste_obs": float(np.mean(d)) if d else None,
+                     "contraste_pred": pd})
+    difs = np.array(difs, float)
+    z3 = ((difs.mean() - np.mean(pred_difs))
+          / (difs.std(ddof=1) / np.sqrt(len(difs)))) if len(difs) > 100 else 0.0
+    A["P3_contraste"] = {"pooled_obs": float(difs.mean()),
+                         "pooled_pred": float(np.mean(pred_difs)),
+                         "z": float(z3), "n_pares": int(len(difs)),
+                         "celulas": det3}
+    A["P3_veredito"] = "FALHA" if abs(z3) > 1.96 else "PASSA"
 
     with open("results/analise.json", "w") as fh:
         json.dump(A, fh, indent=1)
