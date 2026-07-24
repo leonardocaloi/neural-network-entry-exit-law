@@ -138,3 +138,26 @@ v2 testa em N=2; a versão-teorema é um limite adiabático a provar.
 Submeter ESTE enunciado ao ataque adversarial (o mesmo protocolo dos experimentos):
 "C1 é falsa como enunciada? é trivial? já existe? qual é o menor contraexemplo
 candidato?" — só depois disso começar prova.
+
+---
+
+## VEREDITO DA LEITURA DE KRISTIANSEN (2026-07-24; ficha 1603.01821): INVESTIR, ESCOPO REDUZIDO
+
+- Nosso GF-softplus É a classe tanh dele (ε = 2/β); flatness idêntica em espécie.
+- Descoberta operacional: no gauge w = e^{βz} nosso sistema já é ALGÉBRICO — motor
+  da prova = forma quadrática de DM-S + quadratura exata + Grönwall; Kristiansen
+  entra como prior art da classe, justificativa do gauge e templates de canto
+  (Lemma C.1 entrada; C.6–C.7 saída — a contração exponencial de fibras explica
+  nossa independência de β). Ele NÃO tem lei ∫=0 (lacuna reconfirmada).
+- Novo de verdade (ninguém tem): entrada–saída com lado ≡0 sob forcing acoplado
+  não-autônomo; bootstrap R^β ↔ neurônio morto; enunciado híbrido; multi-margem.
+- **T2'-min (alvo de prova):** sob (H1) morte transversal com margem única ativa e
+  (H2) primeiro zero transversal de A(t)=∫cR⁰ em t_exit<T: a trajetória GF-softplus
+  converge (β→∞, uniforme fora de vizinhanças dos 2 cantos) ao sistema híbrido
+  {ativo → sticking → release em t_exit}, com t_release = t_exit + O(β⁻¹ln β).
+  Verificação numérica: erro·β constante por 3 décadas (O(1/β) exato).
+- **Cronograma honesto: 6.5–9 semanas** (5–6 com H3 assumida e DM-S citado);
+  a estimativa anterior de 2–4 era otimista por fator ~2. Dificuldades reais:
+  bootstrap de acoplamento (passo 4) e topologia do enunciado-limite (passo 5).
+  Abertos declarados: cone corank≥2 (ápice), SGLD, horizonte infinito.
+- Pendência antes do passo 3: ler o corpo de Sensi–Desroches–Rodrigues 2023.
