@@ -15,20 +15,30 @@ pró-ativação). Constante de Gram: `c = ‖(x_j,1)‖²/n`.
 
 ## Identidades (I1–I4, todas verificadas simbolicamente)
 
-- **I1 (equação da margem):** enquanto só a face j é relevante,
-  `ż = −c·(softplus_β(z) − R(t))·σ(βz)` com `σ(s) = 1/(1+e^{−s})`.
-  No regime de face (`z ≤ O(β⁻¹ log β)`): `softplus_β(z) = β⁻¹log(1+e^{βz})`
-  contribui `O(β⁻¹ log(1+w))` ⟹ `ż = c·R(t)·σ(βz)·(1 + E_β)` com
-  `|E_β| ≤ β⁻¹log(1+w)/|R|` (erro controlado do passo 1).
-- **I2 (gauge w):** `w = e^{βz}` ⟹ `σ(βz) = w/(1+w)` e, em tempo rápido `τ = βt`:
-  `dw/dτ = c·R(t)·w²/(1+w)·(1+E_β)` — **forma normal QUADRÁTICA de
-  De Maesschalck–Schecter (1511.01815, eqs. 1.9–1.10)** com `f ≡ 1` (lenta:
-  `dt/dτ = 1/β = ε`), `g = c·R/(1+w)`.
-- **I3 (gauge u):** `u = e^{−βz} = 1/w` ⟹ `du/dτ = −c·R(t)·u/(1+u)·(1+E_β)`
+- **I1 (equação da margem):** enquanto só a face $j$ é relevante,
+
+  $$\dot z = -c\,\bigl(\mathrm{softplus}_\beta(z) - R(t)\bigr)\,\sigma(\beta z),\qquad \sigma(s) = \frac{1}{1+e^{-s}}.$$
+
+  No regime de face ($z \le O(\beta^{-1}\log\beta)$), $\mathrm{softplus}_\beta(z) = \beta^{-1}\log(1+e^{\beta z})$ contribui $O(\beta^{-1}\log(1+w))$, logo
+
+  $$\dot z = c\,R(t)\,\sigma(\beta z)\,(1 + E_\beta),\qquad |E_\beta| \le \frac{\log(1+w)}{\beta\,|R|}$$
+
+  (erro controlado do passo 1).
+- **I2 (gauge $w$):** $w = e^{\beta z} \Rightarrow \sigma(\beta z) = \tfrac{w}{1+w}$ e, em tempo rápido $\tau = \beta t$:
+
+  $$\frac{dw}{d\tau} = c\,R(t)\,\frac{w^2}{1+w}\,(1+E_\beta)$$
+
+  — **forma normal QUADRÁTICA de De Maesschalck–Schecter** (1511.01815, eqs. 1.9–1.10) com $f \equiv 1$ (lenta: $dt/d\tau = 1/\beta = \varepsilon$), $g = c R/(1+w)$.
+- **I3 (gauge $u$):** $u = e^{-\beta z} = 1/w \Rightarrow$
+
+  $$\frac{du}{d\tau} = -c\,R(t)\,\frac{u}{1+u}\,(1+E_\beta)$$
+
   (a forma do ataque de 2026-07-24; I2 e I3 são o mesmo objeto).
-- **I4 (lei de área, caso solúvel):** com `R` prescrito e `E_β = 0`, separação de
-  variáveis em I3 dá `Φ(u(τ)) − Φ(u(τ₀)) = −c∫R`, `Φ(u) = log u + u` — release
-  (`u` volta a O(1)) exatamente quando `∫R dt = 0` a menos de `O(β⁻¹ log β)`.
+- **I4 (lei de área, caso solúvel):** com $R$ prescrito e $E_\beta = 0$, separação de variáveis em I3 dá
+
+  $$\Phi\bigl(u(\tau)\bigr) - \Phi\bigl(u(\tau_0)\bigr) = -c\!\int R\,dt,\qquad \Phi(u) = \log u + u$$
+
+  — release ($u$ volta a $O(1)$) exatamente quando $\int R\,dt = 0$, a menos de $O(\beta^{-1}\log\beta)$.
   [Âncora exatamente integrável, papel do Apêndice B de Kristiansen 1603.01821.]
 
 ## Dicionário com a literatura (fixado)
