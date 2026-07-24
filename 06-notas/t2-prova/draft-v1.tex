@@ -155,10 +155,15 @@ $O(\beta^{-1})$ gap (verified). Open: the cone apex (corank $\ge2$), where
 weight decay produces genuine sliding toward the most singular stratum; the
 SGLD gate (pre-registered experiments show the deterministic schedule is
 falsified at first order by persistent residual fluctuations --- the stochastic
-entry--exit is the object of the next cycle); and the non-commutation with discrete-time ReLU training (elementary here,
-since $\mathrm{relu}'(0)=0$ freezes the dead neuron; the relation to the
-broader non-uniqueness literature for ReLU gradient flow is deliberately
-deferred to a verified revision). Conceptual anchors: entry--exit
+entry--exit is the object of the next cycle); and the non-commutation of the two limit orders: the \emph{field-first}
+selection (flow of the pointwise-limit generalized gradient) freezes degenerate
+neurons forever --- this is the rigorous branch of Eberle, Jentzen, Riekert and
+Weiss~\cite{EJRW23}, whose selected solution has non-decreasing degenerate set
+--- whereas our \emph{flow-first} limit ($\beta\to\infty$ of trajectories)
+resurrects by the area law. The two orders do not commute; cf.~\cite{EJRW23}
+for the field-first side (their degenerate stratum is the fully-zero one, not
+literally our functionally dead neuron --- the convention $\mathrm{relu}'(0)=0$
+and the no-revival mechanism are the same). Conceptual anchors: entry--exit
 function~\cite{DMS16,SDR23}; flat slow manifolds~\cite{Kri17}; generic exit
 and regularized-limit theory~\cite{Jef16,GH}; nonsmooth training
 formalism~\cite{BP21}; ReLU--LCP equivalence~\cite{APM20}; dying
@@ -196,6 +201,10 @@ analysis of complementarity systems with neural network controllers},
 arXiv:2011.07626.
 \bibitem{Lu19} L.~Lu, Y.~Shin, Y.~Su, G.~E. Karniadakis, \emph{Dying ReLU and
 initialization: theory and numerical examples}, arXiv:1903.06733.
+\bibitem{EJRW23} S.~Eberle, A.~Jentzen, A.~Riekert, G.~S. Weiss,
+\emph{Existence, uniqueness, and convergence rates for gradient flows in the
+training of artificial neural networks with ReLU activation},
+Electron.~Res.~Arch.\ 31 (2023) 2519--2554; arXiv:2108.08106.
 \bibitem{ST98} J.~Sotomayor, M.~A. Teixeira, \emph{Regularization of
 discontinuous vector fields}, in: Int.\ Conf.\ on Differential Equations
 (Lisboa 1995), World Scientific, 1998, pp.~207--223.
