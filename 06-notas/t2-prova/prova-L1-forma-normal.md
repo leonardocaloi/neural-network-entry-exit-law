@@ -55,7 +55,7 @@ $$\int_{t_{hit}}^{t_{release}} c\,\log(1+w(s))\,ds \;=\; O\!\left(\frac{\log\bet
 
 ## Consequência imediata (usada em L4/L5)
 
-$\Phi(u(t)) = \Phi(u_0) - c\beta A(t) + O(\log\beta)$ uniformemente no episódio
+$\Phi(u(t)) = \Phi(u_0) - c\beta A(t) + O(\log\beta/\beta)$ uniformemente no episódio [corrigido pela prova-L4: a corr é a integral TEMPORAL, $O(\log\beta/\beta)$ em unidades de $\Phi$]
 — a forma que sustenta a profundidade $u = c\beta|A|(1+o(1))$ em compactos e o
 release em $t_{exit} + O(\beta^{-1})$ (o erro $O(\log\beta)$ em $\Phi$ traduz-se
 em $O(\log\beta/(\beta\,c\,R(t_{exit})))$... refinando pela transversalidade:
