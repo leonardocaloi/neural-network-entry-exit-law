@@ -31,12 +31,12 @@ $$\sup_{[t_1,t_2]}\bigl\|\theta_B^\beta - \theta_B^0\bigr\|
 \;\le\; \frac{e^{L (t_2-t_1)} - 1}{L}\; C_f\,\frac{\log(1+w_{\max})}{\beta}
 \;=\; O\!\left(\beta^{-1}\right),$$
 
-com $C_f$ = fator de Gram do acoplamento. **Nota:** isto MELHORA a estimativa
-$O(\beta^{-1}\ln\beta)$ do relatório de leitura — o $\ln\beta$ só seria necessário
-se $w_{\max}$ crescesse polinomialmente em $\beta$, o que (H2) + lei de área
-excluem ($\Phi(u)=\log u + u$ limitada $\Rightarrow$ $u,w = O(1)$ no episódio).
-A melhora é condicional ao passo 3 fechar $w_{\max}=O(1)$; manter
-$O(\beta^{-1}\log\beta)$ como fallback seguro no enunciado de T2'-min.
+com $C_f$ = fator de Gram do acoplamento. **Nota (corrigida pelo passo 3):** a explicação original aqui ("$u=O(1)$ no
+episódio") estava ERRADA — em tempo lento $\Phi = \Phi_0 - c\beta A(t)$, logo
+$u = O(\beta)$ no miolo e $w = 1/u = O(\beta^{-1})$ ⟹ feedback
+$O(\beta^{-2})$ no miolo (verificado: feedback$\cdot\beta^2 \approx 43$ const).
+A cota $O(\beta^{-1})$ de L1.2 permanece válida, dominada pelas janelas de quina
+($w \sim O(1)$) — e explica a superconvergência empírica observada abaixo.
 
 **Prova (esboço numerado).** (1) $\dot\Delta = F_B(\theta_B^\beta) -
 F_B(\theta_B^0) + G_A$, $\|G_A\| \le C_f\,\mathrm{softplus}_\beta(z_A)$;
