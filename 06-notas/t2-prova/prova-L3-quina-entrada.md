@@ -24,8 +24,17 @@ instância vs $K_{emp} = 7.13$ medido — desvio 1.1%.
    $\sigma$ na camada: $\int e^{-\beta z}dt = \frac{1}{\beta v}\int_0^\infty
    e^{-s}(1+e^{-s})\,ds\,(1+o(1)) = \frac{3/2}{\beta v}(1+o(1))$ —
    constante prevista e confirmada a $<1\%$ na verificação (c).
-   Bootstrap padrão para a autoconsistência do peso ($z^\beta$ no lugar de $z^0$
-   custa fator $e^{CK}$ absorvido). Logo $\Delta\theta(t_{\delta}) = O(1/(\beta v))$.
+   **Autoconsistência do peso, por extenso (rota monótona, sem ponto fixo
+   exponencial):** como $e^{-\beta z}$ é decrescente em $z$, o fluxo com
+   inomogeneidade avaliada em qualquer sub-solução $z_- \le z^\beta$ MAJORA a
+   inomogeneidade verdadeira. Itere: $z^{(0)} = z^0$;
+   $z^{(k+1)}$ = solução com peso $e^{-\beta z^{(k)}}$. A iteração é monótona
+   decrescente e limitada por baixo pela sub-solução do relu com folga
+   $2C/(\beta v)$ (pois o incremento de cada passo é
+   $\le C/(\beta v)\cdot\sup e^{\beta(z^{(k)}-z^{(k+1)})}$, e enquanto
+   $|z^{(k)}-z^{(k+1)}| \le 1/\beta$ o fator é $\le e$, mantido pelo tamanho do
+   incremento — indução em $k$). Logo converge a $z^\beta$ com
+   $\Delta\theta(t_\delta) = O(1/(\beta v))$, sem exigir $C_2 e^{c'K} \le K$.
 2. **Identidade da travessia da janela.** Em $[0, \delta_z]$ as velocidades são
    $v_0(z) = v(1+O(\delta_z))$ (relu) e $v_\beta(z) = v_0(z)\,\sigma(\beta z) + O(\beta^{-1})$
    (softplus). A diferença de tempos de travessia é

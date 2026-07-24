@@ -16,7 +16,9 @@ entrada/saída: cada quina contribui o recíproco da sua velocidade transversal.
 
 1. **Propriedade de bootstrap.** $\mathcal{P}_s$: em $[t_{cross}, s]$,
    (a) $\sup\|\theta_B^\beta - \theta_B^{hyb}\| < 2M_2\log\beta/\beta^2$ e
-   (b) $z(t) < \beta^{-1}\log w_0 - \beta^{-1}$ (camada com margem ESTRITA), com
+   (b) $z(t) < \beta^{-1}\log w_0 - \beta^{-1}$ para $t \ge t_{cross} + C_{colar}/\beta$
+   (camada estrita APÓS um colar de entrada $O(1/\beta)$ — em $t_{cross}$ o $z$
+   cruza $\beta^{-1}\log w_0$ continuamente; correção do 2º parecer), com
    $M_2 = e^{L_B T} C_f C_4/c$ explícita (cadeia L2∘L1).
 2. **Abertura no início:** L3 dá o dado inicial com folga ($O(\beta^{-1})$ em
    $\theta$, camada atingida transversalmente); as quantidades de $\mathcal{P}_s$

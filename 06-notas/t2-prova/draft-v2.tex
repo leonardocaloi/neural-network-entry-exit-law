@@ -7,7 +7,7 @@
 \newtheorem{remark}{Remark}
 \newcommand{\R}{\mathbb{R}}
 \title{Dead neurons resurrect by an entry--exit law:\\ the smoothed-ReLU limit of
-training dynamics at an activation boundary\\ \large DRAFT v2 --- 2026-07-24 --- all six lemmas fully proved ---
+training dynamics at an activation boundary\\ \large DRAFT v2.1 --- 2026-07-24 --- all six lemmas fully proved; referee list applied ---
 not for circulation; pending adversarial review}
 \author{L.~Caloi Santos}
 \date{}
@@ -67,7 +67,7 @@ Under (H1)--(H4), for every $\delta>0$,
 \|\theta^\beta(t)-\theta^\infty(t)\| = O_\delta\!\left(\tfrac{\log\beta}{\beta}\right),
 \qquad
 t^\beta_{release}=t_{exit}-\frac{1}{c\,R^{hyb}(t_{exit})}\cdot\frac{1}{\beta}
-+O\!\left(\tfrac{\log\beta}{\beta^{2}}\right),
++o(\beta^{-1}),
 \]
 where $t^\beta_{release}$ is the first return of the margin $z$ to $0$ after
 death. The $\log\beta$ in the sup is sharp and is carried solely by the normal
@@ -78,7 +78,10 @@ exponentially frozen. The first-order release coefficient is \emph{universal}:
 in the product (entry delay $\times$ area cut) the arrival speed cancels,
 leaving the reciprocal exit speed --- each corner contributes the reciprocal of
 its transversal speed, symmetrically (entry: $+1/(c|R^{hyb}(t_{hit})|\beta)$ on
-$t_{hit}$; exit: $-1/(cR^{hyb}(t_{exit})\beta)$ on $t_{release}$).
+$t_{hit}$; exit: $-1/(cR^{hyb}(t_{exit})\beta)$ on $t_{release}$). The remainder is
+$o(\beta^{-1})$ as proved; numerics suggest $O(\log\beta/\beta^2)$, which would
+follow from quantifying the $o(1)$ of Lemma~\ref{lem:corner-in} with
+$\delta_z=\log\beta/\beta$ --- left as a stated refinement.
 The limit is that of the regularized flow: discrete ReLU gradient descent
 freezes the dead neuron forever (the limits do not commute).
 \end{theorem}
@@ -97,7 +100,8 @@ quadrature $d\Phi/dt=-c\beta R(t)(1+E_\beta)$.
 \begin{lemma}[B-subsystem and feedback]\label{lem:gronwall}
 Under (H4) the $B$-field is affine with Lipschitz constant
 $L_B=\lambda_{\max}(G_B)$ and $R^{hyb}$ is affine in $\theta_B$. Integral
-Gr\"onwall consuming the bound of Lemma~\ref{lem:gauge} gives the refined rate
+Gr\"onwall consuming the bound of Lemma~\ref{lem:gauge} gives, \emph{conditionally
+on the layer being maintained} (supplied by Lemma~\ref{lem:bootstrap}), the refined rate
 $\sup\|\theta_B^\beta-\theta_B^{hyb}\|= O(\log\beta/\beta^{2})$ --- one full
 order better than the naive $O(\beta^{-1})$: in the bulk $u=O(\beta|A|)$, so the
 coupling is $O(\beta^{-2})$ there and $O(\beta^{-1})$ only in the
@@ -132,12 +136,15 @@ $\le c\,\delta\,(t_{exit}-t_{hit})/|A'(t_{exit})|+O(\delta^2)$.
 \begin{lemma}[coupled bootstrap]\label{lem:bootstrap}
 Continuation with strict margins: the property ``$\theta_B$ is
 $2M_2\log\beta/\beta^2$-close to the hybrid and the margin stays strictly in
-the layer'' is nonempty (Lemma~\ref{lem:corner-in}), open (strict inequalities
+the layer after an $O(\beta^{-1})$ entry collar'' is nonempty (Lemma~\ref{lem:corner-in}), open (strict inequalities
 + continuity) and closed (the assumption returns the better constant $M_2$
 via Lemma~\ref{lem:gronwall}, and Lemma~\ref{lem:release} with
 $\delta=O(\log\beta/\beta^2)$ keeps the layer up to
-$t_{exit}-C_\varepsilon\log\beta/\beta$), with $M_2=e^{L_BT}C_fC_4/c$ explicit
-and independent of the hypothesis. The terminal window is handled by
+$t_{exit}-C_\varepsilon\log\beta/\beta$), with $M_2=e^{L_BT}C_fC_4/c$
+independent of the hypothesis for $\beta\ge\beta_0$ (a finite threshold traceable
+through the chain of constants, not exhibited); with the empirical $C_4=10.6$,
+$M_2=440.8$; with the proved bound $C_4\le29.6$ (which further omits a
+$T/a_0$ term, $a_0\approx0.02$ in the instance), $M_2\le1233$. The terminal window is handled by
 Lemma~\ref{lem:release}(ii)--(iii); the entry corner cuts initial area
 $\approx R^{hyb}(t_{hit})K/\beta$, advancing the exit by
 $K|R^{hyb}(t_{hit})|/(R^{hyb}(t_{exit})\beta)=1/(cR^{hyb}(t_{exit})\beta)$ ---
@@ -169,12 +176,16 @@ $\theta_B(0)=(1.144,0.261)$; $t_{hit}=0.1114$, $t_{exit}=1.1325$,
 $\delta_1=0.508$. Every empirically measured constant is now predicted by the
 proofs (scripts \texttt{passo0--6}, \texttt{prova\_L1--L6}): entry coefficient
 $K_{teo}=1/(c|R^{hyb}(t_{hit})|)=7.04$ vs $7.13$ fitted ($1.2\%$); weighted
-approach $\tfrac{3}{2}/v$ to $<1\%$; depth ratio $\to1$ ($0.888\to0.982$);
+approach $\tfrac{3}{2}/v$ to $<1\%$; depth ratio $\to1$ ($0.888\to0.982$; coarser prescribed-$R$ run, own
+$t_{exit}=1.1352$);
 bulk feedback $\times\beta^2\approx43$ constant; prescribed-$R$ release delay
-$=\mathrm{corr}/(cR_{exit})$ at $0.2$--$1\%$; coupled two-term law
-$(-1+\mathrm{corr})/(cR_{exit})$ reproducing the sweep
+$=\mathrm{corr}/(cR_{exit})$ at $0.2\%/1.0\%/9.5\%$ (the last collapsing
+$35\%\to9.5\%$ under $5\times$ grid refinement); coupled two-term law
+$(-1+\mathrm{corr})/(cR_{exit})$ reproducing the fine-grid coupled sweep
 $-12.74/-13.93/-14.38/-14.68$ at $1.9\%/0.7\%/0.2\%/0.1\%$ (universal
-coefficient $1/(cR_{exit})=14.815$); gluing metric $0.21$--$0.23$; tangential
+coefficient $1/(cR_{exit})=14.815$; against $-14.68$ the leading coefficient
+alone is at $2.1\%$); gluing metric $0.205$--$0.227$; layer check vacuous for
+$\beta\le3000$ (conservative $C_\varepsilon$) and confirmed at $\beta=10^4$; tangential
 drift at machine zero.
 
 \section{Regularization independence; discussion}\label{sec:reg}
@@ -220,8 +231,8 @@ and geometric singular perturbation theory}, J.~Diff.~Eq.\ 260 (2016) 6697--6715
 \bibitem{Kri17} K.~U. Kristiansen, \emph{Blowup for flat slow manifolds},
 arXiv:1603.01821 (Nonlinearity, 2017).
 \bibitem{GH} N.~Guglielmi, E.~Hairer, \emph{On the limit solution of regularized
-piecewise-smooth dynamical systems}, preprint (Univ.\ Geneva); foundational
-results in SIAM J.~Appl.~Dyn.~Syst.\ 14 (2015) 1454--1477.
+piecewise-smooth dynamical systems}, preprint, Univ.\ Geneva, 2019 (read in
+full); foundational results in SIAM J.~Appl.~Dyn.~Syst.\ 14 (2015) 1454--1477.
 \bibitem{Jef16} M.~R. Jeffrey, \emph{Exit from sliding in piecewise-smooth
 flows: deterministic vs.\ determinacy-breaking}, Chaos 26 (2016) 033108.
 \bibitem{BP21} J.~Bolte, E.~Pauwels, \emph{Conservative set-valued fields,
