@@ -1,0 +1,334 @@
+<title>O Portão com Memória — caderno vivo</title>
+<style>
+:root{
+  --papel:#FAF7F0; --grade:#e4ddd0; --tinta:#26313E; --tinta-fraca:#8a94a0;
+  --azul:#26547C; --rosa:#EF476F; --verde:#069F79; --amarelo:#B8860B;
+  --carta:#fffdf8; --sombra:rgba(38,49,62,.12);
+}
+@media (prefers-color-scheme: dark){:root{
+  --papel:#12151C; --grade:#222835; --tinta:#E8E4D8; --tinta-fraca:#7d8593;
+  --azul:#7FB3E0; --rosa:#FF6B93; --verde:#2EE6A8; --amarelo:#E6C36B;
+  --carta:#181d27; --sombra:rgba(0,0,0,.45);
+}}
+:root[data-theme="dark"]{
+  --papel:#12151C; --grade:#222835; --tinta:#E8E4D8; --tinta-fraca:#7d8593;
+  --azul:#7FB3E0; --rosa:#FF6B93; --verde:#2EE6A8; --amarelo:#E6C36B;
+  --carta:#181d27; --sombra:rgba(0,0,0,.45);
+}
+:root[data-theme="light"]{
+  --papel:#FAF7F0; --grade:#e4ddd0; --tinta:#26313E; --tinta-fraca:#8a94a0;
+  --azul:#26547C; --rosa:#EF476F; --verde:#069F79; --amarelo:#B8860B;
+  --carta:#fffdf8; --sombra:rgba(38,49,62,.12);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--papel); color:var(--tinta);
+  background-image:linear-gradient(var(--grade) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grade) 1px,transparent 1px);
+  background-size:28px 28px;
+  font-family:Georgia,'Iowan Old Style',serif;
+}
+header{padding:18px 22px 6px}
+h1{margin:0;font-size:1.5rem;font-weight:normal;font-style:italic}
+h1 b{font-style:normal}
+.sub{color:var(--tinta-fraca);font-size:.85rem;margin-top:2px}
+.lei{font-family:ui-monospace,Menlo,monospace;font-size:.8rem;color:var(--amarelo)}
+#painel{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;
+  padding:10px 22px;font-size:.8rem}
+#painel label{display:flex;gap:6px;align-items:center;color:var(--tinta-fraca);
+  text-transform:uppercase;letter-spacing:.06em;font-size:.66rem}
+#painel input[type=range]{width:110px;accent-color:var(--azul)}
+button{font:inherit;font-size:.8rem;background:var(--carta);color:var(--tinta);
+  border:1.5px solid var(--tinta);border-radius:3px;padding:5px 12px;cursor:pointer;
+  box-shadow:2px 2px 0 var(--sombra)}
+button:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--sombra)}
+button:focus-visible{outline:2px dashed var(--azul);outline-offset:2px}
+button.on{background:var(--rosa);color:#fff;border-color:var(--rosa)}
+#mesa{display:grid;grid-template-columns:minmax(340px,1.15fr) minmax(300px,1fr);
+  gap:16px;padding:6px 22px 8px;max-width:1180px}
+@media (max-width:780px){#mesa{grid-template-columns:1fr}}
+.folha{background:var(--carta);border:1.5px solid var(--tinta);border-radius:4px;
+  box-shadow:3px 4px 0 var(--sombra);padding:8px 10px 4px;position:relative}
+.folha h2{margin:0 0 2px;font-size:.72rem;font-weight:normal;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--tinta-fraca)}
+canvas{width:100%;display:block}
+#coluna{display:flex;flex-direction:column;gap:16px}
+#nota{max-width:1180px;padding:2px 22px 18px;font-size:.86rem}
+#log{font-family:ui-monospace,Menlo,monospace;font-size:.72rem;line-height:1.7;
+  color:var(--tinta-fraca);white-space:pre-wrap}
+#estado{font-size:.98rem;margin-bottom:4px}
+.viva{color:var(--verde)} .morta{color:var(--rosa)}
+@media (prefers-reduced-motion: reduce){button:hover{transform:none}}
+</style>
+
+<header>
+  <h1><b>O Portão com Memória</b> — um neurônio morre, a cola acumula, e ele só volta quando a história se paga</h1>
+  <div class="sub">Simulação real (SGLD, 2 neurônios, os mesmos parâmetros do teorema T2′-min) rodando ao vivo.
+  A lei provada: <span class="lei">release quando ∫R dt = 0</span> — a área tem de zerar.</div>
+</header>
+
+<div id="painel">
+  <button id="play">⏸ pausar</button>
+  <button id="seed">↺ novo destino</button>
+  <button id="frz">🧊 congelar B</button>
+  <button id="png">💾 salvar PNG</button>
+  <label>velocidade<input id="vel" type="range" min="0" max="100" value="55"></label>
+  <label>temperatura T<input id="tmp" type="range" min="0" max="100" value="40"></label>
+  <label>rigidez β<input id="bet" type="range" min="0" max="100" value="100"></label>
+  <span id="leituras" class="lei"></span>
+</div>
+
+<div id="mesa">
+  <div class="folha">
+    <h2>espaço de pesos do neurônio A — o cone da morte</h2>
+    <canvas id="cvW" width="620" height="560"></canvas>
+  </div>
+  <div id="coluna">
+    <div class="folha">
+      <h2>o que a rede vê — a função e as duas âncoras</h2>
+      <canvas id="cvF" width="560" height="250"></canvas>
+    </div>
+    <div class="folha">
+      <h2>linha do tempo — margem z(t) e a área ∫R dt</h2>
+      <canvas id="cvT" width="560" height="250"></canvas>
+    </div>
+  </div>
+</div>
+
+<div id="nota">
+  <div id="estado"></div>
+  <div id="log"></div>
+</div>
+
+<script>
+"use strict";
+/* ---------- física (porta fiel do experimento) ---------- */
+const X=[0.5,1.5], Y=[0.5,1.0], N=2, ETA_A=1e-3, ETA_B=1e-4;
+let T=1e-3, BETA=Infinity;                     // beta=Inf -> relu puro
+let seed=20260724>>>0;
+function rng(){ seed|=0; seed=(seed+0x6D2B79F5)|0;
+  let t=Math.imul(seed^(seed>>>15),1|seed);
+  t=(t+Math.imul(t^(t>>>7),61|t))^t; return ((t^(t>>>14))>>>0)/4294967296; }
+let sobra=null;
+function gauss(){ if(sobra!==null){const v=sobra;sobra=null;return v}
+  const u=Math.max(rng(),1e-12), v=rng(), r=Math.sqrt(-2*Math.log(u));
+  sobra=r*Math.sin(6.2831853*v); return r*Math.cos(6.2831853*v); }
+function act(z){ if(BETA===Infinity) return Math.max(z,0);
+  const s=BETA*z; return s>30? z : Math.log(1+Math.exp(s))/BETA; }
+function dact(z){ if(BETA===Infinity) return z>0?1:0;
+  const s=BETA*z; return s>30?1:(s<-30?0:1/(1+Math.exp(-s))); }
+
+let pA,pB,t,frzB, morta,tMorte,faceMorte, area, trilha, eventos, marcas;
+function reset(novo){
+  if(novo) seed=(Math.floor(Math.random()*1e9))>>>0;
+  pA=[-0.5,0.27]; pB=[1.144,0.261]; t=0; frzB=false; document.getElementById('frz').classList.remove('on');
+  morta=false; tMorte=0; faceMorte=0; area=0;
+  trilha=[]; eventos=[]; marcas=[];
+  hist.length=0;
+  anota(novo? "novo destino sorteado — mesma física, outro acaso":"início — A vivo, B ajustando");
+}
+function passo(){
+  const zA=[pA[0]*X[0]+pA[1], pA[0]*X[1]+pA[1]];
+  const zB=[pB[0]*X[0]+pB[1], pB[0]*X[1]+pB[1]];
+  const r=[act(zA[0])+act(zB[0])-Y[0], act(zA[1])+act(zB[1])-Y[1]];
+  const gA=[(r[0]*dact(zA[0])*X[0]+r[1]*dact(zA[1])*X[1])/N,
+            (r[0]*dact(zA[0])+r[1]*dact(zA[1]))/N];
+  const sA=Math.sqrt(2*ETA_A*T);
+  pA[0]-=ETA_A*gA[0]-sA*gauss(); pA[1]-=ETA_A*gA[1]-sA*gauss();
+  if(!frzB){
+    const gB=[(r[0]*dact(zB[0])*X[0]+r[1]*dact(zB[1])*X[1])/N,
+              (r[0]*dact(zB[0])+r[1]*dact(zB[1]))/N];
+    const sB=Math.sqrt(2*ETA_B*T);
+    pB[0]-=ETA_B*gB[0]-sB*gauss(); pB[1]-=ETA_B*gB[1]-sB*gauss();
+  }
+  t++;
+  const mortaAgora = zA[0]<=0 && zA[1]<=0;
+  const jStar = zA[0]>zA[1]?0:1;
+  if(mortaAgora && !morta){ morta=true; tMorte=t; area=0; faceMorte=jStar;
+    marcas.push({p:[...pA],cor:'rosa'});
+    anota(`t=${t}  ✝ A morreu (encostou pela face x=${X[jStar]})`); }
+  if(morta){
+    const R = Y[jStar]-act(zB[jStar]);       // resíduo excluindo A, face líder
+    area += R*ETA_A;                          // ∫R dt  (dt = η por passo)
+    if(!mortaAgora){ morta=false;
+      marcas.push({p:[...pA],cor:'verde'});
+      anota(`t=${t}  ☀ RESSUSCITOU — área ∫R dt cruzou zero (durou ${t-tMorte} passos de cola)`); }
+  }
+  return {zA,zB,jStar};
+}
+/* ---------- histórico p/ linha do tempo ---------- */
+const hist=[];  // {t, zmax, area, morta}
+function grava(s){ hist.push({t:t, zmax:Math.max(s.zA[0],s.zA[1]), area:morta?area:0, m:morta});
+  if(hist.length>2600) hist.splice(0,hist.length-2600); }
+
+/* ---------- tinta (traço à mão: 2 passadas com jitter) ---------- */
+let boil=0;
+function j(i,k){ const x=Math.sin(i*127.1+k*311.7+boil)*43758.5453; return (x-Math.floor(x)-0.5); }
+function tinta(ctx,pts,cor,w,tremor=1.1){
+  ctx.strokeStyle=cor; ctx.lineCap='round'; ctx.lineJoin='round';
+  for(let p=0;p<2;p++){ ctx.lineWidth=w*(p?0.55:1); ctx.globalAlpha=p?0.5:0.9;
+    ctx.beginPath();
+    for(let i=0;i<pts.length;i++){
+      const dx=j(i,p)*tremor, dy=j(i,p+7)*tremor;
+      i?ctx.lineTo(pts[i][0]+dx,pts[i][1]+dy):ctx.moveTo(pts[i][0]+dx,pts[i][1]+dy);
+    } ctx.stroke(); }
+  ctx.globalAlpha=1;
+}
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+/* ---------- vista 1: espaço de pesos ---------- */
+const cvW=document.getElementById('cvW'), cxW=cvW.getContext('2d');
+const WV={x0:-1.35,x1:0.95,y0:-1.05,y1:1.05};
+const mx=w=>( (w-WV.x0)/(WV.x1-WV.x0) )*cvW.width;
+const my=b=>( 1-(b-WV.y0)/(WV.y1-WV.y0) )*cvW.height;
+function vistaPesos(){
+  const tin=css('--tinta'), fr=css('--tinta-fraca'), az=css('--azul'),
+        ro=css('--rosa'), ve=css('--verde'), ct=css('--carta');
+  cxW.fillStyle=ct; cxW.fillRect(0,0,cvW.width,cvW.height);
+  // cone da morte: w*x_i + b <= 0 (ambos) -> hachura
+  cxW.save(); cxW.beginPath();
+  cxW.moveTo(mx(WV.x0),my(Math.min(-WV.x0*X[0],-WV.x0*X[1])));
+  for(let w=WV.x0;w<=WV.x1;w+=0.02) cxW.lineTo(mx(w),my(Math.min(-w*X[0],-w*X[1])));
+  cxW.lineTo(mx(WV.x1),my(WV.y0)); cxW.lineTo(mx(WV.x0),my(WV.y0)); cxW.closePath(); cxW.clip();
+  cxW.strokeStyle=fr; cxW.globalAlpha=0.35; cxW.lineWidth=1;
+  for(let k=-40;k<40;k++){ cxW.beginPath();
+    cxW.moveTo(mx(WV.x0)+k*22, my(WV.y0)); cxW.lineTo(mx(WV.x0)+k*22+300, my(WV.y1)); cxW.stroke(); }
+  cxW.globalAlpha=1; cxW.restore();
+  // fronteiras (faces)
+  for(const xi of X){
+    tinta(cxW,[[mx(WV.x0),my(-WV.x0*xi)],[mx(WV.x1),my(-WV.x1*xi)]],fr,1.4);
+  }
+  cxW.fillStyle=fr; cxW.font='italic 13px Georgia';
+  cxW.fillText('face do dado x=0.5', mx(0.30), my(-0.30*X[0])-8);
+  cxW.fillText('face do dado x=1.5', mx(0.42), my(-0.42*X[1])-8);
+  cxW.font='italic 15px Georgia';
+  cxW.fillText('CONE DA MORTE', mx(-0.95), my(-0.62));
+  cxW.font='12px Georgia'; cxW.fillText('(campo = 0 exato: só o acaso caminha aqui)', mx(-1.05), my(-0.72));
+  // trilha
+  if(trilha.length>1){
+    for(let i=1;i<trilha.length;i++){
+      const a=i/trilha.length;
+      cxW.globalAlpha=0.08+0.75*a*a; cxW.strokeStyle=az; cxW.lineWidth=1.6;
+      cxW.beginPath(); cxW.moveTo(mx(trilha[i-1][0]),my(trilha[i-1][1]));
+      cxW.lineTo(mx(trilha[i][0]),my(trilha[i][1])); cxW.stroke();
+    } cxW.globalAlpha=1;
+  }
+  // marcas de morte/ressurreição
+  for(const m of marcas.slice(-8)){
+    cxW.fillStyle = m.cor==='rosa'?ro:ve;
+    cxW.beginPath(); cxW.arc(mx(m.p[0]),my(m.p[1]),5,0,7); cxW.fill();
+  }
+  // partícula
+  cxW.fillStyle=morta?ro:az;
+  cxW.beginPath(); cxW.arc(mx(pA[0]),my(pA[1]),7,0,7); cxW.fill();
+  cxW.strokeStyle=tin; cxW.lineWidth=1.5; cxW.stroke();
+  // eixos
+  cxW.fillStyle=fr; cxW.font='12px ui-monospace,monospace';
+  cxW.fillText('w_A →', cvW.width-52, my(0)-6); cxW.fillText('b_A ↑', mx(0)+6, 14);
+  tinta(cxW,[[mx(WV.x0),my(0)],[mx(WV.x1),my(0)]],fr,0.7,0.6);
+  tinta(cxW,[[mx(0),my(WV.y0)],[mx(0),my(WV.y1)]],fr,0.7,0.6);
+}
+
+/* ---------- vista 2: espaço da função ---------- */
+const cvF=document.getElementById('cvF'), cxF=cvF.getContext('2d');
+function vistaFuncao(){
+  const fr=css('--tinta-fraca'), az=css('--azul'), ro=css('--rosa'),
+        ve=css('--verde'), ct=css('--carta'), tin=css('--tinta');
+  const fx=x=>x/2.1*cvF.width, fy=v=>cvF.height-24-(v/1.45)*(cvF.height-48);
+  cxF.fillStyle=ct; cxF.fillRect(0,0,cvF.width,cvF.height);
+  tinta(cxF,[[0,fy(0)],[cvF.width,fy(0)]],fr,0.8,0.5);
+  // curva total e parcelas
+  const tot=[],hA=[],hB=[];
+  for(let x=0;x<=2.1;x+=0.03){
+    const a=act(pA[0]*x+pA[1]), b=act(pB[0]*x+pB[1]);
+    tot.push([fx(x),fy(a+b)]); hA.push([fx(x),fy(a)]); hB.push([fx(x),fy(b)]);
+  }
+  cxF.setLineDash([5,4]); tinta(cxF,hB,fr,1.1); cxF.setLineDash([]);
+  tinta(cxF,hA,morta?ro:ve,1.6);
+  tinta(cxF,tot,az,2.2);
+  // âncoras (dados)
+  cxF.strokeStyle=tin; cxF.lineWidth=2;
+  for(let i=0;i<2;i++){ const px=fx(X[i]),py=fy(Y[i]);
+    cxF.beginPath(); cxF.moveTo(px-6,py-6); cxF.lineTo(px+6,py+6);
+    cxF.moveTo(px+6,py-6); cxF.lineTo(px-6,py+6); cxF.stroke(); }
+  cxF.fillStyle=fr; cxF.font='italic 12px Georgia';
+  cxF.fillText('rede f(x)', 8, fy(1.32));
+  cxF.fillText(morta?'dobradiça de A (morta — plana)':'dobradiça de A', 8, fy(1.32)+16);
+  cxF.fillText('dobradiça de B (tracejada)', 8, fy(1.32)+32);
+}
+
+/* ---------- vista 3: linha do tempo ---------- */
+const cvT=document.getElementById('cvT'), cxT=cvT.getContext('2d');
+function vistaTempo(){
+  const fr=css('--tinta-fraca'), az=css('--azul'), ro=css('--rosa'),
+        ve=css('--verde'), ct=css('--carta');
+  cxT.fillStyle=ct; cxT.fillRect(0,0,cvT.width,cvT.height);
+  if(hist.length<3) return;
+  const n=hist.length, W=cvT.width, mid1=cvT.height*0.30, mid2=cvT.height*0.74;
+  const tx=i=>i/(n-1)*W;
+  // faixa 1: margem z_max
+  let zmax=0.05; for(const h of hist) zmax=Math.max(zmax,Math.abs(h.zmax));
+  tinta(cxT,[[0,mid1],[W,mid1]],fr,0.7,0.4);
+  const zpts=hist.map((h,i)=>[tx(i), mid1-(h.zmax/zmax)*(cvT.height*0.24)]);
+  // colorir por estado: desenhar em segmentos
+  let seg=[],estado=hist[0].m;
+  for(let i=0;i<n;i++){ if(hist[i].m!==estado||i===n-1){
+      tinta(cxT,seg,estado?ro:az,1.5); seg=[zpts[i]]; estado=hist[i].m;
+    } else seg.push(zpts[i]); }
+  cxT.fillStyle=fr; cxT.font='italic 11px Georgia';
+  cxT.fillText('margem z(t) — abaixo da linha = morto (rosa)', 6, 13);
+  // faixa 2: área ∫R dt (só nos episódios mortos)
+  let am=1e-9; for(const h of hist) am=Math.max(am,Math.abs(h.area));
+  tinta(cxT,[[0,mid2],[W,mid2]],fr,0.7,0.4);
+  cxT.fillStyle=ve; cxT.globalAlpha=0.25;
+  for(let i=1;i<n;i++){ if(hist[i].m){
+      const y=mid2-(hist[i].area/am)*(cvT.height*0.20);
+      cxT.fillRect(tx(i-1), Math.min(mid2,y), Math.max(1,W/n), Math.abs(mid2-y)); } }
+  cxT.globalAlpha=1;
+  const apts=hist.map((h,i)=>[tx(i), mid2-(h.area/am)*(cvT.height*0.20)]);
+  tinta(cxT,apts,ve,1.4);
+  cxT.fillStyle=fr;
+  cxT.fillText('área ∫R dt do episódio — o portão abre quando ela volta a zero', 6, mid2-cvT.height*0.22);
+}
+
+/* ---------- laço, controles, anotações ---------- */
+const elLog=document.getElementById('log'), elEst=document.getElementById('estado'),
+      elLei=document.getElementById('leituras');
+function anota(s){ eventos.push(s); if(eventos.length>7)eventos.shift();
+  elLog.textContent=eventos.map(e=>'· '+e).join('\n'); }
+let rodando=true, subpassos=800, quadro=0;
+function laço(){
+  if(rodando){ let s=null;
+    for(let k=0;k<subpassos;k++){ s=passo();
+      if(k%40===0){ trilha.push([...pA]); if(trilha.length>900)trilha.shift(); } }
+    grava(s);
+  }
+  if(quadro%12===0) boil=Math.random()*10;   // o traço "respira" devagar
+  vistaPesos(); vistaFuncao(); vistaTempo();
+  elEst.innerHTML = morta
+    ? `estado: <b class="morta">MORTO</b> há ${(t-tMorte).toLocaleString('pt-BR')} passos — a cola segura; área atual ${area.toFixed(4)} (precisa zerar)`
+    : `estado: <b class="viva">VIVO</b> — a dobradiça de A trabalha; B ${frzB?'<b>CONGELADO</b>':'ajustando'}`;
+  elLei.textContent=` t=${t.toLocaleString('pt-BR')}  ·  T=${T.toExponential(0)}  ·  β=${BETA===Infinity?'∞ (ReLU)':BETA.toFixed(0)}  ·  ${subpassos}/quadro`;
+  quadro++; requestAnimationFrame(laço);
+}
+document.getElementById('play').onclick=e=>{ rodando=!rodando;
+  e.target.textContent=rodando?'⏸ pausar':'▶ tocar'; };
+document.getElementById('seed').onclick=()=>reset(true);
+document.getElementById('frz').onclick=e=>{ frzB=!frzB; e.target.classList.toggle('on',frzB);
+  anota(frzB? `t=${t}  🧊 B congelado — sem back-reaction: se A morrer agora, o portão vira só acaso`
+            : `t=${t}  B liberado`); };
+document.getElementById('vel').oninput=e=>{ subpassos=Math.round(50*Math.pow(100,e.target.value/100)); };
+document.getElementById('tmp').oninput=e=>{ T=1e-4*Math.pow(100,e.target.value/100); };
+document.getElementById('bet').oninput=e=>{ const v=+e.target.value;
+  BETA = v>97 ? Infinity : 30*Math.pow(100,v/100); };
+document.getElementById('png').onclick=()=>{
+  const c=document.createElement('canvas'); c.width=1240; c.height=640;
+  const g=c.getContext('2d'); g.fillStyle=css('--papel'); g.fillRect(0,0,c.width,c.height);
+  g.fillStyle=css('--tinta'); g.font='italic 22px Georgia';
+  g.fillText(`O Portão com Memória — t=${t}  (T=${T.toExponential(0)}, β=${BETA===Infinity?'∞':BETA.toFixed(0)})`,20,34);
+  g.drawImage(cvW,20,60,600,540); g.drawImage(cvF,640,60,580,260); g.drawImage(cvT,640,340,580,260);
+  const a=document.createElement('a'); a.download=`portao-t${t}.png`; a.href=c.toDataURL('image/png'); a.click();
+  anota(`t=${t}  💾 quadro salvo em PNG`);
+};
+reset(false); laço();
+</script>
