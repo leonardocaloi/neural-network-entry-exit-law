@@ -33,7 +33,7 @@ def roda(seed, T, nulo=False):
 
 
 def metricas(traj):
-    """d = distância ao estrato mais próximo; F_n = |componente do gradiente normal a ele|."""
+    """d = distância ao estrato mais próximo; r_N = |componente do gradiente normal a ele|."""
     a = np.abs(traj)
     perto_w2 = a[:, 1] <= a[:, 0]        # estrato {w2=0} é o mais próximo
     d = np.where(perto_w2, a[:, 1], a[:, 0])
@@ -72,7 +72,7 @@ def main():
                     "tang2_inicio": float(tt[:1000].mean()) if tt.size > 1000 else None,
                     "tang2_fim": float(tt[-1000:].mean()) if tt.size > 1000 else None,
                 }) + "\n")
-                # P-b: ocupação (log d, log F_n)
+                # P-b: ocupação (log d, log r_N)
                 ld = np.log10(np.clip(d, 1e-8, None))
                 lf = np.log10(np.clip(fn, 1e-10, None))
                 h, _, _ = np.histogram2d(ld, lf, bins=C.BINS_OCUPACAO,
@@ -92,7 +92,7 @@ def main():
             ax.imshow(np.log1p(h).T, origin="lower", extent=[-8, 1, -10, 1], aspect="auto")
             ax.set_title(k, fontsize=9)
             ax.set_xlabel("log10 d")
-            ax.set_ylabel("log10 F_n")
+            ax.set_ylabel("log10 r_N")
         fig.tight_layout()
         fig.savefig("results/ocupacao.png", dpi=150)
         print("[ok] results/ocupacao.png")

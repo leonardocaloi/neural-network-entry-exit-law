@@ -13,7 +13,7 @@ Dinâmica: SGLD — `w ← w − η ∇L + √(2ηT) ξ`, ξ ~ N(0, I), temperat
 ## Leitura de contato (hipótese P5, [ESPECULAÇÃO])
 
 Tomando o estrato `{w2=0}` como "parede": distância `d = |w2|`, e a "reação de apoio"
-(proxy) é a componente do gradiente normal ao estrato, `F_n = |∂L/∂w2| = 2 w1² |w2|`,
+(proxy) é a componente do gradiente normal ao estrato, `r_N = |∂L/∂w2| = 2 w1² |w2|`,
 com rigidez local de contato `k(w1) = ∂²L/∂w2²|_{w2=0} = 2 w1²`.
 
 ## Predições falsificáveis (escritas ANTES de rodar)
@@ -21,9 +21,9 @@ com rigidez local de contato `k(w1) = ∂²L/∂w2²|_{w2=0} = 2 w1²`.
 **P-a (pouso e deslize).** Trajetórias atingem `d < δ` em tempo finito e PERMANECEM
 (fração de tempo em contato → 1 após o pouso), em vez de cruzar e recruzar como difusão livre.
 
-**P-b (complementaridade ocupacional).** No plano (d, F_n), a ocupação concentra nos dois
-braços (d≈0 com F_n variável ao longo do estrato; ou F_n≈0) e o quadrante "proibido"
-(d e F_n simultaneamente grandes, relativo ao baseline) fica vazio ordens de magnitude
+**P-b (complementaridade ocupacional).** No plano (d, r_N), a ocupação concentra nos dois
+braços (d≈0 com r_N variável ao longo do estrato; ou r_N≈0) e o quadrante "proibido"
+(d e r_N simultaneamente grandes, relativo ao baseline) fica vazio ordens de magnitude
 além do que o baseline nulo produz.
 
 **P-c (deriva entrópica para o estrato mais degenerado).** Em contato com `{w2=0}`, a força
@@ -39,7 +39,7 @@ a analogia de contato não descreve nem o caso mínimo → registrar negativa e 
 ## Baseline nulo
 
 Mesma dinâmica com `L=0` (passeio aleatório puro, mesma T, mesmos seeds): define a ocupação
-de (d, F_n) e a deriva de ⟨w1²⟩ esperadas SEM mecanismo — tudo em P-a/b/c é medido contra isso.
+de (d, r_N) e a deriva de ⟨w1²⟩ esperadas SEM mecanismo — tudo em P-a/b/c é medido contra isso.
 
 ## Execução
 

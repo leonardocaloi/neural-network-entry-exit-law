@@ -11,4 +11,4 @@ DELTA_CONTATO = 0.05              # d < δ conta como "em contato"
 # Janelas de medição (fixadas a priori):
 JANELA_POUSO = (0, 50_000)        # onde se mede tempo-até-contato (P-a)
 JANELA_DERIVA = (50_000, 200_000) # onde se mede d<w1²>/dt em contato (P-c)
-BINS_OCUPACAO = 60                # heatmap (d, F_n) em escala log (P-b)
+BINS_OCUPACAO = 60                # heatmap (d, r_N) em escala log (P-b)
