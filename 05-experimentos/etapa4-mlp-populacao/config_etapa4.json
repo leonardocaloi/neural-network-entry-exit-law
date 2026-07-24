@@ -1,0 +1,211 @@
+{
+ "exp": "exp05",
+ "etapa": "4a",
+ "commit_calibracao": "bd09a6b",
+ "dados": {
+  "tipo": "1dreg",
+  "n": 32,
+  "func": "sin(2x)+0.3x, x~U[0,2]",
+  "full_batch": true
+ },
+ "arquitetura": {
+  "init_w_b": "N(0,1)",
+  "init_v": "N(0,1/m)"
+ },
+ "device": {
+  "pin": "cpu",
+  "torch_deterministic": true,
+  "threads_por_worker": 1,
+  "justificativa": "B4 do 6o parecer: pareamento por seed exige device unico; modelos minusculos nao pagam overhead de GPU"
+ },
+ "grade": {
+  "m": [
+   16,
+   64,
+   256
+  ],
+  "eta": 0.0003,
+  "passos": 100000,
+  "seeds": [
+   1700,
+   1701,
+   1702,
+   1703,
+   1704,
+   1705,
+   1706,
+   1707,
+   1708,
+   1709,
+   1710,
+   1711,
+   1712,
+   1713,
+   1714,
+   1715,
+   1716,
+   1717,
+   1718,
+   1719
+  ],
+  "bracos": [
+   {
+    "nome": "softplus",
+    "ativ": "softplus",
+    "beta": 300.0,
+    "T": 0.001
+   },
+   {
+    "nome": "erf",
+    "ativ": "erf",
+    "beta": 300.0,
+    "T": 0.001
+   },
+   {
+    "nome": "gelu",
+    "ativ": "gelu",
+    "beta": null,
+    "T": 0.001
+   },
+   {
+    "nome": "relu",
+    "ativ": "relu",
+    "beta": null,
+    "T": 0.001
+   },
+   {
+    "nome": "T0",
+    "ativ": "softplus",
+    "beta": 300.0,
+    "T": 0.0
+   },
+   {
+    "nome": "freeze",
+    "ativ": "softplus",
+    "beta": 300.0,
+    "T": 0.001,
+    "freeze_meio_mortos": true
+   },
+   {
+    "nome": "embaralha",
+    "ativ": "softplus",
+    "beta": 300.0,
+    "T": 0.001,
+    "embaralha": true
+   },
+   {
+    "nome": "semgrad",
+    "ativ": "softplus",
+    "beta": 300.0,
+    "T": 0.001,
+    "sem_grad": true
+   },
+   {
+    "nome": "Tmenor",
+    "ativ": "softplus",
+    "beta": 300.0,
+    "T": 0.0003
+   },
+   {
+    "nome": "Tmaior",
+    "ativ": "softplus",
+    "beta": 300.0,
+    "T": 0.003
+   }
+  ]
+ },
+ "regua": {
+  "limiar": "2*sqrt(n*T)/norm((x_jstar,1)); T com piso 1e-7",
+  "delta_snapshot": 1,
+  "phi_v": "1/(4*sqrt(m))",
+  "q": 2,
+  "q_j": 0,
+  "min_limpos_por_celula": 30,
+  "min_limpos_por_seed_placebo": 2,
+  "calibracao": {
+   "pareado_toy": "34/34",
+   "rel_err_area": 0.534,
+   "rel_err_sinal": 0.851,
+   "erro_intrinseco": "atraso O(1/beta) do teorema"
+  }
+ },
+ "P_A": {
+  "braco": "softplus",
+  "alpha": 0.01,
+  "teste": "sinais entre seeds da fracao-de-vitorias>1/2 (empate/sem-episodios = fracasso; seeds com <3 episodios limpos excluidas, criterio recalculado)",
+  "k_critico_20_seeds": 16,
+  "placebo": {
+   "tipo": "atraso-permutado dentro da mesma seed",
+   "rng_seed": 777
+  },
+  "mata": "area nao vence sinal OU vence sinal mas nao placebo",
+  "agregacao": "avaliado POR celula de m (validas: >=30 limpos); memoria demonstrada se passa (sinal E placebo) em >=2 de 3 celulas validas INCLUINDO m=16; MATA se falha em TODAS as validas; resto = parcial"
+ },
+ "P_B": {
+  "bracos": [
+   "softplus",
+   "erf"
+  ],
+  "piso_rel": 0.05,
+  "alpha": 0.01,
+  "correcao_multipla": "Bonferroni: alpha/3 por estatistica",
+  "estatisticas": [
+   "frac_censurada",
+   "mediana_dur",
+   "n_limpos"
+  ],
+  "teste": "sinais bilateral entre seeds do Delta pareado",
+  "mata": "(sig E |Delta|rel>piso) em alguma estatistica, em >=2 de 3 celulas de m"
+ },
+ "P_B_linha": {
+  "braco": "gelu",
+  "tipo": "EXPLORATORIO fora-da-classe"
+ },
+ "P_C": {
+  "tipo": "ANCORA/ESTIMACAO",
+  "bracos": [
+   "relu",
+   "softplus"
+  ],
+  "report": "frac censurada com CI; permanente-por-mecanismo (grad=0 verificado) separado de censurado"
+ },
+ "P_D": {
+  "bracos": [
+   "freeze",
+   "softplus"
+  ],
+  "piso": "1% da duracao mediana de episodio do controle",
+  "B_boot": 10000,
+  "rng_seed": 778,
+  "mata": "CI95 da mediana(Delta t_res) contem 0 E |mediana|<piso"
+ },
+ "P_E": {
+  "tipo": "ESTIMACAO",
+  "superficies": [
+   "frac_censurada x (T,m)",
+   "medianas t_res e duracao x m",
+   "fracao-limpa x m",
+   "qualidade da predicao-area x m",
+   "fracao morte-por-saida e v_cruzou x m"
+  ]
+ },
+ "P_NULL": {
+  "braco": "semgrad",
+  "criterio": "P-A NAO pode passar (area nao vence placebo); se passar, instrumento viciado -> tudo invalido"
+ },
+ "potencia_P_A": {
+  "modelo": "binomial exata, n_ep=30/seed",
+  "curva": {
+   "0.55": 0.109,
+   "0.60": 0.734,
+   "0.62": 0.911,
+   "0.65": 0.992,
+   "0.70": 1.0
+  },
+  "MDE_power_0.8": 0.62
+ },
+ "resultados": {
+  "formato": "results/{braco}-m{m}-s{seed}.json.gz",
+  "git": "raw fica local (regeneravel, deterministico); manifest com SHA256 + agregados sao commitados"
+ }
+}
