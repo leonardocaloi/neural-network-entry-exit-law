@@ -1,6 +1,13 @@
 # p5-cruz — assinatura de contato na singularidade mínima
 
-**Registrado antes de rodar: 2026-07-23. Status: NÃO RODADO.**
+**ARQUIVADO 2026-07-24 — reprovado em auditoria adversarial SEM rodar** (predições
+satisfeitas por construção em loss suave: r_N·d = 2L; mecanismo de P-c cancela na
+ordem adiabática — derivações na nota 06-notas/2026-07-24-relu-morte-lemas-e-reprova.md).
+Mantido como registro histórico íntegro do desenho. O potencial `w1²w2²` (λ=1/2
+exato) fica reutilizável como âncora analítica do futuro `llc-patch-test`
+(experimento NOVO, a pré-registrar na fase LLC). Não emendar, não rodar.
+
+**Registrado antes de rodar: 2026-07-23. Status original: NÃO RODADO.**
 
 ## Objeto
 
