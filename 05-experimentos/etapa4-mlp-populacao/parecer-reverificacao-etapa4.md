@@ -81,3 +81,33 @@ Nenhum é escolha pós-hoc disfarçada; são inconsistências de documentação.
 ### Resumo executivo
 
 B1, B2, B3, B4: sanados e verificados por execução. P-C rebaixado e P-B reenquadrado: corretos. O que reprova é uma coisa só, mas é a coluna vertebral: **o placebo — a resposta da casa à crítica de decidibilidade de P-A — não segura o α que declara** (FPR até 58× o nominal no regime realista de episódios/seed), por um viés de truncamento que a validação sintética não podia pegar porque fabrica um nulo que o instrumento real não produz. Consertar o placebo (ou trocar a estatística), refazer o `--sintetico` com nulo truncado e demonstrar nível — aí o pacote está pronto para o commit de pré-registro. As sete correções menores (rótulo do (a2), MIN_EP_SEED como campo, guarda S>0 no P-D, report de sem-t_area, condição da potência, prosa do piso P-D, gate P-B) cabem no mesmo passe.
+
+---
+
+# 2ª rodada (mesmo revisor, contexto preservado) — VEREDITO: APTO (commit 8788b83)
+
+Condição de saída verificada e reproduzida pelo revisor: `_fabrica` respeita o
+invariante do instrumento; FPR = 0.000/0.000/0.010 (n_ep 8/40/200, α=0.01) e
+TPR = 1.000 reproduzidos; `_km`/`_amostra_km` verificados contra casos à mão
+(ECDF exata; massa censurada preservada, 0.375 exato). **Ataque próprio do
+revisor:** 21 configurações de nulo truncado — 7 famílias de F (cauda pesada
+σ=1.5, bimodal, quantizada com empates, átomo 30%, truncamento pesado,
+uniforme, durações largas σ=1.2) × n_ep ∈ {3, 40, 200}, S=20 seeds reais.
+Pior FPR: 0.040 (compatível com α=0.01 dado R=100 e 21 comparações); resto
+≤ 0.02. Nível robusto. Potência sob tracking fraco (atraso=0.5·dur,
+σ_rel=0.5): TPR 0.07/0.42/1.00 para n_ep 10/40/200 — com ~170 episódios/seed
+do piloto, adequada; escassez de limpos (m=256) erra na direção honesta
+(MATA/parcial, não falso positivo). `preditor.py` regenera o config
+byte-idêntico; as 7 menores conferidas no diff.
+
+Pontos de ceticismo da casa respondidos: (a) KM dos mesmos dados = bootstrap
+paramétrico clássico, consistente sob H0, custo de amostra finita limitado
+pelas simulações (inclusive canto n_ep=3); (b) má-especificação de F̂ sob H1
+afeta só potência; (c) FPR=0.000 é conservadorismo leve (B=199 na demo;
+análise real usa B=1000); (d) atacado com 7 famílias — segurou.
+
+Não-bloqueantes registradas: (1) caveat de tendência temporal comum
+(rejeição 10% só sob tendência ~fator e) → desarmado com o descritivo
+pré-registrado corr(dur,t_morte)/corr(atraso,t_morte) no P-E (implementado
+antes do freeze); (2) edge T_b=None em p_calibrado — anti-conservador em
+princípio, nunca disparou em ~2100 mundos; mantido.

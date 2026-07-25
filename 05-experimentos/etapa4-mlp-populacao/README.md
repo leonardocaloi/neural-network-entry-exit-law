@@ -1,7 +1,9 @@
 # etapa4-mlp-populacao (exp05 / etapa-4a) — estatística populacional de morte/ressurreição numa MLP real
 
-**STATUS: CANDIDATO A PRÉ-REGISTRO — aguardando re-revisão dos blockers do 6º
-parecer. NÃO RODAR runs confirmatórias antes do commit de pré-registro.**
+**STATUS: PRÉ-REGISTRADO — este commit é o pré-registro.** Trilha: 6º parecer
+NÃO APTO → correções (bd09a6b, 1cba68b) → 7º parecer NÃO APTO (blocker no
+placebo) → P-A reconstruído com nulo calibrado (8788b83) → 2ª rodada do 7º
+parecer: **APTO** (ataque com 7 famílias de F; nível robusto). Runs: §7.
 
 Supersede `README-rascunho.md` (mantido como registro do desenho pré-parecer).
 Parecer integral: `parecer-desenho-etapa4.md`. Respostas item-a-item:
@@ -150,6 +152,13 @@ célula vale para P-A E P-B (7º parecer).
 
 Riscos herdados do rascunho §8 (lavagem por m corpos = risco-1; censura;
 chatter na fronteira) mitigados por filtro-limpo + censura + limiar calibrado.
+**Caveat de interpretação de P-A (7º parecer, 2ª rodada):** o H₀ calibrado é
+"atraso ⊥ duração, iid dentro da célula"; uma tendência temporal COMUM forte
+(durações e atrasos encolhendo juntos no treino, ~fator e no horizonte) pode
+rejeitar sem memória por-episódio (rejeição medida: 10% sob tendência forte,
+0% sob metade dela). Desarme pré-registrado: P-E reporta corr(dur, t_morte) e
+corr(atraso, t_morte) por célula — se P-A passar COM correlações fortes, o
+resultado é rebaixado a "memória OU tendência comum" na nota.
 **Desvios pós-execução: (nenhum ainda — seção obrigatória).**
 
 ## 7. Ordem de execução

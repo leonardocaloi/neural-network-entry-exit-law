@@ -115,7 +115,11 @@ if __name__ == "__main__":
         "P_E": {"tipo": "ESTIMACAO", "superficies": [
             "frac_censurada x (T,m)", "medianas t_res e duracao x m",
             "fracao-limpa x m", "qualidade da predicao-area x m",
-            "fracao morte-por-saida e v_cruzou x m"]},
+            "fracao morte-por-saida e v_cruzou x m",
+            "corr(dur,t_morte) e corr(atraso,t_morte) por celula — descritivo "
+            "de tendencia temporal comum (7o parecer 2a rodada: tendencia "
+            "forte comum pode rejeitar o nulo iid sem memoria por-episodio; "
+            "reportar desarma a objecao)"]},
         "P_NULL": {"braco": "semgrad",
                    "criterio": "P-A calibrado NAO pode passar em nenhuma celula; "
                                "se passar, instrumento/calibracao viciados -> "

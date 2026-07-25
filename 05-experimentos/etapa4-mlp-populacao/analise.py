@@ -348,7 +348,7 @@ def analise_PE(dados, pa):
             if not cel:
                 continue
             tot = cens = limp = saida = cruzou = 0
-            durs, t_ress = [], []
+            durs, t_ress, tms, atrs, tms_a = [], [], [], [], []
             for s in cel:
                 for ep in cel[s]["episodios"]:
                     tot += 1
@@ -358,14 +358,26 @@ def analise_PE(dados, pa):
                     if completo(ep) and eh_limpo(ep, m):
                         limp += 1
                         durs.append(ep["t_res"] - ep["t_morte"])
-                        t_ress.append(ep["t_res"])
+                        t_ress.append(ep["t_res"]); tms.append(ep["t_morte"])
+                        if ep["t_area"] >= 0:
+                            atrs.append(ep["t_area"] - ep["t_morte"])
+                            tms_a.append(ep["t_morte"])
+            # descritivo pré-registrado (7º parecer, 2ª rodada): tendência
+            # temporal comum — dur e atraso correlacionados com t_morte fariam
+            # o nulo iid rejeitar sem memória por-episódio; reportar desarma
+            def _corr(a, b):
+                return (round(float(np.corrcoef(a, b)[0, 1]), 3)
+                        if len(a) >= 3 and np.std(a) > 0 and np.std(b) > 0
+                        else None)
             out[f"{braco}-m{m}"] = dict(
                 episodios=tot, frac_censurada=round(cens / tot, 3) if tot else None,
                 frac_limpa=round(limp / max(tot - cens, 1), 3),
                 frac_morte_por_saida=round(saida / tot, 3) if tot else None,
                 frac_v_cruzou=round(cruzou / tot, 3) if tot else None,
                 mediana_dur=float(np.median(durs)) if durs else None,
-                mediana_t_res=float(np.median(t_ress)) if t_ress else None)
+                mediana_t_res=float(np.median(t_ress)) if t_ress else None,
+                corr_dur_tmorte=_corr(tms, durs),
+                corr_atraso_tmorte=_corr(tms_a, atrs))
     qual = {str(m): dict(T_obs=pa["celulas"][str(m)]["T_obs"],
                          p_calibrado=pa["celulas"][str(m)]["p_calibrado"],
                          frac_sem_area=pa["celulas"][str(m)]["frac_sem_area"])
