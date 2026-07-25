@@ -72,9 +72,12 @@ if __name__ == "__main__":
     os.makedirs(RESDIR, exist_ok=True)
     specs = [(b, m, s) for b in CFG["grade"]["bracos"]
              for m in CFG["grade"]["m"] for s in CFG["grade"]["seeds"]]
-    print(f"{len(specs)} runs; device={CFG['device']['pin']}; Pool 6 nice-19")
+    # nº de workers é INFRA (cada run é determinística e independente do pool);
+    # ajustável por env p/ respeitar a carga da máquina sem tocar na ciência
+    nw = int(os.environ.get("ETAPA4_WORKERS", "6"))
+    print(f"{len(specs)} runs; device={CFG['device']['pin']}; Pool {nw} nice-19")
     feitos = 0
-    with ProcessPoolExecutor(max_workers=6, initializer=worker_init) as ex:
+    with ProcessPoolExecutor(max_workers=nw, initializer=worker_init) as ex:
         for caminho, info in ex.map(job, specs):
             feitos += 1
             if feitos % 20 == 0 or info != "pulado":
