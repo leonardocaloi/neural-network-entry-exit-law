@@ -1,0 +1,601 @@
+{
+  "por_braco": {
+    "relu": {
+      "n_runs": 60,
+      "n_seeds": 30,
+      "n_born_dead": 110,
+      "n_born_rev": 0,
+      "n_dyn": 13,
+      "n_voltas": 0,
+      "n_terminais": 13,
+      "n_censurados": 0,
+      "n_area_abriu": 0,
+      "n_voltas_area": 0,
+      "rate_boot": [
+        0.21666666666666667,
+        0.11666666666666667,
+        0.3333333333333333
+      ],
+      "rate_pois": [
+        0.21666666666666667,
+        0.11536587485006336,
+        0.37050659863598123
+      ],
+      "p_volta_morte": [
+        0.0,
+        0.0,
+        0.24705263800047092
+      ],
+      "p_volta_morte_boot": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "p_volta_area": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "n_ordenados": 0,
+      "cp_ordenados": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "anomalias": []
+    },
+    "sp-b10": {
+      "n_runs": 60,
+      "n_seeds": 30,
+      "n_born_dead": 110,
+      "n_born_rev": 20,
+      "n_dyn": 18,
+      "n_voltas": 4,
+      "n_terminais": 9,
+      "n_censurados": 5,
+      "n_area_abriu": 6,
+      "n_voltas_area": 1,
+      "rate_boot": [
+        0.3,
+        0.18333333333333332,
+        0.43333333333333335
+      ],
+      "rate_pois": [
+        0.3,
+        0.1777990130066588,
+        0.47412933779213307
+      ],
+      "p_volta_morte": [
+        0.2222222222222222,
+        0.0640920477176665,
+        0.4763727657364801
+      ],
+      "p_volta_morte_boot": [
+        0.2222222222222222,
+        0.05555555555555555,
+        0.4117647058823529
+      ],
+      "p_volta_area": [
+        0.16666666666666666,
+        0.00421074451448947,
+        0.6412345789976748
+      ],
+      "n_ordenados": 1,
+      "cp_ordenados": [
+        0.25,
+        0.006309463209709866,
+        0.8058795503167565
+      ],
+      "anomalias": [
+        [
+          "volta_sem_area",
+          "sp-b10",
+          4,
+          106,
+          1
+        ],
+        [
+          "volta_sem_area",
+          "sp-b10",
+          4,
+          112,
+          2
+        ],
+        [
+          "volta_sem_area",
+          "sp-b10",
+          6,
+          114,
+          2
+        ]
+      ]
+    },
+    "sp-b3": {
+      "n_runs": 60,
+      "n_seeds": 30,
+      "n_born_dead": 110,
+      "n_born_rev": 36,
+      "n_dyn": 16,
+      "n_voltas": 6,
+      "n_terminais": 5,
+      "n_censurados": 5,
+      "n_area_abriu": 10,
+      "n_voltas_area": 5,
+      "rate_boot": [
+        0.26666666666666666,
+        0.16666666666666666,
+        0.38333333333333336
+      ],
+      "rate_pois": [
+        0.26666666666666666,
+        0.1524230408940254,
+        0.433049959959349
+      ],
+      "p_volta_morte": [
+        0.375,
+        0.15198367508112207,
+        0.6456539056979218
+      ],
+      "p_volta_morte_boot": [
+        0.375,
+        0.1111111111111111,
+        0.6470588235294118
+      ],
+      "p_volta_area": [
+        0.5,
+        0.18708602844739855,
+        0.8129139715526015
+      ],
+      "n_ordenados": 2,
+      "cp_ordenados": [
+        0.3333333333333333,
+        0.043271868292741676,
+        0.7772219044964879
+      ],
+      "anomalias": [
+        [
+          "volta_sem_area",
+          "sp-b3",
+          6,
+          114,
+          2
+        ]
+      ]
+    },
+    "sp-b300": {
+      "n_runs": 60,
+      "n_seeds": 30,
+      "n_born_dead": 110,
+      "n_born_rev": 1,
+      "n_dyn": 13,
+      "n_voltas": 0,
+      "n_terminais": 13,
+      "n_censurados": 0,
+      "n_area_abriu": 0,
+      "n_voltas_area": 0,
+      "rate_boot": [
+        0.21666666666666667,
+        0.11666666666666667,
+        0.3333333333333333
+      ],
+      "rate_pois": [
+        0.21666666666666667,
+        0.11536587485006336,
+        0.37050659863598123
+      ],
+      "p_volta_morte": [
+        0.0,
+        0.0,
+        0.24705263800047092
+      ],
+      "p_volta_morte_boot": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "p_volta_area": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "n_ordenados": 0,
+      "cp_ordenados": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "anomalias": []
+    }
+  },
+  "por_braco_m": {
+    "relu-m4": {
+      "n_runs": 30,
+      "n_seeds": 30,
+      "n_born_dead": 48,
+      "n_born_rev": 0,
+      "n_dyn": 7,
+      "n_voltas": 0,
+      "n_terminais": 7,
+      "n_censurados": 0,
+      "n_area_abriu": 0,
+      "n_voltas_area": 0,
+      "rate_boot": [
+        0.23333333333333334,
+        0.1,
+        0.4
+      ],
+      "rate_pois": [
+        0.23333333333333334,
+        0.09381210171732884,
+        0.4807558453900792
+      ],
+      "p_volta_morte": [
+        0.0,
+        0.0,
+        0.40961639722500337
+      ],
+      "p_volta_morte_boot": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "p_volta_area": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "n_ordenados": 0,
+      "cp_ordenados": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "anomalias": []
+    },
+    "relu-m6": {
+      "n_runs": 30,
+      "n_seeds": 30,
+      "n_born_dead": 62,
+      "n_born_rev": 0,
+      "n_dyn": 6,
+      "n_voltas": 0,
+      "n_terminais": 6,
+      "n_censurados": 0,
+      "n_area_abriu": 0,
+      "n_voltas_area": 0,
+      "rate_boot": [
+        0.2,
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "rate_pois": [
+        0.2,
+        0.07339647511636169,
+        0.43531580075062287
+      ],
+      "p_volta_morte": [
+        0.0,
+        0.0,
+        0.45925812643990044
+      ],
+      "p_volta_morte_boot": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "p_volta_area": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "n_ordenados": 0,
+      "cp_ordenados": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "anomalias": []
+    },
+    "sp-b10-m4": {
+      "n_runs": 30,
+      "n_seeds": 30,
+      "n_born_dead": 48,
+      "n_born_rev": 10,
+      "n_dyn": 9,
+      "n_voltas": 2,
+      "n_terminais": 5,
+      "n_censurados": 2,
+      "n_area_abriu": 2,
+      "n_voltas_area": 0,
+      "rate_boot": [
+        0.3,
+        0.13333333333333333,
+        0.4666666666666667
+      ],
+      "rate_pois": [
+        0.3,
+        0.13717910324594446,
+        0.5694934483806389
+      ],
+      "p_volta_morte": [
+        0.2222222222222222,
+        0.028144973477898197,
+        0.600093573716312
+      ],
+      "p_volta_morte_boot": [
+        0.2222222222222222,
+        0.0,
+        0.5454545454545454
+      ],
+      "p_volta_area": [
+        0.0,
+        0.0,
+        0.841886116991581
+      ],
+      "n_ordenados": 0,
+      "cp_ordenados": [
+        0.0,
+        0.0,
+        0.841886116991581
+      ],
+      "anomalias": [
+        [
+          "volta_sem_area",
+          "sp-b10",
+          4,
+          106,
+          1
+        ],
+        [
+          "volta_sem_area",
+          "sp-b10",
+          4,
+          112,
+          2
+        ]
+      ]
+    },
+    "sp-b10-m6": {
+      "n_runs": 30,
+      "n_seeds": 30,
+      "n_born_dead": 62,
+      "n_born_rev": 10,
+      "n_dyn": 9,
+      "n_voltas": 2,
+      "n_terminais": 4,
+      "n_censurados": 3,
+      "n_area_abriu": 4,
+      "n_voltas_area": 1,
+      "rate_boot": [
+        0.3,
+        0.13333333333333333,
+        0.5
+      ],
+      "rate_pois": [
+        0.3,
+        0.13717910324594446,
+        0.5694934483806389
+      ],
+      "p_volta_morte": [
+        0.2222222222222222,
+        0.028144973477898197,
+        0.600093573716312
+      ],
+      "p_volta_morte_boot": [
+        0.2222222222222222,
+        0.0,
+        0.5714285714285714
+      ],
+      "p_volta_area": [
+        0.25,
+        0.006309463209709866,
+        0.8058795503167565
+      ],
+      "n_ordenados": 1,
+      "cp_ordenados": [
+        0.5,
+        0.01257911709342505,
+        0.9874208829065749
+      ],
+      "anomalias": [
+        [
+          "volta_sem_area",
+          "sp-b10",
+          6,
+          114,
+          2
+        ]
+      ]
+    },
+    "sp-b3-m4": {
+      "n_runs": 30,
+      "n_seeds": 30,
+      "n_born_dead": 48,
+      "n_born_rev": 20,
+      "n_dyn": 9,
+      "n_voltas": 2,
+      "n_terminais": 4,
+      "n_censurados": 3,
+      "n_area_abriu": 5,
+      "n_voltas_area": 2,
+      "rate_boot": [
+        0.3,
+        0.13333333333333333,
+        0.4666666666666667
+      ],
+      "rate_pois": [
+        0.3,
+        0.13717910324594446,
+        0.5694934483806389
+      ],
+      "p_volta_morte": [
+        0.2222222222222222,
+        0.028144973477898197,
+        0.600093573716312
+      ],
+      "p_volta_morte_boot": [
+        0.2222222222222222,
+        0.0,
+        0.5
+      ],
+      "p_volta_area": [
+        0.4,
+        0.052744950526316906,
+        0.8533672003653268
+      ],
+      "n_ordenados": 1,
+      "cp_ordenados": [
+        0.5,
+        0.01257911709342505,
+        0.9874208829065749
+      ],
+      "anomalias": []
+    },
+    "sp-b3-m6": {
+      "n_runs": 30,
+      "n_seeds": 30,
+      "n_born_dead": 62,
+      "n_born_rev": 16,
+      "n_dyn": 7,
+      "n_voltas": 4,
+      "n_terminais": 1,
+      "n_censurados": 2,
+      "n_area_abriu": 5,
+      "n_voltas_area": 3,
+      "rate_boot": [
+        0.23333333333333334,
+        0.06666666666666667,
+        0.43333333333333335
+      ],
+      "rate_pois": [
+        0.23333333333333334,
+        0.09381210171732884,
+        0.4807558453900792
+      ],
+      "p_volta_morte": [
+        0.5714285714285714,
+        0.184051567640083,
+        0.9010117215574921
+      ],
+      "p_volta_morte_boot": [
+        0.5714285714285714,
+        0.0,
+        1.0
+      ],
+      "p_volta_area": [
+        0.6,
+        0.14663279963467313,
+        0.9472550494736831
+      ],
+      "n_ordenados": 1,
+      "cp_ordenados": [
+        0.25,
+        0.006309463209709866,
+        0.8058795503167565
+      ],
+      "anomalias": [
+        [
+          "volta_sem_area",
+          "sp-b3",
+          6,
+          114,
+          2
+        ]
+      ]
+    },
+    "sp-b300-m4": {
+      "n_runs": 30,
+      "n_seeds": 30,
+      "n_born_dead": 48,
+      "n_born_rev": 1,
+      "n_dyn": 7,
+      "n_voltas": 0,
+      "n_terminais": 7,
+      "n_censurados": 0,
+      "n_area_abriu": 0,
+      "n_voltas_area": 0,
+      "rate_boot": [
+        0.23333333333333334,
+        0.1,
+        0.4
+      ],
+      "rate_pois": [
+        0.23333333333333334,
+        0.09381210171732884,
+        0.4807558453900792
+      ],
+      "p_volta_morte": [
+        0.0,
+        0.0,
+        0.40961639722500337
+      ],
+      "p_volta_morte_boot": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "p_volta_area": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "n_ordenados": 0,
+      "cp_ordenados": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "anomalias": []
+    },
+    "sp-b300-m6": {
+      "n_runs": 30,
+      "n_seeds": 30,
+      "n_born_dead": 62,
+      "n_born_rev": 0,
+      "n_dyn": 6,
+      "n_voltas": 0,
+      "n_terminais": 6,
+      "n_censurados": 0,
+      "n_area_abriu": 0,
+      "n_voltas_area": 0,
+      "rate_boot": [
+        0.2,
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "rate_pois": [
+        0.2,
+        0.07339647511636169,
+        0.43531580075062287
+      ],
+      "p_volta_morte": [
+        0.0,
+        0.0,
+        0.45925812643990044
+      ],
+      "p_volta_morte_boot": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "p_volta_area": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "n_ordenados": 0,
+      "cp_ordenados": [
+        NaN,
+        NaN,
+        NaN
+      ],
+      "anomalias": []
+    }
+  },
+  "tau": {
+    "sp-b3": 192464.5,
+    "sp-b10": 303189.80000000005,
+    "pool": 319550.89999999997
+  },
+  "relu_bug": []
+}
