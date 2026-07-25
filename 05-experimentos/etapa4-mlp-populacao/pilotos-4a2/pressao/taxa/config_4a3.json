@@ -1,0 +1,263 @@
+{
+  "meta": {
+    "etapa": "4a.3-confirmatório",
+    "gerado_por": "preditor_4a3.py",
+    "fonte_numeros": "taxa-resultado.json (piloto-de-taxa, EXPLORATÓRIO 240 runs)",
+    "regime": "DETERMINÍSTICO (T=0); estocástico fora de escopo",
+    "status": "CANDIDATO A PRÉ-REGISTRO — aguardando 10º parecer",
+    "instrumento": "GT-ÁREA (relógio único ground-truth; sem régua v2 no caminho crítico)"
+  },
+  "grade": {
+    "bracos": [
+      {
+        "nome": "sp-b3",
+        "ativ": "softplus",
+        "beta": 3.0,
+        "papel": "primário"
+      },
+      {
+        "nome": "sp-b10",
+        "ativ": "softplus",
+        "beta": 10.0,
+        "papel": "canal-C4"
+      },
+      {
+        "nome": "sp-b300",
+        "ativ": "softplus",
+        "beta": 300.0,
+        "papel": "controle-canal-fechado"
+      },
+      {
+        "nome": "relu",
+        "ativ": "relu",
+        "beta": 300.0,
+        "papel": "validade (grad≡0)"
+      }
+    ],
+    "m": [
+      4,
+      6
+    ],
+    "S": 50,
+    "seeds": [
+      1900,
+      1901,
+      1902,
+      1903,
+      1904,
+      1905,
+      1906,
+      1907,
+      1908,
+      1909,
+      1910,
+      1911,
+      1912,
+      1913,
+      1914,
+      1915,
+      1916,
+      1917,
+      1918,
+      1919,
+      1920,
+      1921,
+      1922,
+      1923,
+      1924,
+      1925,
+      1926,
+      1927,
+      1928,
+      1929,
+      1930,
+      1931,
+      1932,
+      1933,
+      1934,
+      1935,
+      1936,
+      1937,
+      1938,
+      1939,
+      1940,
+      1941,
+      1942,
+      1943,
+      1944,
+      1945,
+      1946,
+      1947,
+      1948,
+      1949
+    ],
+    "H": 500000,
+    "n_dados": 16,
+    "eta": 0.001,
+    "T": 0.0,
+    "rec_cada": 100,
+    "runs_por_braco": 100,
+    "total_runs": 400
+  },
+  "primario": "sp-b3",
+  "janela_elegivel": {
+    "tau_q90_ret_b3": 192464.5,
+    "H": 500000,
+    "fim": 307535.5,
+    "origem": "taxa-resultado.json:tau.sp-b3 (q0.9 do return-time GT do braço β3)"
+  },
+  "C1": {
+    "estimando": "p(volta | morte dinâmica elegível), Clopper-Pearson",
+    "alpha": 0.05,
+    "lam_ci_inf_b3_boot": 0.16666666666666666,
+    "runs_b3": 100,
+    "mortes_esperadas_ci_inf": 16.666666666666664,
+    "n_star": 10,
+    "mata_thresh": 0.07599183754056103,
+    "p_volta_ci_inf_pilot_b3": 0.15198367508112207,
+    "regra": "N_elig≥n*: CP-superior(voltas_elig, N_elig) < mata_thresh ⟹ MATA (mecanismo não reproduz); N_elig<n* ⟹ INCONCLUSIVO (nunca negativo)",
+    "origem": {
+      "lam_ci_inf_b3_boot": "taxa-resultado.json:por_braco.sp-b3.rate_boot[1]",
+      "n_star": "poisson_lower_quantile(lam_ci_inf×runs_b3, q=alpha)",
+      "mata_thresh": "0.5 × taxa-resultado.json:por_braco.sp-b3.p_volta_morte[1]"
+    }
+  },
+  "C2": {
+    "estimando": "fração de voltas dinâmicas ORDENADAS no relógio GT: t_morte ≤ t_área < t_res",
+    "alpha": 0.05,
+    "min_voltas": 6,
+    "piso": 0.5,
+    "empate_morte_area": "permitido (≤)",
+    "empate_area_volta": "proibido (<)",
+    "volta_sem_area": "NÃO-ordenada",
+    "regra": "n_voltas≥6: CP-inferior(ordenadas, voltas) < 0.5 ⟹ MATA (zero-de-área não governa a volta); n_voltas<6 ⟹ INCONCLUSIVO",
+    "nota": "denominador = TODAS as voltas dinâmicas; born-dead excluídos"
+  },
+  "C4": {
+    "estimando": "escada p(volta|morte) por β, com CIs, SEM MATA",
+    "pilot_p_volta_morte": {
+      "sp-b3": [
+        0.375,
+        0.15198367508112207,
+        0.6456539056979218
+      ],
+      "sp-b10": [
+        0.2222222222222222,
+        0.0640920477176665,
+        0.4763727657364801
+      ],
+      "sp-b300": [
+        0.0,
+        0.0,
+        0.24705263800047092
+      ],
+      "relu": [
+        0.0,
+        0.0,
+        0.24705263800047092
+      ]
+    },
+    "origem": "taxa-resultado.json:por_braco.<braço>.p_volta_morte"
+  },
+  "validade": {
+    "regra": "qualquer volta GT no relu (volta dyn OU born-rev OU n_revive_real>0) ⟹ INVÁLIDO",
+    "base": "teorema: grad≡0 no neurônio relu morto ⟹ 0 voltas"
+  },
+  "bootstrap": {
+    "metodo": "cluster por seed",
+    "B": 20000,
+    "seed_rate": 314159,
+    "seed_prop": 271828,
+    "rng_proibidos": [
+      777,
+      779,
+      "5xxx",
+      9090
+    ]
+  },
+  "pilot_ref": {
+    "por_braco": {
+      "sp-b3": {
+        "rate_boot": [
+          0.26666666666666666,
+          0.16666666666666666,
+          0.38333333333333336
+        ],
+        "rate_pois": [
+          0.26666666666666666,
+          0.1524230408940254,
+          0.433049959959349
+        ],
+        "p_volta_morte": [
+          0.375,
+          0.15198367508112207,
+          0.6456539056979218
+        ],
+        "n_dyn": 16,
+        "n_voltas": 6
+      },
+      "sp-b10": {
+        "rate_boot": [
+          0.3,
+          0.18333333333333332,
+          0.43333333333333335
+        ],
+        "rate_pois": [
+          0.3,
+          0.1777990130066588,
+          0.47412933779213307
+        ],
+        "p_volta_morte": [
+          0.2222222222222222,
+          0.0640920477176665,
+          0.4763727657364801
+        ],
+        "n_dyn": 18,
+        "n_voltas": 4
+      },
+      "sp-b300": {
+        "rate_boot": [
+          0.21666666666666667,
+          0.11666666666666667,
+          0.3333333333333333
+        ],
+        "rate_pois": [
+          0.21666666666666667,
+          0.11536587485006336,
+          0.37050659863598123
+        ],
+        "p_volta_morte": [
+          0.0,
+          0.0,
+          0.24705263800047092
+        ],
+        "n_dyn": 13,
+        "n_voltas": 0
+      },
+      "relu": {
+        "rate_boot": [
+          0.21666666666666667,
+          0.11666666666666667,
+          0.3333333333333333
+        ],
+        "rate_pois": [
+          0.21666666666666667,
+          0.11536587485006336,
+          0.37050659863598123
+        ],
+        "p_volta_morte": [
+          0.0,
+          0.0,
+          0.24705263800047092
+        ],
+        "n_dyn": 13,
+        "n_voltas": 0
+      }
+    },
+    "tau": {
+      "sp-b3": 192464.5,
+      "sp-b10": 303189.80000000005,
+      "pool": 319550.89999999997
+    }
+  }
+}
