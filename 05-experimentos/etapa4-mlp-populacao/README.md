@@ -39,10 +39,17 @@ saída se < φ_v), `j_trocas` (líder), log global de switchings.
 
 Calibração do instrumento EXATO (`calibracao_regua_v2.py`, toy-em-harness com
 v treinável): (a) dinâmica converge em tempo contínuo (Δ3.4%); erro da
-predição-área identificado como o atraso O(1/β) do PRÓPRIO teorema (4.54%→1.91%
-quando β 300→1000, razão 0.42); (b) sob ruído T=1e-3: área vence sinal 34/34,
-erro relativo mediano 0.534 vs 0.851 da duração; (c) unit-tests dos flags.
-V1 (`calibracao_regua.py`) fica como registro do instrumento anterior.
+predição-área CONSISTENTE com o atraso O(1/β) do próprio teorema (4.54%→1.91%
+quando β 300→1000, razão 0.42; piso residual ~0.8pp não explicado — rótulo do
+7º parecer); (b) sob ruído T=1e-3: erro relativo mediano da área 0.534 vs 0.851
+do sinal ("área vence sinal 34/34" é DESCRITIVO: t_sinal≤t_area≤t_res por
+construção do instrumento, que para de medir na ressurreição — 7º parecer);
+(c) unit-tests dos flags. V1 (`calibracao_regua.py`) fica como registro.
+
+**Truncamento do instrumento (fato central para a análise):** a régua só
+acumula Â_k enquanto morto ⟹ o atraso observado da área é censurado na duração
+do episódio; episódio em que a área não disparou = censura à direita. TODA
+inferência de P-A respeita isso (nulo calibrado abaixo).
 
 **Episódio limpo** (`episodio_limpo()`, pré-registrado): ≤ q switchings de
 outros neurônios no intervalo, sem v_cruzou, v_min_abs ≥ φ_v, ≤ q_j trocas de
@@ -51,16 +58,22 @@ mecanismo; entra como censurado.
 
 ## 3. Predições congeladas (números em `config_etapa4.json` via `preditor.py`)
 
-- **P-A (MATA — memória, o núcleo).** Episódios limpos, braço softplus T=1e-3,
-  por célula m. Pareado por episódio: erro |t_res−t_área| vs |t_res−t_sinal|.
-  Estatística primária: fração-de-vitórias POR SEED; teste Wilcoxon entre
-  seeds contra 0.5, unilateral, α=0.01, nas 3 células de m.
-  **Nulo assimétrico (competidor 3):** placebo de atraso-permutado — para cada
-  episódio, predição placebo t_morte_i + (t_área_j − t_morte_j) com j sorteado
-  entre os OUTROS episódios limpos da mesma célula (RNG fixo no config). A área
-  tem de vencer TAMBÉM o placebo (Wilcoxon por seed, α=0.01). MATA: se a área
-  não vence o sinal (memória morre — colapsa em complementaridade), OU vence o
-  sinal mas não o placebo (era só viés-de-atraso, não predição).
+- **P-A (MATA — memória, o núcleo; reconstruído após o 7º parecer).** Episódios
+  limpos-completos, braço softplus T=1e-3, por célula m. O 7º parecer provou:
+  (i) "área vence sinal" é mecânico (t_sinal≤t_area≤t_res sempre) — vira
+  report DESCRITIVO; (ii) o placebo de atraso-permutado cru viola o nível
+  (FPR até 58× α) porque não herda o truncamento. **Teste congelado — nulo
+  calibrado por bootstrap paramétrico:** estatística T = média entre seeds da
+  fração-de-vitórias área-vs-placebo-permutado (dentro-da-seed, RNG 777);
+  distribuição nula de T simulada sob H₀ = atraso ⊥ duração, atrasos iid de F̂
+  estimada por **Kaplan-Meier** (não-disparo da área = censura à direita),
+  COM o truncamento do instrumento reproduzido (B=1000, RNG 779);
+  p=(1+#{T_b≥T_obs})/(B+1); passa se p<0.01. Nível e potência DEMONSTRADOS em
+  `analise.py --sintetico`: FPR 0.000/0.000/0.010 para 8/40/200 episódios/seed;
+  TPR 1.000 sob memória. A fração de limpos-completos SEM disparo da área é
+  reportada por célula (evidência contra a lei se alta; 17% no piloto).
+  MATA: p≥0.01 nas células válidas (agregação: demonstra com ≥2/3 incluindo
+  m=16; MATA se falha em todas).
 - **P-B (MATA — universalidade L5.2 DENTRO da classe).** Braço erf-smoothing
   (g′=Φ(βz), classe do teorema) vs softplus, mesmo β=300, pareado por seed.
   Estatísticas: fração-censurada, mediana da DURAÇÃO do episódio (t_res−t_morte;
@@ -125,11 +138,13 @@ Grade: braços × **m ∈ {16, 64, 256}** = 30 células × **20 seeds virgens
 `analise.py` (testada em dados SINTÉTICOS no smoke-gate — regra do 5º parecer)
 lê `results/*.jsonl.gz` + config e emite `resultados.json` + figuras.
 Agregação: seed é a unidade (Bouthillier); IQM/mediana + bootstrap
-estratificado por seed (B=10 000, RNG fixo). Potência P-A: com 20 seeds e a
-variância por seed do toy recalibrado, Wilcoxon unilateral α=0.01 detecta
-fração-de-vitórias ≥ ~0.62 com potência ≥0.8 (MDE documentado no preditor;
-toy deu 1.00). Piso de |Δ| (P-B 5%, P-D 1%) pré-declarado contra
-viés-de-fio-de-cabelo (herança do parecer v2).
+estratificado por seed (B=10 000, RNG fixo). Potência/nível P-A: demonstrados
+por SIMULAÇÃO no `--sintetico` (FPR≈α sob o nulo truncado em 8/40/200
+episódios/seed; TPR=1.0 sob memória), condicionais a episódios/seed
+suficientes (piloto: ~170 completos/seed já em 20k passos, m=64 — folga sobre
+o mínimo de 3). Piso de |Δ| (P-B 5%, P-D 1% com S≥5 seeds) pré-declarado
+contra viés-de-fio-de-cabelo (herança do parecer v2). Gate de 30 limpos por
+célula vale para P-A E P-B (7º parecer).
 
 ## 6. Riscos e desvios
 

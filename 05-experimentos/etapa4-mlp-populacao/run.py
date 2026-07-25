@@ -85,6 +85,13 @@ if __name__ == "__main__":
         if nome.endswith(".json.gz"):
             with open(os.path.join(RESDIR, nome), "rb") as f:
                 man[nome] = hashlib.sha256(f.read()).hexdigest()
+    with open(os.path.join(os.path.dirname(__file__), "config_etapa4.json"),
+              "rb") as f:
+        man["_config_sha256"] = hashlib.sha256(f.read()).hexdigest()
+    import subprocess
+    man["_git_commit"] = subprocess.run(
+        ["git", "rev-parse", "HEAD"], capture_output=True, text=True,
+        cwd=os.path.dirname(__file__)).stdout.strip()
     with open(os.path.join(RESDIR, "manifest.json"), "w") as f:
         json.dump(man, f, indent=0, sort_keys=True)
-    print(f"manifest.json: {len(man)} arquivos")
+    print(f"manifest.json: {len(man)} entradas")

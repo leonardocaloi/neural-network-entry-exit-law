@@ -1,4 +1,24 @@
-# Respostas ao 6º parecer (etapa-4) — 2026-07-24
+# Respostas aos pareceres 6 e 7 (etapa-4) — 2026-07-24
+
+## 7º parecer (re-verificação; `parecer-reverificacao-etapa4.md`)
+
+| Item | Resposta | Evidência |
+|---|---|---|
+| **B-novo: placebo de atraso-permutado viola o nível** (FPR até 58× α; instrumento trunca t_area em t_res) | Caminho 3 do parecer adotado: **nulo calibrado por bootstrap paramétrico** — H₀ = atraso ⊥ duração com atrasos iid de F̂ por **Kaplan-Meier** (não-disparo = censura à direita na duração), simulação COM o truncamento reproduzido (B=1000), p=(1+#{T_b≥T_obs})/(B+1). O viés estrutural fica dentro da calibração | `analise.py` (p_calibrado, _km, _amostra_km) |
+| Condição de saída: `--sintetico` com nulo TRUNCADO + FPR≈α em n_ep/seed ∈ {8,40,200} | Cumprida: `_fabrica` respeita o invariante (jamais t_area>t_res; excedente = -1) e `nivel_potencia()` demonstra **FPR = 0.000 / 0.000 / 0.010** (α=0.01, R=100, B=199) e **TPR = 1.000** sob memória | saída do `--sintetico` |
+| "Área vence sinal" quase-tautológico | Rebaixado a DESCRITIVO em config, análise, README e calibração (34/34 re-rotulado como mecânico) | config P_A.vs_sinal |
+| Rótulo do (a2): "identificado" → "consistente com" | Corrigido em calibracao_regua_v2.py (com o piso residual ~0.8pp explícito) e README §2; calibração re-executada | saída da calibração |
+| MIN_EP_SEED fora do config | Campo explícito `P_A.min_ep_por_seed=3`; análise lê do config | config |
+| Piso P-D: prosa imprecisa | Config: "duração mediana dos episódios LIMPOS-completos do controle" | config P_D |
+| P-D classe "sem" com S=0 | Guarda `S_min_sem=5`: abaixo disso, "indeterminada" | analise_PD |
+| Episódios sem disparo da área invisíveis | `frac_sem_area` reportada por célula em P-A e ecoada em P-E (17% no piloto documentado) | analise_PA/PE |
+| Potência assumia 30/seed | Seção `potencia_P_A` reescrita: nível/potência por simulação, condicional documentada; curva binomial antiga arquivada como referência | config |
+| Gate 30 limpos ausente em P-B | `P_B.gate_min_limpos=30` por braço/célula; célula sem gate não conta para MATA | analise_PB |
+| Manifest sem config/commit | `manifest.json` ganha `_config_sha256` e `_git_commit` | run.py |
+| Vigia de load inexistente no código | Decisão: vigia é EXTERNO ao experimento (Monitor da sessão, como nas runs anteriores) — run.py não vigia; README §7 ajustado implicitamente pela prática | — |
+| Script de verificação do revisor | Preservado em `verificacao-placebo-vies.py` | repo |
+
+## 6º parecer (`parecer-desenho-etapa4.md`)
 
 Cada item do parecer → o que foi feito, onde está a evidência.
 

@@ -110,10 +110,12 @@ if __name__ == "__main__":
           f"(Δ={abs(tau1-tau2)/tau2*100:.1f}%)")
     assert abs(tau1 - tau2) / tau2 < 0.10
     print(f"[a2] erro relativo da área com βη=0.10: β=300 → {r2*100:.2f}%, "
-          f"β=1000 → {r3*100:.2f}% (razão {r3/r2:.2f}; 1/β prevê ~0.30)")
+          f"β=1000 → {r3*100:.2f}% (razão {r3/r2:.2f}; 1/β puro prevê ~0.30)")
     assert r3 < 0.6 * r2 and r3 < 0.025, (r2, r3)
-    print("[OK] (a) erro do instrumento identificado como o atraso O(1/β) do "
-          "teorema (cai com β); dinâmica converge em tempo contínuo")
+    print("[OK] (a) erro do instrumento CONSISTENTE com o atraso O(1/β) do "
+          "teorema (cai com β; piso residual ~0.8pp não explicado por 1/β — "
+          "2 pontos de β não identificam o expoente); dinâmica converge em "
+          "tempo contínuo. Rótulo por exigência do 7º parecer.")
 
     # ---------- (b) sob ruído: pareado área-vs-sinal, 40 seeds ----------
     with ProcessPoolExecutor(max_workers=6) as ex:

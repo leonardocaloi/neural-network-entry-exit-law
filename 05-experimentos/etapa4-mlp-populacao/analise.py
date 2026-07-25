@@ -20,8 +20,8 @@ CFG = json.load(open(os.path.join(AQUI, "config_etapa4.json")))
 ALPHA = CFG["P_A"]["alpha"]
 Q, Q_J = CFG["regua"]["q"], CFG["regua"]["q_j"]
 MIN_LIMPOS = CFG["regua"]["min_limpos_por_celula"]
-MIN_SEED_PLACEBO = CFG["regua"]["min_limpos_por_seed_placebo"]
-MIN_EP_SEED = 3                       # seeds com <3 limpos ficam fora do P-A
+MIN_SEED_PLACEBO = CFG["P_A"]["placebo"]["min_por_seed"]
+MIN_EP_SEED = CFG["P_A"]["min_ep_por_seed"]
 
 
 def phi_v(m):
@@ -66,8 +66,18 @@ def celula(dados, braco, m):
             if (braco, m, s) in dados}
 
 
-# ---------------- P-A: memória (área vs sinal vs placebo) ----------------
+# ---------------- P-A: memória — nulo CALIBRADO por bootstrap paramétrico ----
+# 7º parecer (B-novo): o instrumento trunca t_area em t_res (para de medir na
+# ressurreição) ⟹ (i) t_sinal ≤ t_area ≤ t_res mecanicamente — "área vence
+# sinal" é DESCRITIVO, não MATA; (ii) o placebo de atraso-permutado cru não
+# herda o truncamento e infla o nível (FPR até 58× α medido). Conserto: o nulo
+# é SIMULADO com o truncamento — H0: atraso ⊥ duração, atrasos iid de F̂
+# (Kaplan-Meier; não-disparo da área = censura à direita na duração da própria
+# morte) — e T_obs é comparada à distribuição nula simulada: o viés estrutural
+# fica DENTRO da calibração. Nível/potência demonstrados no --sintetico.
+
 def fracao_vitorias(eps):
+    """DESCRITIVO apenas (mecânico: área nunca perde quando ambos disparam)."""
     v, tot = 0, 0
     for ep in eps:
         if ep["t_area"] < 0 or ep["t_sinal"] < 0:
@@ -77,56 +87,113 @@ def fracao_vitorias(eps):
     return (v / tot) if tot else None, tot
 
 
-def fracao_vitorias_placebo(eps, rng):
-    com_area = [ep for ep in eps if ep["t_area"] >= 0]
-    if len(com_area) < MIN_SEED_PLACEBO:
-        return None, 0
-    v, tot = 0, 0
-    for i, ep in enumerate(com_area):
-        j = int(rng.integers(0, len(com_area) - 1))
-        j = j if j < i else j + 1
-        atraso = com_area[j]["t_area"] - com_area[j]["t_morte"]
-        t_pl = ep["t_morte"] + atraso
-        tot += 1
-        v += int(abs(ep["t_res"] - ep["t_area"]) < abs(ep["t_res"] - t_pl))
-    return v / tot, tot
+def _arrays_seed(eps):
+    dur = np.array([e["t_res"] - e["t_morte"] for e in eps], float)
+    delay = np.array([e["t_area"] - e["t_morte"] if e["t_area"] >= 0 else -1.0
+                      for e in eps], float)
+    return dur, delay, delay >= 0
 
 
-def teste_sinais(fracs, alpha):
-    validos = [f for f in fracs if f is not None]
-    S = len(validos)
-    k = crit_binomial(S, alpha) if S else 999
-    n_pos = sum(1 for f in validos if f > 0.5)
-    return dict(S=S, n_pos=n_pos, k_critico=k, passa=bool(S and n_pos >= k))
+def _win_frac(dur, delay, fired, rng):
+    """Fração de vitórias área-vs-placebo-permutado numa seed (None se <2)."""
+    com = np.where(fired)[0]
+    if len(com) < MIN_SEED_PLACEBO:
+        return None
+    d, a = dur[com], delay[com]
+    n = len(com)
+    j = rng.integers(0, n - 1, size=n)
+    j = j + (j >= np.arange(n))
+    return float(np.mean((d - a) < np.abs(d - a[j])))
+
+
+def _km(obs, event):
+    """CDF de Kaplan-Meier do atraso (censura à direita = não-disparo).
+    Retorna (tempos de evento, F acumulada); massa além do último evento
+    permanece censurada (atraso = ∞ ⟹ não-disparo na amostragem)."""
+    ordem = np.argsort(obs, kind="stable")
+    obs, event = np.asarray(obs)[ordem], np.asarray(event)[ordem].astype(bool)
+    S, ts, Fs = 1.0, [], []
+    n, i = len(obs), 0
+    while i < n:
+        t, em_risco, mortes = obs[i], n - i, 0
+        while i < n and obs[i] == t:
+            mortes += int(event[i]); i += 1
+        if mortes:
+            S *= 1.0 - mortes / em_risco
+            ts.append(float(t)); Fs.append(1.0 - S)
+    return np.array(ts), np.array(Fs)
+
+
+def _amostra_km(ts, Fs, rng, n):
+    if len(ts) == 0:
+        return np.full(n, np.inf)
+    u = rng.random(n)
+    idx = np.searchsorted(Fs, u, side="left")
+    return np.where(idx < len(ts), ts[np.minimum(idx, len(ts) - 1)], np.inf)
+
+
+def _T_stat(dados_seeds, rngs):
+    fr = [_win_frac(d, a, f, r) for (d, a, f), r in zip(dados_seeds, rngs)]
+    fr = [x for x in fr if x is not None]
+    return (float(np.mean(fr)) if fr else None), len(fr)
+
+
+def p_calibrado(dados_seeds, ids, chave, B):
+    """p-valor do bootstrap paramétrico sob o nulo truncado. dados_seeds:
+    lista de (dur, atraso, disparou) por seed; ids: identificadores das seeds
+    (entram no RNG observacional p/ determinismo); chave: (braço, célula)."""
+    rngs_obs = [np.random.default_rng(
+        [CFG["P_A"]["placebo"]["rng_seed"], *chave, int(s)]) for s in ids]
+    T_obs, S_ef = _T_stat(dados_seeds, rngs_obs)
+    if T_obs is None:
+        return None, None, 0
+    obs = np.concatenate([np.where(f, a, d) for d, a, f in dados_seeds])
+    ev = np.concatenate([f for _, _, f in dados_seeds])
+    ts, Fs = _km(obs, ev)
+    rng_mc = np.random.default_rng([CFG["P_A"]["rng_seed_mc"], *chave])
+    excede = 0
+    for _ in range(B):
+        sims = []
+        for d, _, _ in dados_seeds:
+            atr = _amostra_km(ts, Fs, rng_mc, len(d))
+            f2 = atr <= d
+            sims.append((d, np.where(f2, atr, -1.0), f2))
+        T_b, _ = _T_stat(sims, [rng_mc] * len(sims))
+        if T_b is not None and T_b >= T_obs:
+            excede += 1
+    return (1 + excede) / (B + 1), T_obs, S_ef
 
 
 def analise_PA(dados, braco):
+    ib = [b["nome"] for b in CFG["grade"]["bracos"]].index(braco)
+    B = CFG["P_A"]["B"]
     out = {}
     for im, m in enumerate(CFG["grade"]["m"]):
         cel = celula(dados, braco, m)
-        fr_sinal, fr_plac, n_limpos = [], [], 0
+        dados_seeds, ids, fr_sinal = [], [], []
+        n_limpos = sem_area = 0
         for s in sorted(cel):
             eps = sorted(
                 (ep for ep in cel[s]["episodios"]
                  if completo(ep) and eh_limpo(ep, m)),
                 key=lambda e: (e["t_morte"], e["k"]))
             n_limpos += len(eps)
+            sem_area += sum(1 for ep in eps if ep["t_area"] < 0)
             if len(eps) < MIN_EP_SEED:
-                fr_sinal.append(None); fr_plac.append(None)
                 continue
             f, _ = fracao_vitorias(eps)
-            fr_sinal.append(f)
-            rng = np.random.default_rng([CFG["P_A"]["placebo"]["rng_seed"], im, s])
-            fp, _ = fracao_vitorias_placebo(eps, rng)
-            fr_plac.append(fp)
-        t_sin = teste_sinais(fr_sinal, ALPHA)
-        t_pla = teste_sinais(fr_plac, ALPHA)
+            fr_sinal.append(None if f is None else round(f, 3))
+            dados_seeds.append(_arrays_seed(eps))
+            ids.append(s)
+        p, T_obs, S_ef = (p_calibrado(dados_seeds, ids, (ib, im), B)
+                          if dados_seeds else (None, None, 0))
         out[m] = dict(
             n_limpos=n_limpos, valida=bool(n_limpos >= MIN_LIMPOS),
-            fracs_sinal=[None if f is None else round(f, 3) for f in fr_sinal],
-            fracs_placebo=[None if f is None else round(f, 3) for f in fr_plac],
-            teste_sinal=t_sin, teste_placebo=t_pla,
-            passa=bool(t_sin["passa"] and t_pla["passa"]))
+            frac_sem_area=round(sem_area / max(n_limpos, 1), 3),
+            T_obs=None if T_obs is None else round(T_obs, 4),
+            p_calibrado=None if p is None else round(p, 4), S_efetivo=S_ef,
+            fracs_sinal_descritivo=fr_sinal,
+            passa=bool(p is not None and p < ALPHA))
     validas = [m for m in out if out[m]["valida"]]
     passam = [m for m in validas if out[m]["passa"]]
     if not validas:
@@ -138,6 +205,15 @@ def analise_PA(dados, braco):
     else:
         veredito = f"parcial (passa em {passam} de {validas})"
     return dict(celulas={str(m): out[m] for m in out}, veredito=veredito)
+
+
+def teste_sinais(fracs, alpha):
+    """Usado por P-B (Δ pareado entre braços), não mais por P-A."""
+    validos = [f for f in fracs if f is not None]
+    S = len(validos)
+    k = crit_binomial(S, alpha) if S else 999
+    n_pos = sum(1 for f in validos if f > 0.5)
+    return dict(S=S, n_pos=n_pos, k_critico=k, passa=bool(S and n_pos >= k))
 
 
 # ---------------- P-B: universalidade in-class ----------------
@@ -159,6 +235,8 @@ def analise_PB(dados, b1="softplus", b2="erf"):
     for m in CFG["grade"]["m"]:
         c1, c2 = celula(dados, b1, m), celula(dados, b2, m)
         seeds = sorted(set(c1) & set(c2))
+        gate = all(sum(stats_seed(c[s], m)["n_limpos"] for s in seeds)
+                   >= CFG["P_B"]["gate_min_limpos"] for c in (c1, c2))
         res_e = {}
         mata_cel = False
         for est in CFG["P_B"]["estatisticas"]:
@@ -175,8 +253,10 @@ def analise_PB(dados, b1="softplus", b2="erf"):
             res_e[est] = dict(S=len(pares), p=round(p, 5), delta_rel=round(rel, 4),
                               sig=sig, acima_do_piso=bool(rel > piso))
             mata_cel = mata_cel or (sig and rel > piso)
+        mata_cel = mata_cel and gate            # célula sem gate não conta p/ MATA
         celulas_mata += int(mata_cel)
-        out[str(m)] = dict(estatisticas=res_e, mata_celula=bool(mata_cel))
+        out[str(m)] = dict(estatisticas=res_e, gate_min_limpos=bool(gate),
+                           mata_celula=bool(mata_cel))
     veredito = ("MATA: L5.2 nao ergue (universalidade falha in-class)"
                 if celulas_mata >= 2 else "universalidade in-class sustentada")
     return dict(celulas=out, celulas_mata=celulas_mata, veredito=veredito)
@@ -235,7 +315,9 @@ def analise_PD(dados):
                for ep in cc[s]["episodios"] if completo(ep) and eh_limpo(ep, m)]
         piso = 0.01 * float(np.median(dur)) if dur else 0.0
         contem0 = bool(ci[0] <= 0.0 <= ci[1])
-        if contem0 and abs(mediana) < piso:
+        if len(med_seed) < CFG["P_D"]["S_min_sem"]:
+            classe = "indeterminada"       # 7º parecer: "sem" exige S mínimo
+        elif contem0 and abs(mediana) < piso:
             classe = "sem"                 # MATA-condição do README §3
         elif not contem0 and abs(mediana) >= piso:
             classe = "detectada"
@@ -284,21 +366,22 @@ def analise_PE(dados, pa):
                 frac_v_cruzou=round(cruzou / tot, 3) if tot else None,
                 mediana_dur=float(np.median(durs)) if durs else None,
                 mediana_t_res=float(np.median(t_ress)) if t_ress else None)
-    return dict(superficies=out,
-                qualidade_area_por_m={str(m): pa["celulas"][str(m)]["teste_sinal"]
-                                      for m in CFG["grade"]["m"]
-                                      if str(m) in pa["celulas"]})
+    qual = {str(m): dict(T_obs=pa["celulas"][str(m)]["T_obs"],
+                         p_calibrado=pa["celulas"][str(m)]["p_calibrado"],
+                         frac_sem_area=pa["celulas"][str(m)]["frac_sem_area"])
+            for m in CFG["grade"]["m"] if str(m) in pa["celulas"]}
+    return dict(superficies=out, qualidade_area_por_m=qual)
 
 
 # ---------------- P-NULL: validade do instrumento ----------------
 def analise_PNULL(dados):
     pa = analise_PA(dados, braco="semgrad")
-    passou_algum = any(c["teste_placebo"]["passa"] for c in pa["celulas"].values())
+    passou_algum = any(c["passa"] for c in pa["celulas"].values())
     return dict(celulas=pa["celulas"],
                 instrumento_valido=bool(not passou_algum),
                 veredito=("INSTRUMENTO VICIADO — experimento INVALIDO"
                           if passou_algum else
-                          "instrumento ok (difusao pura nao engana o placebo)"))
+                          "instrumento ok (difusao pura nao passa no nulo calibrado)"))
 
 
 def roda_analise(dados):
@@ -326,14 +409,19 @@ def _fabrica(braco, m, seed, modo, shift_pd=0, shift_pb=1.0):
         else:
             t_res = t0 + dur + (shift_pd if braco == "freeze" else 0)
         censura = t_res < 0 or t_res > 100000 or (braco == "relu")
-        if modo == "memoria":
-            t_area = t0 + int(0.9 * dur)
-            t_sinal = t0 + int(0.2 * dur)
-        else:                              # nulo: atraso independente da duração
-            t_area = t0 + int(rng.lognormal(8.0, 0.3)) + 200
-            t_sinal = t0 + int(rng.lognormal(7.0, 0.3)) + 100
         if braco == "erf":
             t_res = t0 + int((t_res - t0) * shift_pb) if t_res >= 0 else t_res
+        # INVARIANTE DO INSTRUMENTO (7º parecer): a régua para de medir na
+        # ressurreição — atraso que excede a duração vira NÃO-DISPARO (-1),
+        # jamais t_area > t_res. O nulo fabricado herda o truncamento real.
+        dur_ef = (t_res - t0) if not censura else (100000 - t0)
+        if modo == "memoria":
+            atr_a, atr_s = int(0.9 * dur), int(0.2 * dur)
+        else:                              # nulo: atraso independente da duração
+            atr_a = int(rng.lognormal(8.0, 0.3)) + 200
+            atr_s = int(rng.lognormal(7.0, 0.3)) + 100
+        t_area = t0 + atr_a if atr_a <= dur_ef else -1
+        t_sinal = t0 + atr_s if atr_s <= dur_ef else -1
         ep = dict(k=i, t_morte=t0, t_area=t_area, t_sinal=t_sinal,
                   t_res=-1 if censura else t_res, v_morte=0.5, v_min_abs=0.5,
                   v_cruzou=False, j_trocas=0, alheios=0)
@@ -345,8 +433,47 @@ def _fabrica(braco, m, seed, modo, shift_pd=0, shift_pb=1.0):
                 episodios=eps, segundos=0.0)
 
 
+def nivel_potencia():
+    """Demonstração exigida pelo 7º parecer: FPR≈α do teste calibrado sob o
+    nulo TRUNCADO para n_ep/seed ∈ {8,40,200}; TPR sob mundo-memória."""
+    print("-- nível (FPR) do teste calibrado sob nulo truncado, α=0.01 --")
+    B, R, S = 199, 100, 10
+    for n_ep in (8, 40, 200):
+        rej = 0
+        for r in range(R):
+            rng = np.random.default_rng([9090, n_ep, r])
+            ds, ids = [], []
+            for s in range(S):
+                dur = rng.lognormal(8.0, 0.5, n_ep) + 200
+                atr = rng.lognormal(7.8, 0.6, n_ep) + 200
+                f = atr <= dur
+                ds.append((dur, np.where(f, atr, -1.0), f)); ids.append(s)
+            p, _, _ = p_calibrado(ds, ids, (99, n_ep), B)
+            rej += int(p is not None and p < ALPHA)
+        fpr = rej / R
+        print(f"   n_ep/seed={n_ep:3d}: FPR={fpr:.3f} (R={R}, B={B})")
+        assert fpr <= 0.05, (n_ep, fpr)
+    print("-- potência (TPR) sob memória (atraso=0.9·dur, σ_rel=5%) --")
+    rej = 0
+    Rp = 40
+    for r in range(Rp):
+        rng = np.random.default_rng([9191, r])
+        ds, ids = [], []
+        for s in range(S):
+            dur = rng.lognormal(8.0, 0.5, 40) + 200
+            atr = np.minimum(0.9 * dur * (1 + 0.05 * rng.standard_normal(40)), dur)
+            ds.append((dur, atr, np.ones(40, bool))); ids.append(s)
+        p, _, _ = p_calibrado(ds, ids, (98, r), B)
+        rej += int(p is not None and p < ALPHA)
+    tpr = rej / Rp
+    print(f"   TPR={tpr:.3f} (R={Rp}, B={B})")
+    assert tpr >= 0.9, tpr
+    print("[OK] nível segurado (FPR≈α com truncamento) e potência preservada")
+
+
 def sintetico():
     print("== ANÁLISE SINTÉTICA (verdade conhecida) ==")
+    nivel_potencia()
     bracos = [b["nome"] for b in CFG["grade"]["bracos"]]
 
     def mundo(modo, shift_pd=0, shift_pb=1.0, modo_semgrad=None):
@@ -366,7 +493,8 @@ def sintetico():
     # 2) mundo-nulo: P-A MATA (área não vence placebo)
     r2 = roda_analise(mundo("nulo"))
     assert r2["P_A"]["veredito"].startswith("MATA"), r2["P_A"]["veredito"]
-    print("[OK] mundo-nulo: P-A dispara MATA (placebo segura o viés-de-atraso)")
+    print("[OK] mundo-nulo TRUNCADO: P-A dispara MATA (o nulo calibrado por "
+          "KM absorve o viés estrutural do truncamento)")
     # 3) semgrad em mundo-memória: P-NULL acusa instrumento viciado
     r3 = roda_analise(mundo("memoria", modo_semgrad="memoria"))
     assert not r3["P_NULL"]["instrumento_valido"]

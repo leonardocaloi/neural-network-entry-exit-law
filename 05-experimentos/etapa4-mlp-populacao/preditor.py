@@ -65,46 +65,71 @@ if __name__ == "__main__":
             "limiar": "2*sqrt(n*T)/norm((x_jstar,1)); T com piso 1e-7",
             "delta_snapshot": 1, "phi_v": "1/(4*sqrt(m))", "q": 2, "q_j": 0,
             "min_limpos_por_celula": N_EP_MIN,
-            "min_limpos_por_seed_placebo": 2,
-            "calibracao": {"pareado_toy": "34/34", "rel_err_area": 0.534,
+            "calibracao": {"pareado_toy": "34/34 (DESCRITIVO: mecanico dado o "
+                           "truncamento — 7o parecer)", "rel_err_area": 0.534,
                            "rel_err_sinal": 0.851,
-                           "erro_intrinseco": "atraso O(1/beta) do teorema"},
+                           "erro_intrinseco": "CONSISTENTE com atraso O(1/beta) "
+                           "do teorema (300->1000: 4.54%->1.91%, razao 0.42; "
+                           "piso residual ~0.8pp nao explicado)"},
         },
-        "P_A": {"braco": "softplus", "alpha": 0.01,
-                "teste": "sinais entre seeds da fracao-de-vitorias>1/2 "
-                         "(empate/sem-episodios = fracasso; seeds com <3 "
-                         "episodios limpos excluidas, criterio recalculado)",
-                "k_critico_20_seeds": crit_binomial(S),
+        "P_A": {"braco": "softplus", "alpha": 0.01, "B": 1000,
+                "rng_seed_mc": 779, "min_ep_por_seed": 3,
+                "teste": "bootstrap parametrico sob o nulo TRUNCADO (7o parecer): "
+                         "H0 = atraso da area independente da duracao, atrasos "
+                         "iid de F-hat (Kaplan-Meier; nao-disparo = censura a "
+                         "direita na duracao); estatistica T = media entre seeds "
+                         "da fracao-de-vitorias area-vs-placebo-permutado; "
+                         "p=(1+#{T_b>=T_obs})/(B+1); passa se p<alpha. Nivel e "
+                         "potencia demonstrados no analise.py --sintetico "
+                         "(FPR para n_ep/seed em {8,40,200}; TPR memoria)",
                 "placebo": {"tipo": "atraso-permutado dentro da mesma seed",
-                            "rng_seed": 777},
-                "mata": "area nao vence sinal OU vence sinal mas nao placebo",
+                            "rng_seed": 777, "min_por_seed": 2},
+                "vs_sinal": "DESCRITIVO apenas: t_sinal<=t_area<=t_res por "
+                            "construcao do instrumento (7o parecer) — nao e MATA",
+                "report_sem_area": "fracao de limpos-completos sem disparo da "
+                                   "area reportada por celula (evidencia contra "
+                                   "a lei se alta; 17% no piloto m=64/20k)",
+                "mata": "p_calibrado >= alpha nas celulas validas (agregacao)",
                 "agregacao": "avaliado POR celula de m (validas: >=30 limpos); "
-                             "memoria demonstrada se passa (sinal E placebo) em "
-                             ">=2 de 3 celulas validas INCLUINDO m=16; MATA se "
-                             "falha em TODAS as validas; resto = parcial"},
+                             "memoria demonstrada se p<alpha em >=2 de 3 celulas "
+                             "validas INCLUINDO m=16; MATA se falha em TODAS as "
+                             "validas; resto = parcial"},
         "P_B": {"bracos": ["softplus", "erf"], "piso_rel": 0.05, "alpha": 0.01,
                 "correcao_multipla": "Bonferroni: alpha/3 por estatistica",
                 "estatisticas": ["frac_censurada", "mediana_dur", "n_limpos"],
                 "teste": "sinais bilateral entre seeds do Delta pareado",
+                "gate_min_limpos": N_EP_MIN,
                 "mata": "(sig E |Delta|rel>piso) em alguma estatistica, em "
-                        ">=2 de 3 celulas de m"},
+                        ">=2 de 3 celulas de m COM gate de limpos"},
         "P_B_linha": {"braco": "gelu", "tipo": "EXPLORATORIO fora-da-classe"},
         "P_C": {"tipo": "ANCORA/ESTIMACAO", "bracos": ["relu", "softplus"],
                 "report": "frac censurada com CI; permanente-por-mecanismo "
                           "(grad=0 verificado) separado de censurado"},
         "P_D": {"bracos": ["freeze", "softplus"], "piso": "1% da duracao "
-                "mediana de episodio do controle", "B_boot": 10000,
-                "rng_seed": 778,
-                "mata": "CI95 da mediana(Delta t_res) contem 0 E |mediana|<piso"},
+                "mediana dos episodios LIMPOS-completos do controle",
+                "B_boot": 10000, "rng_seed": 778, "S_min_sem": 5,
+                "mata": "classe 'sem' (CI95 da mediana(Delta t_res) contem 0 E "
+                        "|mediana|<piso E S>=S_min_sem) em todas as celulas; "
+                        "'detectada' exige CI fora de 0 E |mediana|>=piso; "
+                        "resto = indeterminada"},
         "P_E": {"tipo": "ESTIMACAO", "superficies": [
             "frac_censurada x (T,m)", "medianas t_res e duracao x m",
             "fracao-limpa x m", "qualidade da predicao-area x m",
             "fracao morte-por-saida e v_cruzou x m"]},
         "P_NULL": {"braco": "semgrad",
-                   "criterio": "P-A NAO pode passar (area nao vence placebo); "
-                               "se passar, instrumento viciado -> tudo invalido"},
-        "potencia_P_A": {"modelo": "binomial exata, n_ep=30/seed",
-                         "curva": potencia, "MDE_power_0.8": mde},
+                   "criterio": "P-A calibrado NAO pode passar em nenhuma celula; "
+                               "se passar, instrumento/calibracao viciados -> "
+                               "tudo invalido"},
+        "potencia_P_A": {
+            "metodo": "nivel (FPR) e potencia (TPR) do teste calibrado "
+                      "demonstrados por simulacao no --sintetico, sob o nulo "
+                      "truncado e sob memoria; ver saida impressa la",
+            "condicional": "potencia condicional a episodios/seed suficientes "
+                           "(piloto: ~170 completos/seed em 20k passos, m=64 — "
+                           "folga grande sobre min_ep_por_seed=3)",
+            "referencia_binomial_antiga": {"curva": potencia, "MDE": mde,
+                                           "nota": "valia para o teste de sinais "
+                                           "abandonado no P-A (7o parecer)"}},
         "resultados": {"formato": "results/{braco}-m{m}-s{seed}.json.gz",
                        "git": "raw fica local (regeneravel, deterministico); "
                               "manifest com SHA256 + agregados sao commitados"},
