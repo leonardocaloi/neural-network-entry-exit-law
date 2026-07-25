@@ -1,0 +1,544 @@
+{
+  "meta": {
+    "etapa": "5-confirmatorio (transformer FFN)",
+    "gerado_por": "preditor_e5.py",
+    "fonte_numeros": "piloto-de-taxa e5 (results-taxa/*.json, 160 runs EXPLORATORIO, colapso de-chatter de analise_taxa) + calibracao propria de d_h",
+    "regime": "DETERMINISTICO (GD puro T=0); estocastico fora de escopo",
+    "status": "CANDIDATO — aguardando 11o parecer",
+    "instrumento": "contador-mestre GT com HISTERESE d_h (mata o chatter do canal nao-estacionario) + volta SUSTENTADA (viva no fim de H)"
+  },
+  "arms": [
+    "sp-b3",
+    "sp-b10",
+    "gelu",
+    "relu"
+  ],
+  "grade": {
+    "bracos": [
+      {
+        "nome": "sp-b3",
+        "ativ": "softplus",
+        "beta": 3.0,
+        "papel": "primario (classe-do-teorema)"
+      },
+      {
+        "nome": "sp-b10",
+        "ativ": "softplus",
+        "beta": 10.0,
+        "papel": "escada-beta"
+      },
+      {
+        "nome": "gelu",
+        "ativ": "gelu",
+        "beta": 1.0,
+        "papel": "barreira (fora-de-classe)"
+      },
+      {
+        "nome": "relu",
+        "ativ": "relu",
+        "beta": 1.0,
+        "papel": "validade / montante puro"
+      }
+    ],
+    "factors": [
+      "train",
+      "frozen"
+    ],
+    "inj_depths": [
+      -0.3,
+      -2.0
+    ],
+    "S": 50,
+    "seeds": [
+      2000,
+      2001,
+      2002,
+      2003,
+      2004,
+      2005,
+      2006,
+      2007,
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026,
+      2027,
+      2028,
+      2029,
+      2030,
+      2031,
+      2032,
+      2033,
+      2034,
+      2035,
+      2036,
+      2037,
+      2038,
+      2039,
+      2040,
+      2041,
+      2042,
+      2043,
+      2044,
+      2045,
+      2046,
+      2047,
+      2048,
+      2049
+    ],
+    "H": 200000,
+    "m_ffn": 4,
+    "n_dados": 24,
+    "S_seq": 3,
+    "d_model": 16,
+    "H_heads": 2,
+    "eta": 0.001,
+    "T": 0.0,
+    "rec_cada": 300,
+    "celulas": 8,
+    "runs_por_celula": 100,
+    "total_runs": 800,
+    "nota_injecao": "1 unidade injetada por run, na profundidade da grade (kill_depth). O piloto injetava 2/run (1 rasa+1 profunda); aqui a profundidade e FATOR => 1/run, isolando o canal por profundidade. Disclosure: pressao mais branda (3 vivas de 4 vs 2 do piloto) => se algo, favorece a volta (conservador p/ o MATA)."
+  },
+  "seeds": [
+    2000,
+    2001,
+    2002,
+    2003,
+    2004,
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026,
+    2027,
+    2028,
+    2029,
+    2030,
+    2031,
+    2032,
+    2033,
+    2034,
+    2035,
+    2036,
+    2037,
+    2038,
+    2039,
+    2040,
+    2041,
+    2042,
+    2043,
+    2044,
+    2045,
+    2046,
+    2047,
+    2048,
+    2049
+  ],
+  "alpha": 0.05,
+  "delta_h": 0.047603416442871034,
+  "delta_h_derivacao": {
+    "metodo": "quantil q0.99 da amplitude=meia-p2p(zmax) em janelas de L=200 passos, sobre unidades VIVAS (zmax>0 todo o run) em runs FROZEN sem injecao",
+    "calib_seeds": [
+      7,
+      8,
+      9
+    ],
+    "calib_steps": 15000,
+    "janela_L": 200,
+    "quantil": 0.99,
+    "n_amostras": 3256,
+    "por_braco": {
+      "sp-b3": {
+        "q99": 0.047750263214111376,
+        "n": 814
+      },
+      "sp-b10": {
+        "q99": 0.04817134201526642,
+        "n": 814
+      },
+      "gelu": {
+        "q99": 0.04221331715583809,
+        "n": 814
+      },
+      "relu": {
+        "q99": 0.03214237928390506,
+        "n": 814
+      }
+    },
+    "nota": "valida a posteriori a escolha d~0.05 do piloto (TAXA-e5.md 0/7); d_h derivado, nao magico"
+  },
+  "tau_por_braco": {
+    "sp-b3": 64240.5,
+    "sp-b10": 62516.700000000004,
+    "gelu": 59680.30000000001,
+    "relu": 67723.5
+  },
+  "janela": {
+    "regra": "[0, H - tau_braco]",
+    "H": 200000,
+    "fim_por_braco": {
+      "sp-b3": 135759.5,
+      "sp-b10": 137483.3,
+      "gelu": 140319.69999999998,
+      "relu": 132276.5
+    },
+    "origem": "tau_braco = q0.9 do return-time (colapso de-chatter, pool train+frozen)",
+    "nota": "injetadas nascem mortas em t=0 => a janela liga no TEMPO DE VOLTA (t_res <= H-tau), nao no tempo de morte (difere do 4a.3). 'sustained' primario = alive-no-fim (histerese); janela e robustez secundaria."
+  },
+  "E_A": {
+    "estimando": "VALIDADE: qualquer volta sustentada em relu-frozen (rasa OU profunda) => INVALIDO",
+    "base": "teorema: grad proprio==0 (relu morto) E entrada fixa (frozen) => terminal, 0 voltas",
+    "decidibilidade": "DECIDIVEL e limpa (piloto: relu-frozen 0/40). Obrigatoria."
+  },
+  "E_B": {
+    "estimando": "Delta = p_sust(train) - p_sust(frozen) por braco (pool profundidades)",
+    "regra": "CI(boot seed): CI-inf>0 => REPRODUZ; CI-sup<=0 => MATA (montante falso); senao INCONCLUSIVO",
+    "pilot_delta": {
+      "sp-b3": {
+        "train": 11,
+        "frozen": 5,
+        "delta": 6
+      },
+      "sp-b10": {
+        "train": 9,
+        "frozen": 3,
+        "delta": 6
+      },
+      "gelu": {
+        "train": 14,
+        "frozen": 8,
+        "delta": 6
+      },
+      "relu": {
+        "train": 8,
+        "frozen": 0,
+        "delta": 8
+      }
+    },
+    "disclosure": "piloto (contador z_alive=0, chatter-propenso) mostrou Delta>0 decisivo (+6/+6/+6/+8; relu 0->8 = montante puro, own_move=0). MAS a HISTERESE d_h e ESTRITA: exige zmax>+d_h SUSTENTADO, nao so tocar 0. Teste em s103 mostrou chatter cru (160 travessias) -> 0 voltas confirmadas a H=8e4. A H=2e5 (>=3tau) os climbs de montante tem tempo de exceder d_h e sustentar => REPRODUCAO ESPERADA mas NAO garantida; MATA se o montante for so hover. Decidivel a S=50."
+  },
+  "E_C": {
+    "estimando": "sp-b3-frozen inj -0.3: p(volta sustentada | inj), Clopper-Pearson",
+    "n_star": 6,
+    "mata_thresh": 0.0061742635851474,
+    "regra": "CP-sup < mata_thresh => MATA (nao transfere); senao sust>=n* => TRANSFERE; senao INCONCLUSIVO. (MATA checado 1o.)",
+    "pilot": {
+      "rev": 2,
+      "n": 20,
+      "cp": [
+        0.1,
+        0.0123485271702948,
+        0.3169827140190823
+      ],
+      "ci_inf": 0.0123485271702948
+    },
+    "origem": {
+      "mata_thresh": "0.5 * CP-inf(piloto sp-b3-frozen rasa = 2/20)",
+      "n_star": "TAXA-e5.md 7 (piso de voltas sustentadas)"
+    },
+    "disclosure": "mata_thresh=0.00617 e minusculo => CP-sup(0,N)<thresh so a N>=800 (CP-sup(0,50)=0.0711 > thresh). A N=50 a MATA de E-C e QUASE-INATINGIVEL (paridade honesta com o C1 do 4a.3, que pedia N>=47 zero-volta): E-C decide na pratica entre TRANSFERE (>=6 sustentadas) e INCONCLUSIVO (<6). O poder REAL e o gate positivo: o piloto a H=8e4 deu 2/20 (frozen rasa); projetado a H=2e5 (~3tau) p~0.28 => >=6/50 esperado. Falsificavel em principio (N grande)."
+  },
+  "E_D": {
+    "estimando": "gelu-frozen: p_sust(profunda -2.0) vs p_sust(rasa -0.3). Barreira preve rasa>>profunda no canal PROPRIO. Estimando extra: fracao de trios com sinal(A_drive)!=sinal(A_mlp) (S1), deep vs raso.",
+    "n_star": 6,
+    "regra": "CP-inf(prof) >= CP-sup(rasa) => MATA-BARREIRA (barreira nao existe); CP-inf(rasa) > CP-sup(prof) e rasa>=n* => SUSTENTA-BARREIRA; senao INCONCLUSIVO",
+    "pilot": {
+      "gelu_frozen_rasa": {
+        "rev": 4,
+        "n": 20,
+        "cp": [
+          0.2,
+          0.05733399705003275,
+          0.4366140029966684
+        ]
+      },
+      "gelu_frozen_prof": {
+        "rev": 4,
+        "n": 20,
+        "cp": [
+          0.2,
+          0.05733399705003275,
+          0.4366140029966684
+        ]
+      }
+    },
+    "disclosure": "o piloto injetou a -1.0 (so um pouco abaixo de z*=-0.752) e deu rasa 4/20 = profunda 4/20: EMPATE, NAO decidiu (P-ii nao sustentada a -1.0). O confirmatorio injeta a -2.0 (bem abaixo de z*) => se a barreira for terminal, profunda cai e a separacao aparece. E o teste GENUINO da barreira que o piloto nao pode fazer. Inversao de sinal de A_drive (S1) reportada como estimando (piloto: 80-95% opostos nos profundos)."
+  },
+  "E_E": {
+    "estimando": "escada p(volta sustentada) por beta {3,10}, frozen e train; estimacao, SEM MATA",
+    "pilot_rasa": {
+      "sp-b3-train": {
+        "rev": 10,
+        "n": 20,
+        "cp": [
+          0.5,
+          0.2719578495607917,
+          0.7280421504392083
+        ]
+      },
+      "sp-b3-frozen": {
+        "rev": 2,
+        "n": 20,
+        "cp": [
+          0.1,
+          0.0123485271702948,
+          0.3169827140190823
+        ]
+      },
+      "sp-b10-train": {
+        "rev": 9,
+        "n": 20,
+        "cp": [
+          0.45,
+          0.2305778967759241,
+          0.6847218669594515
+        ]
+      },
+      "sp-b10-frozen": {
+        "rev": 3,
+        "n": 20,
+        "cp": [
+          0.15,
+          0.03207093718546371,
+          0.37892682654531396
+        ]
+      }
+    }
+  },
+  "contagem": {
+    "regra": "volta SUSTENTADA (histerese; unidade termina H viva) UNICA por unidade injetada; trios GT-area (t_area_drive <= t_res) com A_drive; born-dead por injecao => t_morte=0."
+  },
+  "bootstrap": {
+    "metodo": "cluster por seed",
+    "B": 20000,
+    "seed_prop": 161803,
+    "seed_montante": 141421,
+    "rng_proibidos": [
+      777,
+      779,
+      "5xxx",
+      9090,
+      314159,
+      271828
+    ]
+  },
+  "pilot_ref": {
+    "tau": {
+      "sp-b3": 64240.5,
+      "sp-b10": 62516.700000000004,
+      "gelu": 59680.30000000001,
+      "relu": 67723.5
+    },
+    "delta_montante": {
+      "sp-b3": {
+        "train": 11,
+        "frozen": 5,
+        "delta": 6
+      },
+      "sp-b10": {
+        "train": 9,
+        "frozen": 3,
+        "delta": 6
+      },
+      "gelu": {
+        "train": 14,
+        "frozen": 8,
+        "delta": 6
+      },
+      "relu": {
+        "train": 8,
+        "frozen": 0,
+        "delta": 8
+      }
+    },
+    "por_celula_prof": {
+      "sp-b3-train-rasa": {
+        "rev": 10,
+        "n": 20,
+        "cp": [
+          0.5,
+          0.2719578495607917,
+          0.7280421504392083
+        ]
+      },
+      "sp-b3-train-prof": {
+        "rev": 1,
+        "n": 20,
+        "cp": [
+          0.05,
+          0.0012650894979498034,
+          0.24873276277202777
+        ]
+      },
+      "sp-b3-frozen-rasa": {
+        "rev": 2,
+        "n": 20,
+        "cp": [
+          0.1,
+          0.0123485271702948,
+          0.3169827140190823
+        ]
+      },
+      "sp-b3-frozen-prof": {
+        "rev": 3,
+        "n": 20,
+        "cp": [
+          0.15,
+          0.03207093718546371,
+          0.37892682654531396
+        ]
+      },
+      "sp-b10-train-rasa": {
+        "rev": 9,
+        "n": 20,
+        "cp": [
+          0.45,
+          0.2305778967759241,
+          0.6847218669594515
+        ]
+      },
+      "sp-b10-train-prof": {
+        "rev": 0,
+        "n": 20,
+        "cp": [
+          0.0,
+          0.0,
+          0.1684334709830853
+        ]
+      },
+      "sp-b10-frozen-rasa": {
+        "rev": 3,
+        "n": 20,
+        "cp": [
+          0.15,
+          0.03207093718546371,
+          0.37892682654531396
+        ]
+      },
+      "sp-b10-frozen-prof": {
+        "rev": 0,
+        "n": 20,
+        "cp": [
+          0.0,
+          0.0,
+          0.1684334709830853
+        ]
+      },
+      "gelu-train-rasa": {
+        "rev": 13,
+        "n": 20,
+        "cp": [
+          0.65,
+          0.40781146546717184,
+          0.8460907952154588
+        ]
+      },
+      "gelu-train-prof": {
+        "rev": 1,
+        "n": 20,
+        "cp": [
+          0.05,
+          0.0012650894979498034,
+          0.24873276277202777
+        ]
+      },
+      "gelu-frozen-rasa": {
+        "rev": 4,
+        "n": 20,
+        "cp": [
+          0.2,
+          0.05733399705003275,
+          0.4366140029966684
+        ]
+      },
+      "gelu-frozen-prof": {
+        "rev": 4,
+        "n": 20,
+        "cp": [
+          0.2,
+          0.05733399705003275,
+          0.4366140029966684
+        ]
+      },
+      "relu-train-rasa": {
+        "rev": 8,
+        "n": 20,
+        "cp": [
+          0.4,
+          0.1911900607253072,
+          0.6394574126925103
+        ]
+      },
+      "relu-train-prof": {
+        "rev": 0,
+        "n": 20,
+        "cp": [
+          0.0,
+          0.0,
+          0.1684334709830853
+        ]
+      },
+      "relu-frozen-rasa": {
+        "rev": 0,
+        "n": 20,
+        "cp": [
+          0.0,
+          0.0,
+          0.1684334709830853
+        ]
+      },
+      "relu-frozen-prof": {
+        "rev": 0,
+        "n": 20,
+        "cp": [
+          0.0,
+          0.0,
+          0.1684334709830853
+        ]
+      }
+    },
+    "e_c_analogo": {
+      "rev": 2,
+      "n": 20,
+      "cp": [
+        0.1,
+        0.0123485271702948,
+        0.3169827140190823
+      ],
+      "ci_inf": 0.0123485271702948
+    }
+  }
+}
