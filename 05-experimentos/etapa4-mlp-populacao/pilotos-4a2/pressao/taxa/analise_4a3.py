@@ -33,6 +33,20 @@ import numpy as np
 AQUI = os.path.dirname(os.path.abspath(__file__))
 CONFIG = os.path.join(AQUI, "config_4a3.json")
 
+try:
+    _CFG0 = json.load(open(CONFIG))
+except Exception:                       # sintético constrói o próprio ambiente
+    _CFG0 = {}
+
+
+def _cfg_alpha():
+    return float(_CFG0.get("C1", {}).get("alpha", 0.05))
+
+
+def _cfg_B():
+    return int(_CFG0.get("bootstrap", {}).get("B", 20000))
+
+
 
 # ============================ estatística EXATA (sem scipy) ===================
 def _bisect(f, target, incr, lo=0.0, hi=1.0, it=200):

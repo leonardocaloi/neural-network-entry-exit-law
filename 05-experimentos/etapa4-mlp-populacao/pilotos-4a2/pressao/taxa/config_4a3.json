@@ -123,14 +123,14 @@
     }
   },
   "C2": {
-    "estimando": "fração de voltas dinâmicas ORDENADAS no relógio GT: t_morte ≤ t_área < t_res",
+    "estimando": "fração de voltas dinâmicas cuja ÁREA do drive-líder ABRE (t_área ≥ 0) durante o episódio morto, antes da volta",
     "alpha": 0.05,
     "min_voltas": 6,
     "piso": 0.5,
-    "empate_morte_area": "permitido (≤)",
-    "empate_area_volta": "proibido (<)",
-    "volta_sem_area": "NÃO-ordenada",
-    "regra": "n_voltas≥6: CP-inferior(ordenadas, voltas) < 0.5 ⟹ MATA (zero-de-área não governa a volta); n_voltas<6 ⟹ INCONCLUSIVO",
+    "honestidade_estrutural": "10º parecer: no relógio único GT, t_morte ≤ t_área < t_res é GARANTIDO POR CONSTRUÇÃO sempre que a área abre (t_área só é setada em passos mortos e o episódio fecha na volta). O ÚNICO modo de falha empírico é 'volta sem área' — distinções empate/estrito são imateriais à contagem. NÃO reivindicar 'lei de ordenação temporal' como achado.",
+    "volta_sem_area": "conta como falha (evidência contra a lei)",
+    "regra": "n_voltas≥6: CP-inferior(área-abriu, voltas) < 0.5 ⟹ MATA (o drive-líder não explica a volta); n_voltas<6 ⟹ INCONCLUSIVO",
+    "desfecho_esperado": "disclosure em paridade com C1: o piloto prevê fração≈1.0 sob o instrumento GT ⟹ SUSTENTA é o esperado; a potência de MATA vem inteiramente da taxa de voltas-sem-área (1 em 6 já mata; voltas conduzidas fora-do-líder produziriam exatamente isso)",
     "nota": "denominador = TODAS as voltas dinâmicas; born-dead excluídos"
   },
   "C4": {

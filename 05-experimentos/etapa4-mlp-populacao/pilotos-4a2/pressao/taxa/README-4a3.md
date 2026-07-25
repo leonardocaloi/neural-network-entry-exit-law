@@ -1,7 +1,11 @@
 # etapa-4a.3 — CONFIRMATÓRIO: estatística da ressurreição-por-mecanismo em MLP (T=0)
 
-**STATUS: CANDIDATO A PRÉ-REGISTRO — aguardando 10º parecer. NÃO congelado, NÃO rodar
-a grade confirmatória.** Supersede `README-4a3-rascunho.md`. Todos os números de
+**STATUS: PRÉ-REGISTRADO — este commit é o pré-registro.** Trilha: 9º parecer
+CORRIGIR-DESENHO → piloto-de-taxa (240 runs) → pacote candidato (a622224) →
+10º parecer NÃO-APTO (estimando C2 estrutural — `parecer-10-pacote-4a3.md`) →
+correções textuais + fiação alpha/B → lista mínima do parecer atendida ⟹ APTO.
+z_park = min de zmax no episódio (leitura confirmada; C3 exploratório).
+Supersede `README-4a3-rascunho.md`. Todos os números de
 desenho vêm do **piloto-de-taxa** (240 runs, EXPLORATÓRIO) e foram derivados
 PROGRAMATICAMENTE por `preditor_4a3.py` para `config_4a3.json` (nada digitado à mão).
 
@@ -29,12 +33,18 @@ reescritos com MATA condicional e denominador correto; (v) `motor/preditor/anali
   p(volta) < ½·(CI-inferior do piloto) = **0.076** ⟹ mecanismo não reproduz na escala.
   **N_elig < n* ⟹ INCONCLUSIVO** (nunca negativo). relu = controle de validade
   (zero é TEOREMA, grad≡0; não é braço-pareado — divergem do passo 1).
-- **C2 (LEI-DE-ÁREA — o CORAÇÃO, braço β3).** Para cada volta dinâmica, o trio
-  **no relógio único ground-truth** (t_morte, t_área, t_res) do instrumento GT-ÁREA.
-  Estatística = fração ORDENADA **t_morte ≤ t_área < t_res** (empate morte-área
-  permitido — absorve a discretização; área-volta estrito; **volta sem área =
-  NÃO-ordenada**). **MATA:** CP-inferior < 0.5 com ≥6 voltas. **<6 voltas ⟹
-  INCONCLUSIVO.** Denominador = TODAS as voltas dinâmicas; born-dead excluídos.
+- **C2 (LEI-DE-ÁREA — o CORAÇÃO, braço β3).** Estatística = fração de voltas
+  dinâmicas cuja **área do drive-líder ABRE (t_área ≥ 0) durante o episódio
+  morto, antes da volta**. **Honestidade estrutural (10º parecer):** no relógio
+  único GT, t_morte ≤ t_área < t_res é GARANTIDO POR CONSTRUÇÃO sempre que a
+  área abre (t_área só é setada em passos mortos; o episódio fecha na volta) —
+  o ÚNICO modo de falha empírico é **volta sem área**, e é ele que carrega toda
+  a potência do MATA (1 falha em 6 voltas já mata; voltas conduzidas
+  fora-do-líder produziriam exatamente isso). NÃO reivindicar "lei de ordenação
+  temporal" como achado. **Disclosure (paridade com C1):** o piloto prevê
+  fração≈1.0 sob o instrumento GT ⟹ SUSTENTA é o desfecho esperado. **MATA:**
+  CP-inferior < 0.5 com ≥6 voltas. **<6 voltas ⟹ INCONCLUSIVO.** Denominador =
+  TODAS as voltas dinâmicas; born-dead excluídos.
 - **C3 (GAP-DE-SUBIDA — estimação, sem MATA).** gap = t_res − t_área vs profundidade
   **z_park** (min de zmax no episódio GT-morto) e canal **σ(β·z_park)**. Alimenta o paper.
 - **C4 (CANAL-β — estimação, sem MATA).** Escada p(volta|morte) por β∈{3,10,300}
@@ -109,7 +119,7 @@ assimétrica ⟹ censura tratada com a janela [0,H−τ], não estendendo H.
 | 2 | Estimando C1 = p(volta\|morte elegível) CP | `config_4a3.C1.estimando`; `analise_4a3.avalia_C1` (CP exato sem scipy) |
 | 3 | MATA condicional (n*, piso, α; N<n*⟹inconclusivo) | n\*=10, thresh=0.076, α=0.05 congelados; regra em `avalia_C1` |
 | 4 | Janela [0,H−τ] + terminal-vs-censurado + dois p + person-time | janela [0,307 535]; `classifica_run` separa terminal/censurado; reporta p(volta\|morte) **e** p(volta\|elegível); ret-times por episódio p/ KM |
-| 5 | C2: todas-as-voltas, estritas, born-out, sizing por C2 | denominador = todas voltas dyn; **t_morte ≤ t_área < t_res** (resolve a inconsistência README≤/código<); born-dead fora; sizing por C2 no piloto |
+| 5 | C2: todas-as-voltas, estritas, born-out, sizing por C2 | denominador = todas voltas dyn; estimando reescrito no 10º parecer: **área-abriu (t_área ≥ 0)** — a ordenação temporal é estrutural no relógio GT, não achado; born-dead fora; sizing por C2 no piloto |
 | 6 | Contador ground-truth + regra dyn/born | contador-mestre GT (zmax<0→>0); classe born(t_morte=0)/dyn(t_morte>0) em `motor_4a3` |
 | 7 | Grade β∈{3,10,300}; C4 sem MATA com piso | grade nos 4 braços; `escada_C4` sem MATA |
 | 8 | relu = validade | `avalia_validade`: qualquer volta GT no relu ⟹ INVÁLIDO |
