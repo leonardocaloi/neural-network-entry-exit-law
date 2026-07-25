@@ -302,23 +302,41 @@ def avalia_EC_transferencia(tab_cell_depth, cfg):
 
 
 def avalia_ED_barreira(tab_cell_depth, cfg):
-    """gelu-frozen: rasa(-0.3) vs profunda(-2.0). MATA-barreira se CP-inf(prof)>=CP-sup(rasa);
-    SUSTENTA-barreira se CP-inf(rasa)>CP-sup(prof) e rasa>=n*; senao INCONCLUSIVO."""
+    """gelu-frozen: rasa(-0.3) vs profunda(-2.0). 11º PARECER (confound
+    profundidade×barreira): a separação INTRA-gelu é necessária mas NÃO
+    suficiente — nada garante que a profundidade sozinha não explique o zero
+    da profunda. O controle depth-matched JÁ está na grade: sp-b3-frozen a
+    -2.0 (mesma profundidade, SEM barreira, g'>0). Regra congelada:
+      MATA-BARREIRA: CP-inf(prof-gelu) >= CP-sup(rasa-gelu)  [limpo, inalterado]
+      SUSTENTA-BARREIRA: exige (a) intra-gelu rasa>>prof (CP disjuntos, rasa>=n*)
+        E (b) cross-arm depth-matched: CP-sup(gelu-frozen-prof) < CP-inf(sp-b3-frozen-prof)
+        [gelu revive MENOS que softplus À MESMA profundidade];
+      só (a) sem (b) ⟹ "CONSISTENTE-COM-BARREIRA (confundido com profundidade)";
+      senão INCONCLUSIVO."""
     rasa = tab_cell_depth.get(("gelu", "frozen", -0.3), dict(n_inj=0, n_sust=0))
     prof = tab_cell_depth.get(("gelu", "frozen", -2.0), dict(n_inj=0, n_sust=0))
+    spp = tab_cell_depth.get(("sp-b3", "frozen", -2.0), dict(n_inj=0, n_sust=0))
     cp_r = clopper_pearson(rasa["n_sust"], rasa["n_inj"]) if rasa["n_inj"] else (float("nan"),) * 3
     cp_p = clopper_pearson(prof["n_sust"], prof["n_inj"]) if prof["n_inj"] else (float("nan"),) * 3
+    cp_s = clopper_pearson(spp["n_sust"], spp["n_inj"]) if spp["n_inj"] else (float("nan"),) * 3
     n_star = cfg["E_D"]["n_star"]
+    intra = (rasa["n_inj"] > 0 and prof["n_inj"] > 0
+             and cp_r[1] > cp_p[2] and rasa["n_sust"] >= n_star)
+    cross = (spp["n_inj"] > 0 and prof["n_inj"] > 0 and cp_p[2] < cp_s[1])
     if rasa["n_inj"] == 0 or prof["n_inj"] == 0:
         status = "INCONCLUSIVO"
     elif cp_p[1] >= cp_r[2]:
         status = "MATA-BARREIRA"        # profunda >= rasa com confianca => sem barreira
-    elif cp_r[1] > cp_p[2] and rasa["n_sust"] >= n_star:
-        status = "SUSTENTA-BARREIRA"    # rasa >> profunda
+    elif intra and cross:
+        status = "SUSTENTA-BARREIRA"    # rasa>>prof E gelu<softplus a -2.0
+    elif intra:
+        status = "CONSISTENTE-COM-BARREIRA (confundido com profundidade)"
     else:
         status = "INCONCLUSIVO"
     return dict(rasa=dict(n_sust=rasa["n_sust"], n_inj=rasa["n_inj"], cp=cp_r),
                 prof=dict(n_sust=prof["n_sust"], n_inj=prof["n_inj"], cp=cp_p),
+                controle_sp_prof=dict(n_sust=spp["n_sust"], n_inj=spp["n_inj"], cp=cp_s),
+                intra_gelu=bool(intra), cross_depth_matched=bool(cross),
                 n_star=n_star, status=status)
 
 
@@ -441,9 +459,10 @@ def sintetico(cfg):
     runs = []
     # sp-b3: frozen rasa com muitas voltas (transfere), train ainda mais (montante)
     runs += _mkcell("sp-b3", "frozen", -0.3, 12, NS)
-    runs += _mkcell("sp-b3", "frozen", -2.0, 4, NS)
+    runs += _mkcell("sp-b3", "frozen", -2.0, 9, NS)   # 9/50: CP-inf>CP-sup(0/50) — o
+    # controle depth-matched revive SEM barreira ⟹ cross-arm do E-D fecha (11º parecer)
     runs += _mkcell("sp-b3", "train", -0.3, 22, NS, canal="proprio+montante")
-    runs += _mkcell("sp-b3", "train", -2.0, 6, NS, canal="proprio+montante")
+    runs += _mkcell("sp-b3", "train", -2.0, 15, NS, canal="proprio+montante")
     runs += _mkcell("sp-b10", "frozen", -0.3, 8, NS)
     runs += _mkcell("sp-b10", "frozen", -2.0, 2, NS)
     runs += _mkcell("sp-b10", "train", -0.3, 18, NS)
@@ -539,6 +558,23 @@ def sintetico(cfg):
     check(f"(vi) E-D INCONCLUSIVO (rasa {av['E_D']['rasa']['n_sust']}, prof "
           f"{av['E_D']['prof']['n_sust']}; sem separacao)",
           av["E_D"]["status"] == "INCONCLUSIVO")
+
+    # ============ MUNDO (vii): PROFUNDIDADE-PURA (confound do 11º parecer) ======
+    # gelu rasa>>prof (intra fecha) MAS softplus-frozen a -2.0 TAMBEM nao revive
+    # => nada separa barreira de profundidade => rotulo CONSISTENTE, nunca SUSTENTA
+    runs = []
+    runs += _mkcell("gelu", "frozen", -0.3, 14, NS, Ad=1.0, Am=1.0)
+    runs += _mkcell("gelu", "frozen", -2.0, 0, NS)
+    runs += _mkcell("sp-b3", "frozen", -2.0, 0, NS)   # controle depth-matched TAMBEM zero
+    runs += _mkcell("sp-b3", "frozen", -0.3, 12, NS)
+    runs += _mkcell("relu", "frozen", -0.3, 0, NS, canal=None)
+    runs += _mkcell("relu", "frozen", -2.0, 0, NS, canal=None)
+    av = avaliacao_completa(_cls(runs, cfg), cfg)
+    check(f"(vii) E-D NAO-SUSTENTA sob profundidade-pura (intra={av['E_D']['intra_gelu']}, "
+          f"cross={av['E_D']['cross_depth_matched']})",
+          av["E_D"]["status"].startswith("CONSISTENTE"))
+    check("(vii) E-D nao e MATA nem SUSTENTA (rotulo honesto do confound)",
+          av["E_D"]["status"] not in ("SUSTENTA-BARREIRA", "MATA-BARREIRA"))
 
     print(f"== SELF-TEST {'OK — TUDO PASSA' if falhas == 0 else f'FALHOU ({falhas})'} ==")
     return falhas == 0

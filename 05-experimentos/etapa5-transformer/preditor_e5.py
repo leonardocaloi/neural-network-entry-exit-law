@@ -182,6 +182,15 @@ def main():
         alpha=ALPHA,
         delta_h=delta_h,
         delta_h_derivacao=meta_dh,
+        delta_h_disclosure_train=(
+            "11o PARECER: a base de calibracao e FROZEN-ONLY. A mesma estatistica em runs "
+            "TRAIN da q0.99 ~ 0.070-0.081 (~1.7x o delta_h; canal de montante adiciona "
+            "nao-estacionaridade que frozen nao ve). Sonda operacional: run TRAIN sem "
+            "injecao sob delta_h=0.0476 => n_natural_dyn~0 e 0 voltas espurias (o fantasma "
+            "permanece fechado: viva genuina oscila em torno de media alta e nunca chega a "
+            "-delta_h; a regra sustained=viva-no-fim transforma borderline em hover). "
+            "Todo estimando decidivel dependente do delta_h absoluto (E-A/E-C/E-D) vive em "
+            "celulas FROZEN, onde a base e exatamente a certa."),
         tau_por_braco=tau,
         janela=dict(regra="[0, H - tau_braco]", H=H,
                     fim_por_braco={a: H - tau[a] for a in tau},
@@ -231,16 +240,24 @@ def main():
                        "preve rasa>>profunda no canal PROPRIO. Estimando extra: fracao de "
                        "trios com sinal(A_drive)!=sinal(A_mlp) (S1), deep vs raso."),
             n_star=N_STAR,
-            regra=("CP-inf(prof) >= CP-sup(rasa) => MATA-BARREIRA (barreira nao existe); "
-                   "CP-inf(rasa) > CP-sup(prof) e rasa>=n* => SUSTENTA-BARREIRA; senao INCONCLUSIVO"),
+            regra=("CP-inf(prof) >= CP-sup(rasa) => MATA-BARREIRA (limpo); "
+                   "SUSTENTA-BARREIRA exige (a) intra-gelu CP-inf(rasa)>CP-sup(prof) e "
+                   "rasa>=n* E (b) cross-arm depth-matched: CP-sup(gelu-frozen-prof) < "
+                   "CP-inf(sp-b3-frozen-prof) [gelu revive MENOS que softplus A MESMA "
+                   "profundidade]; so (a) sem (b) => 'CONSISTENTE-COM-BARREIRA "
+                   "(confundido com profundidade)'; senao INCONCLUSIVO"),
             pilot=dict(gelu_frozen_rasa=piloto["por_celula_prof"]["gelu-frozen-rasa"],
                        gelu_frozen_prof=piloto["por_celula_prof"]["gelu-frozen-prof"]),
             disclosure=(
-                "o piloto injetou a -1.0 (so um pouco abaixo de z*=-0.752) e deu rasa 4/20 = "
-                "profunda 4/20: EMPATE, NAO decidiu (P-ii nao sustentada a -1.0). O "
-                "confirmatorio injeta a -2.0 (bem abaixo de z*) => se a barreira for terminal, "
-                "profunda cai e a separacao aparece. E o teste GENUINO da barreira que o piloto "
-                "nao pode fazer. Inversao de sinal de A_drive (S1) reportada como estimando "
+                "11o PARECER (honestidade estrutural, mesma classe do C2/4a.3): a separacao "
+                "INTRA-gelu rasa-vs-profunda CONFUNDE barreira com profundidade — nada garante "
+                "que sp-b3-frozen a -2.0 (sem barreira, g'>0) reviva; se ele tambem der ~0, o "
+                "zero da profunda mede DISTANCIA, nao barreira. Por isso SUSTENTA exige o "
+                "controle depth-matched (ja na grade). Sonda do parecer: a unidade gelu a -2.0 "
+                "SE MOVE (own_move 1.4e-2..1.9e-3, decrescente; g'(-2)=-0.085 inverte o drive) "
+                "e nao vence a barreira no horizonte — nao e celula vazia. Historico: piloto "
+                "injetou -1.0 e deu empate 4/20=4/20 (P-ii nao sustentada a -1.0); -2.0 e o "
+                "teste genuino. S1 (inversao de sinal de A_drive) reportada como estimando "
                 "(piloto: 80-95% opostos nos profundos)."),
         ),
         E_E=dict(

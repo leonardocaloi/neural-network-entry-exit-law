@@ -1,6 +1,6 @@
 # etapa-5 — CONFIRMATORIO: ressurreicao-por-canal na FFN de um transformer (T=0)
 
-**STATUS: CANDIDATO — aguardando 11o parecer.** NENHUMA run confirmatoria foi
+**STATUS: PRÉ-REGISTRADO — este commit é o pré-registro.** Trilha: piloto-de-taxa e5 → pacote candidato (3962929) → 11º parecer NÃO-APTO (2 itens textuais: confound profundidade×barreira em E-D; disclosure do δ_h frozen-only) → correções aplicadas (regra E-D com controle depth-matched + mundo sintético (vii) do confound + disclosures) → lista mínima atendida ⟹ APTO.
 executada. Trilha: scoping (`RELATORIO-scoping.md`, sinal negativo informativo) →
 piloto-de-taxa (`TAXA-e5.md`, 160 runs EXPLORATORIO, de-chatter) → este pacote. Herda
 a disciplina do confirmatorio **4a.3** (contador ground-truth, CP/bootstrap exatos sem
@@ -150,3 +150,16 @@ setsid taskset -c 0-7 nice -n 19 ../../venv/bin/python run_e5.py --workers 4 \
 - **Runtime ~3.7 min/run** (H=2e5, celula frozen-injetada; a mais cara). 800 runs / 4
   workers ≈ 12 h — rodar em lote noturno, comecando pelo par relu (E-A/E-B, decisivos e
   baratos de interpretar) e pelo primario sp-b3.
+
+## Adendo do 11º parecer (congelado com o pré-registro)
+
+- **E-D**: SUSTENTA-BARREIRA exige o controle depth-matched (CP-sup(gelu-frozen-−2.0)
+  < CP-inf(sp-b3-frozen-−2.0)); só a separação intra-gelu ⟹ "CONSISTENTE-COM-BARREIRA
+  (confundido com profundidade)". Sonda: a unidade a −2.0 SE MOVE (own_move≠0,
+  g'(−2)=−0.085 inverte o drive) — não é célula vazia. MATA-BARREIRA inalterado.
+- **δ_h=0.04760**: base de calibração é FROZEN-ONLY; em TRAIN a mesma estatística dá
+  q0.99≈0.07–0.08 (montante adiciona não-estacionaridade), e ainda assim a sonda
+  operacional dá n_natural_dyn≈0 sob δ_h — fantasma fechado; estimandos decidíveis
+  dependentes de δ_h absoluto vivem em células frozen.
+- Sintético ganhou o mundo (vii) profundidade-pura: intra sem cross ⟹ CONSISTENTE,
+  nunca SUSTENTA (validado nos dois sentidos).
