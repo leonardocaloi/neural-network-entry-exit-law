@@ -1,0 +1,112 @@
+{
+ "semgrad-T1e-05": {
+  "n_runs": 3,
+  "n_ep": 349,
+  "n_fis": 117,
+  "n_comp": 50,
+  "n_cens": 67,
+  "censura_fis": 0.573,
+  "med_dur": 500000.0,
+  "p90_dur": 500000.0,
+  "fis_por_seed": [
+   47,
+   29,
+   41
+  ],
+  "comp_por_seed": [
+   27,
+   6,
+   17
+  ],
+  "fis_por_seed_med": 41.0,
+  "comp_por_seed_med": 17.0
+ },
+ "semgrad-T1e-04": {
+  "n_runs": 3,
+  "n_ep": 4016,
+  "n_fis": 624,
+  "n_comp": 556,
+  "n_cens": 68,
+  "censura_fis": 0.109,
+  "med_dur": 258.0,
+  "p90_dur": 341164.0,
+  "fis_por_seed": [
+   196,
+   253,
+   175
+  ],
+  "comp_por_seed": [
+   174,
+   233,
+   149
+  ],
+  "fis_por_seed_med": 196.0,
+  "comp_por_seed_med": 174.0
+ },
+ "softplus-T0e+00": {
+  "n_runs": 3,
+  "n_ep": 69,
+  "n_fis": 69,
+  "n_comp": 2,
+  "n_cens": 67,
+  "censura_fis": 0.971,
+  "med_dur": 500000.0,
+  "p90_dur": 500000.0,
+  "fis_por_seed": [
+   21,
+   24,
+   24
+  ],
+  "comp_por_seed": [
+   1,
+   1,
+   0
+  ],
+  "fis_por_seed_med": 24.0,
+  "comp_por_seed_med": 1.0
+ },
+ "softplus-T1e-05": {
+  "n_runs": 3,
+  "n_ep": 1402,
+  "n_fis": 256,
+  "n_comp": 188,
+  "n_cens": 68,
+  "censura_fis": 0.266,
+  "med_dur": 350.0,
+  "p90_dur": 500000.0,
+  "fis_por_seed": [
+   171,
+   41,
+   44
+  ],
+  "comp_por_seed": [
+   151,
+   17,
+   20
+  ],
+  "fis_por_seed_med": 44.0,
+  "comp_por_seed_med": 20.0
+ },
+ "softplus-T1e-04": {
+  "n_runs": 3,
+  "n_ep": 5142,
+  "n_fis": 815,
+  "n_comp": 747,
+  "n_cens": 68,
+  "censura_fis": 0.083,
+  "med_dur": 230.0,
+  "p90_dur": 30086.0,
+  "fis_por_seed": [
+   217,
+   368,
+   230
+  ],
+  "comp_por_seed": [
+   196,
+   347,
+   204
+  ],
+  "fis_por_seed_med": 230.0,
+  "comp_por_seed_med": 204.0
+ }
+}
