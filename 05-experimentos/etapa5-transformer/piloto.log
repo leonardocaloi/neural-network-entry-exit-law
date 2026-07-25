@@ -1,0 +1,20 @@
+== piloto_e5: 18 runs, 2 workers, passos=150000 ==
+OK gelu-press-s43: 199s plato=0.1447 lossf=0.1429 born=0 dyn=0 rev=0 eps=0
+OK gelu-press-s42: 200s plato=0.1243 lossf=0.1218 born=0 dyn=0 rev=0 eps=0
+OK gelu-press-s44: 194s plato=0.0875 lossf=0.0840 born=0 dyn=0 rev=0 eps=0
+OK gelu-slack-s42: 201s plato=0.0118 lossf=0.0106 born=0 dyn=0 rev=0 eps=0
+OK gelu-slack-s43: 203s plato=0.0237 lossf=0.0234 born=0 dyn=0 rev=0 eps=0
+OK gelu-slack-s44: 201s plato=0.0107 lossf=0.0099 born=0 dyn=0 rev=0 eps=0
+OK gelu-kill-tr-s42: 221s plato=0.1745 lossf=0.1704 born=2 dyn=0 rev=0 eps=2
+OK gelu-kill-tr-s43: 223s plato=0.2647 lossf=0.2613 born=2 dyn=0 rev=0 eps=2
+OK gelu-kill-fz-s42: 212s plato=0.2251 lossf=0.2247 born=2 dyn=0 rev=0 eps=2
+OK gelu-kill-tr-s44: 220s plato=0.2135 lossf=0.2112 born=2 dyn=0 rev=0 eps=2
+OK gelu-kill-fz-s43: 213s plato=0.2880 lossf=0.2877 born=2 dyn=0 rev=0 eps=2
+OK gelu-kill-fz-s44: 212s plato=0.2374 lossf=0.2374 born=2 dyn=0 rev=0 eps=2
+OK relu-kill-tr-s42: 197s plato=0.1829 lossf=0.1818 born=2 dyn=0 rev=0 eps=2
+OK relu-kill-tr-s43: 200s plato=0.2178 lossf=0.2156 born=2 dyn=0 rev=0 eps=2
+OK relu-kill-fz-s42: 193s plato=0.2262 lossf=0.2260 born=2 dyn=0 rev=0 eps=2
+OK relu-kill-tr-s44: 196s plato=0.2129 lossf=0.2123 born=2 dyn=0 rev=0 eps=2
+OK relu-kill-fz-s43: 190s plato=0.2559 lossf=0.2557 born=2 dyn=0 rev=0 eps=2
+OK relu-kill-fz-s44: 191s plato=0.2385 lossf=0.2385 born=2 dyn=0 rev=0 eps=2
+== FIM: 18 runs em 1854s ==
