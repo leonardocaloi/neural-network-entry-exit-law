@@ -159,7 +159,20 @@ rejeitar sem memória por-episódio (rejeição medida: 10% sob tendência forte
 0% sob metade dela). Desarme pré-registrado: P-E reporta corr(dur, t_morte) e
 corr(atraso, t_morte) por célula — se P-A passar COM correlações fortes, o
 resultado é rebaixado a "memória OU tendência comum" na nota.
-**Desvios pós-execução: (nenhum ainda — seção obrigatória).**
+**Desvios pós-execução:** (1) infra: workers 6→4 via env durante a run (vigia
+de load; não toca na ciência — runs determinísticas e independentes do pool;
+commit próprio). (2) NENHUM desvio de análise: vereditos saíram 100% do código
+congelado.
+
+## 8. RESULTADO (2026-07-24): INVÁLIDO por P-NULL
+
+O braço semgrad passou no teste calibrado (m=16, p=0.002) ⟹ pela regra
+pré-registrada, instrumento viciado; P-A/P-B/P-D anulados. Diagnóstico
+(chatter de fronteira; heterogeneidade por neurônio quebra o H0 iid; física
+real em T→0 com 99.6% de censura) e herança para a etapa-4a.2:
+`06-notas/2026-07-24-etapa4a-invalido-instrumento.md` e
+`05-experimentos/NEGATIVOS.md`. Agregados em `resultados.json`; raw local
+(regenerável, determinístico) com SHA256 em `results/manifest.json`.
 
 ## 7. Ordem de execução
 

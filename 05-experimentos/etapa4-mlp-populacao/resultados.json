@@ -1,0 +1,754 @@
+{
+ "P_A": {
+  "celulas": {
+   "16": {
+    "n_limpos": 2323,
+    "valida": true,
+    "frac_sem_area": 0.362,
+    "T_obs": 0.0165,
+    "p_calibrado": 0.041,
+    "S_efetivo": 16,
+    "fracs_sinal_descritivo": [
+     0.02,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.059,
+     0.0,
+     0.0,
+     0.024,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "passa": false
+   },
+   "64": {
+    "n_limpos": 12478,
+    "valida": true,
+    "frac_sem_area": 0.332,
+    "T_obs": 0.035,
+    "p_calibrado": 0.004,
+    "S_efetivo": 20,
+    "fracs_sinal_descritivo": [
+     0.011,
+     0.009,
+     0.004,
+     0.03,
+     0.056,
+     0.013,
+     0.013,
+     0.015,
+     0.012,
+     0.0,
+     0.006,
+     0.017,
+     0.009,
+     0.011,
+     0.019,
+     0.013,
+     0.027,
+     0.033,
+     0.006,
+     0.016
+    ],
+    "passa": true
+   },
+   "256": {
+    "n_limpos": 48044,
+    "valida": true,
+    "frac_sem_area": 0.378,
+    "T_obs": 0.0515,
+    "p_calibrado": 0.5335,
+    "S_efetivo": 20,
+    "fracs_sinal_descritivo": [
+     0.024,
+     0.011,
+     0.024,
+     0.022,
+     0.017,
+     0.023,
+     0.033,
+     0.029,
+     0.032,
+     0.017,
+     0.027,
+     0.014,
+     0.027,
+     0.021,
+     0.016,
+     0.037,
+     0.022,
+     0.023,
+     0.019,
+     0.026
+    ],
+    "passa": false
+   }
+  },
+  "veredito": "parcial (passa em [64] de [16, 64, 256])"
+ },
+ "P_B": {
+  "celulas": {
+   "16": {
+    "estatisticas": {
+     "frac_censurada": {
+      "S": 15,
+      "p": 1.0,
+      "delta_rel": 0.0233,
+      "sig": false,
+      "acima_do_piso": false
+     },
+     "mediana_dur": {
+      "S": 6,
+      "p": 0.6875,
+      "delta_rel": 0.2308,
+      "sig": false,
+      "acima_do_piso": true
+     },
+     "n_limpos": {
+      "S": 15,
+      "p": 1.0,
+      "delta_rel": 0.0066,
+      "sig": false,
+      "acima_do_piso": false
+     }
+    },
+    "gate_min_limpos": true,
+    "mata_celula": false
+   },
+   "64": {
+    "estatisticas": {
+     "frac_censurada": {
+      "S": 18,
+      "p": 0.48068,
+      "delta_rel": 0.0001,
+      "sig": false,
+      "acima_do_piso": false
+     },
+     "mediana_dur": {
+      "S": 1,
+      "p": 1.0,
+      "delta_rel": 0.3333,
+      "sig": false,
+      "acima_do_piso": true
+     },
+     "n_limpos": {
+      "S": 19,
+      "p": 1.0,
+      "delta_rel": 0.0077,
+      "sig": false,
+      "acima_do_piso": false
+     }
+    },
+    "gate_min_limpos": true,
+    "mata_celula": false
+   },
+   "256": {
+    "estatisticas": {
+     "frac_censurada": {
+      "S": 19,
+      "p": 0.35928,
+      "delta_rel": 0.0003,
+      "sig": false,
+      "acima_do_piso": false
+     },
+     "mediana_dur": {
+      "S": 1,
+      "p": 1.0,
+      "delta_rel": 0.5,
+      "sig": false,
+      "acima_do_piso": true
+     },
+     "n_limpos": {
+      "S": 18,
+      "p": 0.23788,
+      "delta_rel": 0.0041,
+      "sig": false,
+      "acima_do_piso": false
+     }
+    },
+    "gate_min_limpos": true,
+    "mata_celula": false
+   }
+  },
+  "celulas_mata": 0,
+  "veredito": "universalidade in-class sustentada"
+ },
+ "P_C": {
+  "frac_censurada_por_braco": {
+   "16": {
+    "relu": {
+     "mediana": 0.051,
+     "q25": 0.022,
+     "q75": 0.182,
+     "S": 20
+    },
+    "softplus": {
+     "mediana": 0.051,
+     "q25": 0.022,
+     "q75": 0.171,
+     "S": 20
+    },
+    "erf": {
+     "mediana": 0.051,
+     "q25": 0.022,
+     "q75": 0.173,
+     "S": 20
+    },
+    "gelu": {
+     "mediana": 0.041,
+     "q25": 0.031,
+     "q75": 0.227,
+     "S": 20
+    }
+   },
+   "64": {
+    "relu": {
+     "mediana": 0.034,
+     "q25": 0.027,
+     "q75": 0.043,
+     "S": 20
+    },
+    "softplus": {
+     "mediana": 0.034,
+     "q25": 0.027,
+     "q75": 0.042,
+     "S": 20
+    },
+    "erf": {
+     "mediana": 0.034,
+     "q25": 0.027,
+     "q75": 0.042,
+     "S": 20
+    },
+    "gelu": {
+     "mediana": 0.036,
+     "q25": 0.031,
+     "q75": 0.047,
+     "S": 20
+    }
+   },
+   "256": {
+    "relu": {
+     "mediana": 0.033,
+     "q25": 0.028,
+     "q75": 0.035,
+     "S": 20
+    },
+    "softplus": {
+     "mediana": 0.033,
+     "q25": 0.028,
+     "q75": 0.035,
+     "S": 20
+    },
+    "erf": {
+     "mediana": 0.033,
+     "q25": 0.028,
+     "q75": 0.035,
+     "S": 20
+    },
+    "gelu": {
+     "mediana": 0.032,
+     "q25": 0.028,
+     "q75": 0.037,
+     "S": 20
+    }
+   }
+  },
+  "nota": "ancora da nao-comutacao; SEM MATA (6o parecer)"
+ },
+ "P_D": {
+  "celulas": {
+   "16": {
+    "S": 7,
+    "mediana_delta": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "piso": 0.0,
+    "frac_revive_freeze": 0.173,
+    "frac_revive_controle": 0.173,
+    "classe": "sem"
+   },
+   "64": {
+    "S": 18,
+    "mediana_delta": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "piso": 0.0,
+    "frac_revive_freeze": 0.181,
+    "frac_revive_controle": 0.181,
+    "classe": "sem"
+   },
+   "256": {
+    "S": 20,
+    "mediana_delta": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "piso": 0.0,
+    "frac_revive_freeze": 0.167,
+    "frac_revive_controle": 0.167,
+    "classe": "sem"
+   }
+  },
+  "veredito": "MATA: sem back-reaction populacional detectavel"
+ },
+ "P_E": {
+  "superficies": {
+   "softplus-m16": {
+    "episodios": 3149,
+    "frac_censurada": 0.042,
+    "frac_limpa": 0.77,
+    "frac_morte_por_saida": 0.178,
+    "frac_v_cruzou": 0.028,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 52669.0,
+    "corr_dur_tmorte": -0.031,
+    "corr_atraso_tmorte": 0.012
+   },
+   "softplus-m64": {
+    "episodios": 16187,
+    "frac_censurada": 0.035,
+    "frac_limpa": 0.799,
+    "frac_morte_por_saida": 0.129,
+    "frac_v_cruzou": 0.032,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 49253.0,
+    "corr_dur_tmorte": -0.002,
+    "corr_atraso_tmorte": 0.018
+   },
+   "softplus-m256": {
+    "episodios": 69492,
+    "frac_censurada": 0.031,
+    "frac_limpa": 0.713,
+    "frac_morte_por_saida": 0.127,
+    "frac_v_cruzou": 0.041,
+    "mediana_dur": 2.0,
+    "mediana_t_res": 49167.0,
+    "corr_dur_tmorte": 0.016,
+    "corr_atraso_tmorte": 0.009
+   },
+   "erf-m16": {
+    "episodios": 3148,
+    "frac_censurada": 0.042,
+    "frac_limpa": 0.77,
+    "frac_morte_por_saida": 0.178,
+    "frac_v_cruzou": 0.027,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 52698.0,
+    "corr_dur_tmorte": -0.031,
+    "corr_atraso_tmorte": 0.016
+   },
+   "erf-m64": {
+    "episodios": 16202,
+    "frac_censurada": 0.035,
+    "frac_limpa": 0.799,
+    "frac_morte_por_saida": 0.13,
+    "frac_v_cruzou": 0.032,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 49297.5,
+    "corr_dur_tmorte": -0.003,
+    "corr_atraso_tmorte": 0.018
+   },
+   "erf-m256": {
+    "episodios": 69437,
+    "frac_censurada": 0.031,
+    "frac_limpa": 0.713,
+    "frac_morte_por_saida": 0.127,
+    "frac_v_cruzou": 0.041,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 49185.0,
+    "corr_dur_tmorte": 0.016,
+    "corr_atraso_tmorte": 0.009
+   },
+   "gelu-m16": {
+    "episodios": 3036,
+    "frac_censurada": 0.044,
+    "frac_limpa": 0.755,
+    "frac_morte_por_saida": 0.197,
+    "frac_v_cruzou": 0.028,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 45860.0,
+    "corr_dur_tmorte": -0.03,
+    "corr_atraso_tmorte": 0.0
+   },
+   "gelu-m64": {
+    "episodios": 15718,
+    "frac_censurada": 0.036,
+    "frac_limpa": 0.803,
+    "frac_morte_por_saida": 0.134,
+    "frac_v_cruzou": 0.033,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 49119.5,
+    "corr_dur_tmorte": 0.004,
+    "corr_atraso_tmorte": 0.03
+   },
+   "gelu-m256": {
+    "episodios": 69454,
+    "frac_censurada": 0.031,
+    "frac_limpa": 0.715,
+    "frac_morte_por_saida": 0.124,
+    "frac_v_cruzou": 0.041,
+    "mediana_dur": 2.0,
+    "mediana_t_res": 49876.0,
+    "corr_dur_tmorte": 0.012,
+    "corr_atraso_tmorte": 0.002
+   },
+   "relu-m16": {
+    "episodios": 3127,
+    "frac_censurada": 0.042,
+    "frac_limpa": 0.768,
+    "frac_morte_por_saida": 0.181,
+    "frac_v_cruzou": 0.027,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 52580.0,
+    "corr_dur_tmorte": -0.029,
+    "corr_atraso_tmorte": 0.015
+   },
+   "relu-m64": {
+    "episodios": 16191,
+    "frac_censurada": 0.035,
+    "frac_limpa": 0.798,
+    "frac_morte_por_saida": 0.13,
+    "frac_v_cruzou": 0.032,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 49283.0,
+    "corr_dur_tmorte": -0.002,
+    "corr_atraso_tmorte": 0.018
+   },
+   "relu-m256": {
+    "episodios": 69428,
+    "frac_censurada": 0.031,
+    "frac_limpa": 0.713,
+    "frac_morte_por_saida": 0.127,
+    "frac_v_cruzou": 0.041,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 49215.0,
+    "corr_dur_tmorte": 0.016,
+    "corr_atraso_tmorte": 0.008
+   },
+   "T0-m16": {
+    "episodios": 116,
+    "frac_censurada": 0.991,
+    "frac_limpa": 1.0,
+    "frac_morte_por_saida": 0.224,
+    "frac_v_cruzou": 0.0,
+    "mediana_dur": 4411.0,
+    "mediana_t_res": 4411.0,
+    "corr_dur_tmorte": null,
+    "corr_atraso_tmorte": null
+   },
+   "T0-m64": {
+    "episodios": 461,
+    "frac_censurada": 0.996,
+    "frac_limpa": 1.0,
+    "frac_morte_por_saida": 0.191,
+    "frac_v_cruzou": 0.0,
+    "mediana_dur": 1110.0,
+    "mediana_t_res": 1110.0,
+    "corr_dur_tmorte": null,
+    "corr_atraso_tmorte": null
+   },
+   "T0-m256": {
+    "episodios": 1700,
+    "frac_censurada": 0.999,
+    "frac_limpa": 1.0,
+    "frac_morte_por_saida": 0.189,
+    "frac_v_cruzou": 0.0,
+    "mediana_dur": 3779.0,
+    "mediana_t_res": 3779.0,
+    "corr_dur_tmorte": null,
+    "corr_atraso_tmorte": null
+   },
+   "freeze-m16": {
+    "episodios": 2670,
+    "frac_censurada": 0.051,
+    "frac_limpa": 0.744,
+    "frac_morte_por_saida": 0.188,
+    "frac_v_cruzou": 0.02,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 50215.0,
+    "corr_dur_tmorte": -0.016,
+    "corr_atraso_tmorte": -0.027
+   },
+   "freeze-m64": {
+    "episodios": 12507,
+    "frac_censurada": 0.047,
+    "frac_limpa": 0.812,
+    "frac_morte_por_saida": 0.112,
+    "frac_v_cruzou": 0.022,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 46472.0,
+    "corr_dur_tmorte": 0.003,
+    "corr_atraso_tmorte": 0.024
+   },
+   "freeze-m256": {
+    "episodios": 52578,
+    "frac_censurada": 0.043,
+    "frac_limpa": 0.736,
+    "frac_morte_por_saida": 0.119,
+    "frac_v_cruzou": 0.033,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 49558.0,
+    "corr_dur_tmorte": 0.023,
+    "corr_atraso_tmorte": 0.005
+   },
+   "embaralha-m16": {
+    "episodios": 4705,
+    "frac_censurada": 0.03,
+    "frac_limpa": 0.743,
+    "frac_morte_por_saida": 0.193,
+    "frac_v_cruzou": 0.021,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 62188.0,
+    "corr_dur_tmorte": -0.059,
+    "corr_atraso_tmorte": -0.039
+   },
+   "embaralha-m64": {
+    "episodios": 16350,
+    "frac_censurada": 0.034,
+    "frac_limpa": 0.796,
+    "frac_morte_por_saida": 0.139,
+    "frac_v_cruzou": 0.032,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 50969.0,
+    "corr_dur_tmorte": -0.005,
+    "corr_atraso_tmorte": -0.019
+   },
+   "embaralha-m256": {
+    "episodios": 68169,
+    "frac_censurada": 0.032,
+    "frac_limpa": 0.719,
+    "frac_morte_por_saida": 0.119,
+    "frac_v_cruzou": 0.041,
+    "mediana_dur": 2.0,
+    "mediana_t_res": 48030.5,
+    "corr_dur_tmorte": 0.021,
+    "corr_atraso_tmorte": 0.0
+   },
+   "semgrad-m16": {
+    "episodios": 4350,
+    "frac_censurada": 0.032,
+    "frac_limpa": 0.744,
+    "frac_morte_por_saida": 0.198,
+    "frac_v_cruzou": 0.019,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 61639.0,
+    "corr_dur_tmorte": -0.047,
+    "corr_atraso_tmorte": -0.005
+   },
+   "semgrad-m64": {
+    "episodios": 16492,
+    "frac_censurada": 0.034,
+    "frac_limpa": 0.782,
+    "frac_morte_por_saida": 0.152,
+    "frac_v_cruzou": 0.033,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 51126.0,
+    "corr_dur_tmorte": -0.016,
+    "corr_atraso_tmorte": 0.007
+   },
+   "semgrad-m256": {
+    "episodios": 69475,
+    "frac_censurada": 0.031,
+    "frac_limpa": 0.719,
+    "frac_morte_por_saida": 0.126,
+    "frac_v_cruzou": 0.041,
+    "mediana_dur": 2.0,
+    "mediana_t_res": 48426.5,
+    "corr_dur_tmorte": 0.012,
+    "corr_atraso_tmorte": -0.016
+   },
+   "Tmenor-m16": {
+    "episodios": 1526,
+    "frac_censurada": 0.083,
+    "frac_limpa": 0.78,
+    "frac_morte_por_saida": 0.193,
+    "frac_v_cruzou": 0.024,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 49610.0,
+    "corr_dur_tmorte": -0.089,
+    "corr_atraso_tmorte": -0.072
+   },
+   "Tmenor-m64": {
+    "episodios": 10157,
+    "frac_censurada": 0.05,
+    "frac_limpa": 0.841,
+    "frac_morte_por_saida": 0.125,
+    "frac_v_cruzou": 0.027,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 46403.5,
+    "corr_dur_tmorte": 0.004,
+    "corr_atraso_tmorte": 0.033
+   },
+   "Tmenor-m256": {
+    "episodios": 37417,
+    "frac_censurada": 0.052,
+    "frac_limpa": 0.738,
+    "frac_morte_por_saida": 0.175,
+    "frac_v_cruzou": 0.049,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 53179.5,
+    "corr_dur_tmorte": -0.008,
+    "corr_atraso_tmorte": 0.007
+   },
+   "Tmaior-m16": {
+    "episodios": 7063,
+    "frac_censurada": 0.021,
+    "frac_limpa": 0.783,
+    "frac_morte_por_saida": 0.145,
+    "frac_v_cruzou": 0.023,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 49135.0,
+    "corr_dur_tmorte": -0.035,
+    "corr_atraso_tmorte": -0.018
+   },
+   "Tmaior-m64": {
+    "episodios": 27653,
+    "frac_censurada": 0.023,
+    "frac_limpa": 0.751,
+    "frac_morte_por_saida": 0.122,
+    "frac_v_cruzou": 0.031,
+    "mediana_dur": 3.0,
+    "mediana_t_res": 46948.0,
+    "corr_dur_tmorte": 0.003,
+    "corr_atraso_tmorte": 0.01
+   },
+   "Tmaior-m256": {
+    "episodios": 116370,
+    "frac_censurada": 0.021,
+    "frac_limpa": 0.67,
+    "frac_morte_por_saida": 0.086,
+    "frac_v_cruzou": 0.036,
+    "mediana_dur": 2.0,
+    "mediana_t_res": 50669.0,
+    "corr_dur_tmorte": 0.0,
+    "corr_atraso_tmorte": -0.004
+   }
+  },
+  "qualidade_area_por_m": {
+   "16": {
+    "T_obs": 0.0165,
+    "p_calibrado": 0.041,
+    "frac_sem_area": 0.362
+   },
+   "64": {
+    "T_obs": 0.035,
+    "p_calibrado": 0.004,
+    "frac_sem_area": 0.332
+   },
+   "256": {
+    "T_obs": 0.0515,
+    "p_calibrado": 0.5335,
+    "frac_sem_area": 0.378
+   }
+  }
+ },
+ "P_NULL": {
+  "celulas": {
+   "16": {
+    "n_limpos": 3132,
+    "valida": true,
+    "frac_sem_area": 0.452,
+    "T_obs": 0.0172,
+    "p_calibrado": 0.002,
+    "S_efetivo": 14,
+    "fracs_sinal_descritivo": [
+     null,
+     0.0,
+     0.0,
+     null,
+     0.071,
+     0.0,
+     0.0,
+     0.0,
+     null,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "passa": true
+   },
+   "64": {
+    "n_limpos": 12449,
+    "valida": true,
+    "frac_sem_area": 0.481,
+    "T_obs": 0.0038,
+    "p_calibrado": 0.4615,
+    "S_efetivo": 20,
+    "fracs_sinal_descritivo": [
+     0.003,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.004,
+     0.003,
+     0.004,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.005,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.005,
+     0.0
+    ],
+    "passa": false
+   },
+   "256": {
+    "n_limpos": 48426,
+    "valida": true,
+    "frac_sem_area": 0.526,
+    "T_obs": 0.0027,
+    "p_calibrado": 0.4915,
+    "S_efetivo": 20,
+    "fracs_sinal_descritivo": [
+     0.0,
+     0.0,
+     0.0,
+     0.002,
+     0.001,
+     0.002,
+     0.002,
+     0.001,
+     0.0,
+     0.005,
+     0.001,
+     0.0,
+     0.001,
+     0.001,
+     0.002,
+     0.0,
+     0.004,
+     0.0,
+     0.001,
+     0.001
+    ],
+    "passa": false
+   }
+  },
+  "instrumento_valido": false,
+  "veredito": "INSTRUMENTO VICIADO — experimento INVALIDO"
+ }
+}
