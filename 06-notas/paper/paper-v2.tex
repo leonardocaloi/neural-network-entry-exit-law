@@ -1,5 +1,5 @@
 % paper-v2.tex -- gap-list editorial aplicada sobre paper-v1.tex (que fica como registro).
-% arXiv, campo Comments (C17): "32 pages, 5 figures, 3 tables. Comments welcome."
+% arXiv, campo Comments (C17): "34 pages, 5 figures, 3 tables. Comments welcome."
 % Categoria primaria math.DS, cross-list cs.LG.
 % Convencoes da casa fixadas: Psi = quadratura log u + u (Phi reservado para a
 % parametrizacao); H = horizonte de treino (tempo no fluxo, passos no experimento);
@@ -109,7 +109,11 @@ of 16 returns, hard ReLU structurally zero, and return probability monotone in
 the stiffness. A pre-registered transformer confirmatory ($800$ runs)
 transfers the theorem class to the feed-forward block ($\hat p=0.44$, area
 opening before $21/22$ returns) and reproduces a second, upstream resurrection
-channel in all four arms, including hard ReLU.
+channel in all four arms, including hard ReLU. In that block, hard-ReLU units
+that die do come back when the feed-forward input is non-stationary ($20/100$
+against $0/100$ with attention frozen; two-sided Fisher exact
+$p=6.6\cdot10^{-7}$): the terminality of discrete death is a statement about a
+unit's own channel under stationary input, not about training a transformer.
 \end{abstract}
 
 \noindent\textbf{Keywords:} entry--exit function; geometric singular
@@ -123,7 +127,10 @@ perturbation; dead neurons; smoothed ReLU; gradient flow; loss of plasticity.
 Write $\Phi:\mathcal{W}\to\mathcal{F}$ for the parametrization of a network and
 $J=D\Phi$ for its Jacobian. A neuron whose pre-activation margin is negative on
 every datum contributes an identically zero column to $J$: it sits on a stratum
-of the singular locus where $J$ drops rank. Under a hard ReLU the gradient of the
+of the singular locus where $J$ drops rank. This is exact for ReLU and
+exponentially thin for softplus-$\beta$; it does not hold for GELU at all, whose
+output is nonzero for every finite negative margin (\cref{sec:transformer}).
+Under a hard ReLU the gradient of the
 loss in the directions of that unit is exactly zero, so the stratum is absorbing.
 A dead unit stays dead. This is the mechanism behind the empirically documented
 dormant-neuron and loss-of-plasticity
@@ -163,13 +170,16 @@ runs in which the area law reproduces with confidence intervals, hard ReLU acts
 as the zero-gradient control, and the return probability is monotone in $\beta$
 (\cref{sec:confirmatory,fig:escada}). The scoping of the transformer
 (\cref{sec:transformer}) exposed two new mechanisms, a GELU sign-flip barrier and
-an upstream channel, and the corresponding confirmatory is stated here as a
-pre-registered protocol.
+an upstream channel, and its own pre-registered confirmatory of 800 runs was
+executed: the theorem class transfers to the feed-forward block through the own
+channel, the upstream channel reproduces in all four arms including hard ReLU,
+and the barrier remains confounded with injection depth.
 \end{itemize}
 
-The theorem covers one two-neuron instance; the confirmatory covers one small
-architecture at zero noise; the stochastic regime is open and, where we probed
-it, it breaks the deterministic schedule (\cref{sec:falsification}).
+The theorem covers one two-neuron instance; the two confirmatories, the MLP
+(4a.3) and the transformer (\texttt{etapa-5}), cover two small architectures at
+zero noise; the stochastic regime is open and, where we probed it, it breaks the
+deterministic schedule (\cref{sec:falsification}).
 
 The paper is organized as follows. \Cref{sec:setup} fixes the model and the four
 hypotheses. \Cref{sec:theorem} states the entry--exit theorem, the six lemmas
@@ -177,8 +187,8 @@ that compose it and the numerical verification of its constants; the complete
 proofs of the lemmas are deferred to \cref{app:lemmas}. \Cref{sec:noncomm} makes
 the non-commutation of the two limit orders precise and connects it to the
 plasticity literature, which \cref{sec:related} surveys. \Cref{sec:experiments}
-is the experimental ladder, from the falsified reduced model to the confirmatory
-and to the transformer protocol; \cref{sec:limits,sec:conclusion,sec:repro} give
+is the experimental ladder, from the falsified reduced model to the two executed
+confirmatories, the MLP and the transformer; \cref{sec:limits,sec:conclusion,sec:repro} give
 the limitations, the conclusion, and the reproducibility record.
 
 \section{Setup and notation}\label{sec:setup}
@@ -472,14 +482,18 @@ is at $0.9\%$); the tangential drift is at machine zero. All numerics are this
 single two-neuron instance, and breadth is future work.
 
 The measured coefficient is a discretization, not a fit, so it must be shown to
-converge. \Cref{tab:dt} refines the Euler step at the stiffest point of the
-sweep, $\beta=10^{4}$, keeping everything else fixed.
+converge. \Cref{tab:dt} is that test: it refines the Euler step at the stiffest
+point of the sweep, $\beta=10^{4}$, keeping everything else fixed, and asks
+whether the measured offset approaches the \emph{proved} limit $-14.815$ of
+\eqref{eq:twoterm} rather than some nearby number.
 
 \begin{table}[h]
 \centering
-\caption{Convergence in the time step at $\beta=10^{4}$: the measured release
-offset converges to the proved coefficient
-$-1/(cR^{\hyb}(\texit))=-14.815$, reaching $0.1\%$ at the finest step. The
+\caption{A convergence test for the two-term law, not a table of measurements:
+the proved coefficient $-1/(cR^{\hyb}(\texit))=-14.815$ is the limit, and the
+rows are successive refinements of the Euler step at $\beta=10^{4}$ that must
+approach it. They do, monotonically, closing to $0.1\%$ at the finest step; a law
+with the wrong constant would leave a floor here instead. The
 correction term of \cref{lem:bootstrap} is $\mathrm{corr}=0.00977$ at every step,
 so what is refining is the quadrature and not the law. At $dt=10^{-5}$ the
 measurement is quantized in units of $\beta\,dt=0.1$, which is the whole of that
@@ -548,13 +562,18 @@ $\dot z(\texit^+)=cR^{\hyb}(\texit)>0$, so $z>0$ immediately after $\texit$.
 \end{proof}
 
 In machine-learning terms this non-commutation is the statement behind an
-empirical trend. Discrete ReLU units that die stay dead, which is the
-dormant-neuron and loss-of-plasticity phenomenon documented across deep and
-reinforcement learning~\cite{Sokar23,Lyle23,Dohare24} and mitigated in practice
-by recycling dead units or by migrating to smooth activations; the smoothed flow
-resurrects them by the area law. The channel that reopens a smoothed unit is
-$e^{\beta z}$, which closes as $\beta\to\infty$. \Cref{sec:confirmatory} measures
-the resulting staircase directly.
+empirical trend. Discrete ReLU units that die stay dead --- an exact statement
+about a unit's \emph{own} channel under a fixed input, which is the setting of
+\cref{prop:noncomm} --- and this is the setting in which the dormant-neuron and
+loss-of-plasticity phenomena are usually read~\cite{Sokar23,Lyle23,Dohare24},
+mitigated in practice by recycling dead units or by migrating to smooth
+activations; the smoothed flow resurrects them by the area law. The channel that
+reopens a smoothed unit is $e^{\beta z}$, which closes as $\beta\to\infty$.
+\Cref{sec:confirmatory} measures the resulting staircase directly. The
+qualification matters: once the input of the layer is itself moving, terminality
+is no longer implied, and in our transformer data $20\%$ of injected hard-ReLU
+units return ($20/100$ against $0/100$ with the upstream block frozen);
+\cref{sec:transformer} isolates that second channel.
 
 \section{Related work}\label{sec:related}
 
@@ -588,6 +607,20 @@ continual learning~\cite{Dohare24}. The practical mitigations are recycling dead
 units and smoothing the activation. \Cref{thm:main} and \cref{prop:noncomm} say
 what the second mitigation buys: a channel of width $e^{\beta z}$ and a return
 time set by an area.
+
+\paragraph{Dormancy is not death.} The two objects should not be conflated.
+Dormancy in~\cite{Sokar23} is a normalized activation score falling below a
+threshold: a unit can be dormant and still have a nonzero column in $J$. Our
+object is the exact stratum on which the unit's column of $J$ is identically zero
+on every datum. The sets are different, and the apparent tension with deep
+reinforcement learning --- whose input is non-stationary by construction, and
+where dormancy nonetheless persists --- dissolves once they are kept apart: a
+low-score unit need not be on the stratum, so nothing in this paper predicts
+that it must return. What our results do separate are two independent channels. The
+\emph{own} channel requires smoothness of the activation, and its width is the
+$\beta$ staircase; for hard ReLU it is exactly zero. The \emph{upstream} channel
+requires only that the layer's input move, and it operates for every activation
+we tested, hard ReLU included.
 
 \section{Experiments}\label{sec:experiments}
 
@@ -903,6 +936,14 @@ Self-resurrection is possible only in the shallow band $(-0.752,0)$. The MLP's
 blind area port, which omits $g'$, gets the sign wrong on $12/12$ GELU episodes;
 the correct instrument uses the slope-weighted area $\Ar_{\mathrm{drive}}$. GELU
 is therefore genuinely outside the monotone-sigmoid class of \cref{thm:main}.
+There is a prior point: GELU has no dead stratum to begin with. A unit at margin
+$-0.3$ emits $\mathrm{GELU}(-0.3)=-0.115\ne0$ and keeps contributing to the
+residual, so $\{z\le0$ on every datum$\}$ is not a singular stratum for GELU but
+a region of weak, sign-inverted coupling. The sign-flip barrier is the symptom
+that the definition of death does not apply, and it is consistent with GELU
+being the most revivable arm we measured (shallow frozen $0.580$); we note that
+against sp-$\beta3$-frozen ($29/50$ against $22/50$) the difference is not
+statistically separable, two-sided Fisher exact $p=0.23$.
 \item \textbf{S2, an upstream channel.} The input of the block,
 $h=e+\mathrm{attn}(e)$, is non-stationary, so a hard-ReLU unit whose own gradient
 is identically zero can still revive because $h$ moves. With attention frozen the
@@ -957,8 +998,12 @@ $m_{\mathrm{ffn}}=4$ block units) with rich one-dimensional targets, chosen so
 that a single unit can be tracked with a ground-truth clock.
 \textbf{(iv)} GELU is outside the monotone class; its own-channel revival is
 blocked below $z^\ast=-0.752$, and in the confirmatory the barrier could not be
-separated from depth (the pre-registered three-way label). The upstream channel
-is established; the barrier's terminality remains open.
+separated from depth (the pre-registered three-way label), because at the deep
+injection $z=-2.0$ the softplus own channel is starved to $0.9\%$ of its shallow
+value while $\mathrm{GELU}'$ is adverse, so both mechanisms predict the same
+zero; the separating design, a sweep of injection depths around
+$z^\ast=-0.752$, is stated in \cref{app:estimands} and left as future work. The
+upstream channel is established; the barrier's terminality remains open.
 \textbf{(v)} The cone apex, of corank $\ge2$, where weight decay produces genuine
 sliding toward the most singular stratum, is untouched.
 \textbf{(vi)} The independence of the law from the smoothing is proved for
@@ -980,11 +1025,15 @@ label, reported as frozen.
 
 \section{Reproducibility}\label{sec:repro}
 
-All code, per-run manifests and aggregate JSON needed to reproduce every
-number and figure in this note are in a single Git repository; raw episode
-files are excluded from version control by policy but are byte-reproducible
-from the pinned configs (deterministic CPU runs) and are checksummed in the
-versioned manifests.
+All code, configs, per-run manifests and aggregate JSON needed to reproduce every
+number and figure in this note are in a single Git repository. One policy governs
+the raw data, in both confirmatories: the per-episode trace files
+(\path{results-4a3/*.jsonl.gz}, \path{results-e5/*.jsonl.gz}) are kept out of
+version control, while the manifests that checksum them
+(\path{results-4a3/manifest-4a3.json}, \path{results-e5/manifest-e5.json}) are
+versioned. The traces are byte-reproducible from the pinned configs
+(deterministic single-threaded CPU runs), so the versioned SHA256 list is what
+makes a regenerated file verifiable.
 That repository is private at the time of writing, so the commit hashes below,
 while they resolve in it and fix the state of every experiment, are not
 independently checkable today; public release under the MIT licence is a
@@ -1029,8 +1078,9 @@ Every run is single-threaded CPU on an Intel Core i9-9900K, with 4 concurrent
 workers through Python \texttt{multiprocessing} at \texttt{nice 19} and no GPU;
 the only dependency is \texttt{numpy} (Python 3.14, numpy 2.4). The 4a.3
 confirmatory, 400 runs at $H=5\cdot10^{5}$, took $4.9$ h wall-clock, that is
-$19.5$ CPU-hours at $175$ s per run. The transformer protocol, 800 runs at
-$H=2\cdot10^{5}$, is budgeted at $\approx12.2$ h. The preliminary and discarded
+$19.5$ CPU-hours at $175$ s per run. The transformer confirmatory, 800 runs at
+$H=2\cdot10^{5}$, took $13.9$ h wall-clock, which includes one stall of the
+runner and its resumption. The preliminary and discarded
 runs, namely \texttt{etapa-4a} (600 runs), the \texttt{4a.2} redesign, the pressure pilot (64
 runs) and the two rate pilots (240 and 160 runs), are of the same order again and
 are not otherwise reported.
@@ -1040,11 +1090,14 @@ This work received no funding and was carried out independently. The author
 declares no competing interests.
 
 \section*{Data availability}
-All code, per-run manifests, raw episode files and aggregate JSON needed to
-reproduce every number and every figure in this note are held in the Git
-repository described in \cref{sec:repro}, at the commits cited there. That
-repository is not public at the time of writing; no external data were used, and
-all data are generated by the scripts listed in \cref{sec:repro}.
+All code, configs, per-run manifests and aggregate JSON needed to reproduce every
+number and every figure in this note are held in the Git repository described in
+\cref{sec:repro}, at the commits cited there. Under the policy stated in
+\cref{sec:repro}, the raw per-episode trace files are not versioned; they are
+regenerated byte-for-byte from the pinned configs and verified against the
+SHA256 lists in the versioned manifests. That repository is not public at the
+time of writing; no external data were used, and all data are generated by the
+scripts listed in \cref{sec:repro}.
 
 \section*{Declaration of LLM usage}
 Every lemma of \cref{app:lemmas} is re-checked by an independent executable
@@ -1519,7 +1572,7 @@ t_{\mathrm{area}},t_{\mathrm{res}},\text{revived},z_{\mathrm{park}})$
   \STATE $\mathrm{dead}_k\leftarrow[\,z^{\max}_k<0\,]$
          \COMMENT{ground truth: the unit is off on \emph{every} datum}
   \STATE $\hat R_k\leftarrow v_k\bigl[(y-f)_{j^\ast_k}+v_k\,a_{j^\ast_k k}\bigr]$
-         \COMMENT{leader-datum residual drive}
+         \COMMENT{leader-datum residual drive; the $1/n$ of $L$ is dropped (see below)}
   \FORALL{$k$ with $\mathrm{dead}_k\wedge\neg\mathrm{open}_k$}
     \STATE open an episode: $\mathrm{open}_k\leftarrow\textsc{true}$,
            $\hat{\Ar}_k\leftarrow0$, $t_{\mathrm{area}}^{k}\leftarrow-1$,
@@ -1540,8 +1593,8 @@ t_{\mathrm{area}},t_{\mathrm{res}},\text{revived},z_{\mathrm{park}})$
            $\text{revived}\leftarrow\textsc{true}$;
            $\mathrm{open}_k\leftarrow\textsc{false}$
   \ENDFOR
-  \STATE $\theta\leftarrow\theta-\eta\nabla_\theta\tfrac12\overline{\mathrm{res}^2}$
-         \COMMENT{plain gradient descent; the instrument never touches the dynamics}
+  \STATE $\theta\leftarrow\theta-\eta\nabla_\theta\tfrac1{2n}\sum_j\mathrm{res}_j^2$
+         \COMMENT{plain gradient descent on the loss $L$ of \cref{sec:setup}; the instrument never touches the dynamics}
 \ENDFOR
 \STATE close every still-open episode as \textbf{censored}:
        $t_{\mathrm{res}}\leftarrow\textsc{none}$,
@@ -1549,6 +1602,19 @@ t_{\mathrm{area}},t_{\mathrm{res}},\text{revived},z_{\mathrm{park}})$
        \COMMENT{never recorded as ``permanent''}
 \end{algorithmic}
 \end{algorithm}
+
+\noindent One normalization is deliberate and is recorded here because it looks
+like an inconsistency. The descent step is taken on
+$L=\tfrac1{2n}\sum_j\mathrm{res}_j^2$, so the parameter move carries a factor
+$1/n$, whereas the accumulated drive $\hat{\Ar}_k$ is built from the
+leader-datum quantity $\hat R_k$, which does not. The two differ by the fixed
+positive constant $1/n$, and every claim read off the clock --- the sign of
+$\hat{\Ar}_k$, the first instant at which it turns positive ($t_{\mathrm{area}}$)
+and hence the ordering $\thit\le t_{\mathrm{area}}<t_{\mathrm{res}}$ --- is
+invariant under multiplication by a positive constant. What is \emph{not}
+invariant is the magnitude of $\hat{\Ar}_k$, which is therefore never compared
+against the theoretical area of \cref{thm:main} and is used only through its
+sign and its first zero crossing.
 
 \noindent Two guards are asserted before any run is used. Bit-exact parity: the
 loss trace must agree with the pilot engine to $10^{-12}$, so the clock is known
@@ -1784,7 +1850,7 @@ input makes death terminal. The pilot gave $0/40$.\eresult{\textbf{VALID.} $0/10
 $\Delta=p_{\mathrm{sust}}(\text{train})-p_{\mathrm{sust}}(\text{frozen})$ per
 arm, and will call the effect reproduced if the bootstrap lower bound is
 positive. Under the hysteresis instrument the test is stricter than in the
-pilot. The hysteresis band was calibrated on frozen runs only; alive units in training runs fluctuate up to $1.7\times$ wider, so in the training arms the band is narrow relative to the arm's own noise and crossings are easier --- an anti-conservative direction for $\Delta$. The sustained-return filter is the measured containment: five returns failed sustainment (hover), all five in training cells and none in frozen, and none entered the counts.\eresult{\textbf{REPRODUCED in all four arms.} $\Delta=0.210$ $[0.120,0.300]$ (sp-$\beta3$), $0.200$ $[0.110,0.280]$ (sp-$\beta10$), $0.220$ $[0.120,0.320]$ (GELU), $0.200$ $[0.120,0.280]$ (ReLU, $20/100$ vs.\ $0/100$): the non-stationary FFN input is a real resurrection channel, of comparable size across activations.}
+pilot. The hysteresis band was calibrated on frozen runs only; alive units in training runs fluctuate up to $1.7\times$ wider, so in the training arms the band is narrow relative to the arm's own noise and crossings are easier --- an anti-conservative direction for $\Delta$. The sustained-return filter is the measured containment: five returns failed sustainment (hover), all five in training cells and none in frozen, and none entered the counts. The ReLU arm is, in addition, immune to that argument: its own-move is identically zero on both sides of the contrast, so if a band that is narrow relative to training noise were manufacturing spurious crossings, they would appear in relu-frozen as well --- and relu-frozen gives $0/100$. The $20/100$ against $0/100$ contrast (two-sided Fisher exact $p=6.6\cdot10^{-7}$) is therefore the internal control that closes E-B without relying on the calibration of $\delta_h$.\eresult{\textbf{REPRODUCED in all four arms.} $\Delta=0.210$ $[0.120,0.300]$ (sp-$\beta3$), $0.200$ $[0.110,0.280]$ (sp-$\beta10$), $0.220$ $[0.120,0.320]$ (GELU), $0.200$ $[0.120,0.280]$ (ReLU, $20/100$ vs.\ $0/100$): the non-stationary FFN input is a real resurrection channel, of comparable size across activations.}
 \item \textbf{E-C, transfer of the theorem class.} For sp-$\beta3$ frozen under
 shallow injection we will estimate
 $p(\text{sustained return}\mid\text{injection})$, and will call the class
@@ -1793,7 +1859,7 @@ direct analogue of C2 in the MLP.\eresult{\textbf{TRANSFERRED.} $22/50$ sustaine
 \item \textbf{E-D, GELU barrier.} For gelu-frozen we will compare deep injection
 ($-2.0$) against shallow ($-0.3$); the barrier predicts shallow far above deep in
 the own channel, with a depth-matched control against sp-$\beta3$. The pilot at
-$-1.0$ was a tie and did not decide.\eresult{\textbf{Consistent with the barrier, confounded with depth} (the three-way label frozen at pre-registration). Intra-GELU: shallow $29/50$ vs.\ deep $0/50$; but the depth-matched control sp-$\beta3$-frozen at $-2.0$ also gave $0/50$, so depth alone accounts for the deep zero and the sustained-barrier claim is not licensed by this design. The S1 signature remains sharp: $\mathrm{sign}(\mathcal A_{\mathrm{drive}})\neq\mathrm{sign}(\mathcal A_{\mathrm{mlp}})$ in $92\%$ of deep vs.\ $4\%$ of shallow episodes --- the barrier is present in the drive field; its terminality is not separable from depth here.}
+$-1.0$ was a tie and did not decide.\eresult{\textbf{Consistent with the barrier, confounded with depth} (the three-way label frozen at pre-registration). Intra-GELU: shallow $29/50$ vs.\ deep $0/50$; but the depth-matched control sp-$\beta3$-frozen at $-2.0$ also gave $0/50$, so depth alone accounts for the deep zero and the sustained-barrier claim is not licensed by this design. The S1 signature remains sharp: $\mathrm{sign}(\mathcal A_{\mathrm{drive}})\neq\mathrm{sign}(\mathcal A_{\mathrm{mlp}})$ in $92\%$ of deep vs.\ $4\%$ of shallow episodes --- the barrier is present in the drive field; its terminality is not separable from depth here. The floor is structural, not accidental: at $z=-2.0$ the own channel of sp-$\beta3$ is $\sigma(3z)=0.0025$, that is $0.9\%$ of its value at $z=-0.3$ (gradient starvation), while $\mathrm{GELU}'(-2.0)\approx-0.085$ is adverse --- the depth $-2.0$ is deep for \emph{both} mechanisms at once, so $0/50$ against $0/50$ (Fisher exact $p=1.0$) carries no information by construction. The design that would separate them injects at $z\approx-0.9$, where $\mathrm{GELU}'\approx-0.055$ is already adverse but $\sigma(3z)\approx0.063$ still leaves $\approx22\%$ of the shallow softplus channel; a sweep over $\{-0.5,-0.75,-0.9,-1.2\}$ tests the differential prediction --- an abrupt drop for GELU at $z^\ast=-0.7518$ against a smooth decay for softplus --- a signature no depth confound reproduces. This is inherited as future work, not claimed here.}
 \item \textbf{E-E, $\beta$ staircase.} We will estimate
 $p(\text{sustained return})$ across $\beta\in\{3,10\}$, frozen and training, as
 an estimation with no kill condition.\eresult{$\beta=3$ above $\beta=10$ in both factors (frozen $0.220$ $[0.143,0.314]$ vs.\ $0.090$ $[0.042,0.164]$; training $0.430$ $[0.331,0.533]$ vs.\ $0.290$ $[0.204,0.389]$). GELU itself is the most revivable arm (shallow frozen $0.580$ $[0.432,0.718]$; with the upstream channel $0.860$ $[0.733,0.942]$): the activation used in practice sits at the open end of the channel.}
