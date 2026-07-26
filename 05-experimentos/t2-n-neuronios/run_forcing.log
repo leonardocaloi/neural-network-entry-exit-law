@@ -1,0 +1,31 @@
+peneira (dt=0.0004): 75/2100 candidatas em 1.0 min
+=== DEGRAU 1 — forcing com m vivos + 1 morto, beta=1e+04, dt0=1e-05, H=1.8, 6.0 min ===
+baseline 2-neuronios (m=1): mediana 2.68% | p90 7.26% | max 12.01% (n=57)
+
+--- m = 4 vivos: 700 sorteadas, 25 passaram a peneira, 23 passaram (H1')-(H4') em dt0  (3.3% do total)
+       675  peneira: sem episodio (dt grosseiro)
+         1  beta-run sem release no horizonte
+         1  morte antes de t_min (fora da janela)
+    erro rel |medido-predito|/|predito|: mediana 0.80% | p90 5.42% | max 16.17%
+    R_exit in [0.0490, 0.2297]  predito in [-70.14, -14.30]
+
+--- m = 8 vivos: 700 sorteadas, 25 passaram a peneira, 21 passaram (H1')-(H4') em dt0  (3.0% do total)
+       675  peneira: sem episodio (dt grosseiro)
+         4  beta-run sem release no horizonte
+    erro rel |medido-predito|/|predito|: mediana 6.85% | p90 17.30% | max 20.45%
+    R_exit in [0.0348, 0.1423]  predito in [-104.16, -23.45]
+
+--- m = 16 vivos: 700 sorteadas, 25 passaram a peneira, 22 passaram (H1')-(H4') em dt0  (3.1% do total)
+       675  peneira: sem episodio (dt grosseiro)
+         3  beta-run sem release no horizonte
+    erro rel |medido-predito|/|predito|: mediana 5.58% | p90 16.94% | max 23.22%
+    R_exit in [0.0350, 0.1227]  predito in [-109.12, -24.01]
+
+--- controle de discretizacao (m=16, dt0/5, 5 inst.)
+    seed 21860741: erro 12.67% (dt0) -> 12.67% (dt0/5)
+    seed 21860754: erro 2.22% (dt0) -> 2.05% (dt0/5)
+    seed 21860770: erro 0.42% (dt0) -> 0.53% (dt0/5)
+    seed 21860822: erro 2.10% (dt0) -> 1.87% (dt0/5)
+    seed 21860847: erro 1.48% (dt0) -> 1.47% (dt0/5)
+
+jsonl: /home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios/forcing_m.jsonl
