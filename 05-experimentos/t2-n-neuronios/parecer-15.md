@@ -5,7 +5,9 @@
 forcing prescrito gerado por um subsistema vivo afim arbitrário de ordem `m`).
 Scripts do parecer: `parecer15_o5.py`, `parecer15_o5b.py` (este diretório).
 
-**Veredito: DRAFT COM REPAROS.**
+**Veredito (rodada 1): DRAFT COM REPAROS.**
+**Veredito (rodada 2, final): PROMOVIDO A TEOREMA** — 1 reparo obrigatório + 5 cosméticos.
+Ver [Rodada final](#rodada-final--promovido-a-teorema) ao fim deste documento.
 
 ## O5 — FECHADO
 
@@ -128,3 +130,46 @@ mediana +0.042), sobrando o `o(1)` não quantificado da quina de entrada (L3′)
 Teorema com **hipóteses fortes declaradas** (não prova condicional): uniformidade até `O(m)` em `β₀`
 e `O(√m)` nas constantes explícitas; a lei de primeira ordem `−1/(c R(t_exit))` permanece
 estruturalmente `m`-livre. Único item genuinamente aberto: (O3), herdado.
+
+---
+
+## Rodada final — PROMOVIDO A TEOREMA
+
+Reexame do draft com os 9 reparos aplicados. O desdobramento do item (iv) em duas cláusulas
+(`(ivA)` contra `θ^hyb` até `t_rel`, `(ivB)` contra `θ^∞` em `[t_rel,H]`) foi **aceito**: a via
+"restringir a `[0,t_rel]`" era a barata, e a via escolhida — repetição PSD pós-release, escrita por
+extenso no Passo 5 — é a recomendada; a descoberta de que o `sup` em `[0,H]` *não pode* ser contra
+`θ^hyb` (pós-`t_exit` o híbrido mantém A congelado para sempre) é correta e estava latente no
+enunciado antigo.
+
+**Veredito: PROMOVIDO A TEOREMA**, com 1 reparo obrigatório e 5 cosméticos.
+
+### Obrigatório
+
+- **(H4′) ganha uma linha**: "A chaveia exatamente duas vezes em `[0,H]`, em `t_hit` e em `t_rel`;
+  em particular `z ≥ δ₁′ > 0` em `[t_rel+η, H]` ao longo de ambas as trajetórias."
+- Em **(O2)**, na lista "onde a hipótese é consumida", acrescentar o **quinto lugar**: o Passo 5
+  exige A **viva em todo `[t_rel,H]` nos dois fluxos** — sem isso não há Gram comum pós-release e a
+  identidade `δθ̇ = −G δθ + E` falha exatamente como falha sob chaveamento das vivas.
+- Registrar que **o filtro numérico já aplica essa condição**: `verifica_forcing.py` conta as mortes
+  de A ao longo do `β`-run e rejeita `n_mortes != 1`. A hipótese não é só verificável a posteriori em
+  princípio — é a condição em que os experimentos já peneiravam.
+
+### Cosméticos
+
+2. Justificar o "em particular" do item (iv): `θ^∞ ≡ θ^hyb` em `[0,t_exit]` **por definição**, e
+   diferem por `O(β⁻²)` em `[t_exit,t_rel]` (janela `O(β⁻¹)` × drift `O(β⁻¹)` de A). Isso também
+   licencia `‖Δ(t_rel)‖ ≤ 2M₂ logβ/β²` como dado inicial do Passo 5.
+3. Corrigir a frase de abertura do Passo 5 ("makes the supremum of item (iv) legitimate on all of
+   `[0,H]`" é resquício pré-desdobramento) — reescrever refletindo `(ivA)`/`(ivB)`.
+4. `C_A` na eq. (postrelA): anotar o fator `O(1)` sem nome da normalização `1/‖(x_j,1)‖` na conversão
+   `Δz → Δθ_A`.
+5. `‖E‖` do Passo 5: incluir os termos `i ≠ j` (`C₃e^{−βδ₁}`) que o Passo 4 lista, por consistência
+   de escrituração.
+6. Notar que `β₁` é **implícita** (`β` dos dois lados) e se resolve por iteração — contração,
+   `β₁ = δ_B⁻¹log(m²H) + 2δ_B⁻¹loglog(m²H) + O(1)` — antes do `max` da Prop. 1.
+
+### Rodapé de status resultante
+
+> **TEOREMA** — promovido no 15º parecer (2 rodadas); (O3) único aberto declarado; (H4′) como escopo;
+> `β₀ = O(m)` (Prop. 1).
