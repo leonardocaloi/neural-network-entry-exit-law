@@ -53,3 +53,5 @@ taxa refinada $O(\log\beta/\beta^2)$ com métrica $\sup\cdot\beta^2/\log\beta$
 estável em $[4.20, 5.70]$ (β ∈ [300, 3000]); margens de (H4): $\min z_B = 0.39$.
 Segundo lema com prova completa. O refinamento deve ser propagado ao draft-v2
 (o Lemma 2 do draft-v1 afirma $O(\beta^{-1})$ — correto mas não-ótimo).
+
+**ERRATA 2026-07-26:** a linha da métrica $4.87, 5.76, 6.03$ acima é de run antiga; o script canônico `prova_L2_verificacao.py` re-executado dá [4.20, 5.70] (β∈[300,3000]) — o valor do Status e dos drafts. Mantida por registro.

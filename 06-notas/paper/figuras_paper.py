@@ -1,7 +1,14 @@
 """Figura do paper relu-morte: escada do canal C4 (4a.3), p(volta|morte) por beta,
 com CIs Clopper-Pearson. Numeros verbatim de
 05-experimentos/etapa4-mlp-populacao/pilotos-4a2/pressao/taxa/resultado-4a3.md
-(commit 5a961cb). PDF+PNG (padrao da casa). Roda em nice -19."""
+(commit 5a961cb). PDF+PNG (padrao da casa). Roda em nice -19.
+
+Tambem ACHATA para este diretorio as figuras geradas noutros lugares, com os
+nomes que paper-v2.tex usa sem caminho (o tarball do arXiv tem raiz unica e nao
+resolve '../'). Assim a figura no paper nunca diverge da figura gerada."""
+import shutil
+from pathlib import Path
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -46,3 +53,20 @@ fig.tight_layout()
 for ext in ("pdf", "png"):
     fig.savefig(f"fig-escada-4a3.{ext}", dpi=300, bbox_inches="tight")
 print("fig-escada-4a3.{pdf,png} escritas")
+
+# --- achatamento das figuras externas (B1 da gap-list) -----------------------
+AQUI = Path(__file__).resolve().parent
+EXTERNAS = {
+    "fig1-mecanismo.pdf": AQUI / ".." / "t2-prova" / "fig1-mecanismo.pdf",
+    "fig2-constantes.pdf": AQUI / ".." / "t2-prova" / "fig2-constantes.pdf",
+    "fig3-diagnostico.pdf": (AQUI / ".." / ".." / "05-experimentos"
+                             / "etapa4-mlp-populacao"
+                             / "fig-diagnostico-duracoes.pdf"),
+}
+for destino, origem in EXTERNAS.items():
+    origem = origem.resolve()
+    if origem.is_file():
+        shutil.copyfile(origem, AQUI / destino)
+        print(f"{destino} <- {origem}")
+    else:
+        print(f"AVISO: origem ausente, {destino} nao atualizada ({origem})")
