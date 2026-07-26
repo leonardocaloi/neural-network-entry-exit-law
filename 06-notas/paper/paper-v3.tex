@@ -784,6 +784,10 @@ and is out of scope for the theorem, whose regime is deterministic gradient flow
 
 \subsection{Two instrument designs failed their own null control}\label{sec:negatives}
 
+This subsection is the most transferable part of the paper: any pipeline that
+counts rare unit-level events during training --- dormancy dashboards included
+--- can commit the two errors documented here, and the calibrated null that
+catches them is reusable as stated in \cref{app:algorithms}.
 The first attempt to see the law in a real MLP failed on the instrument, and the
 failure was caught by a pre-registered null (the first MLP stage, labelled
 \texttt{etapa-4a} in the repository; commit \texttt{6411ac8}, 600 runs, MLP with
@@ -1305,6 +1309,25 @@ in $21/22$), a second upstream channel reproduced in all four arms, and GELU's
 sign-changing derivative left its signature in $92\%$ of deep episodes while its
 terminality remained confounded with depth --- the pre-registered three-way
 label, reported as frozen.
+
+What this is, and is not. The value of the law is understanding: it replaces
+``dead units are terminal'' with a mechanism --- a gate with memory --- in the
+regime where the mechanism is provable. It is not a training tool. The
+asymptotics live on the channel $e^{\beta z}$ being exponentially small, and an
+adaptive optimizer that divides by the running RMS of the gradient rescales
+precisely that smallness, so we expect none of the quantitative schedule ---
+sticking depth, release time, the coefficient $-1/(cR(\texit))$ --- to survive
+Adam; this expectation is stated here as reasoning, not measurement. What does
+transfer is smaller and sharper: the sign structure of the activation
+derivative, which is an exact fact about GELU (\cref{sec:transformer-gelu})
+and, with the zero at $z^\ast=-1.2785$ instead of $-0.7518$, about SiLU; the
+calibrated-null instrument of \cref{sec:negatives}, which any measurement of
+rare events in training can reuse; and the folklore correction that the
+terminality of discrete death is a statement about stationary input. The
+cheapest consequential experiment this paper points at is not a scaling of the
+theorem but a histogram: the mass of feed-forward pre-activations below
+$z^\ast$ in production-scale models, and whether that mass is sticky across
+training.
 
 \section{Reproducibility}\label{sec:repro}
 
