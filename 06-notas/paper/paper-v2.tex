@@ -11,6 +11,8 @@
 \usepackage{booktabs}
 \usepackage{microtype}
 \usepackage{aliascnt}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage[nameinlink]{cleveref}                 % C4: nada de "Thm."/"Fig."
 
@@ -34,6 +36,8 @@
 \aliascntresetthe{remark}
 
 % C4: nomes por extenso; equacao sem a palavra "eq." (IOP 4.4).
+\crefname{algorithm}{Algorithm}{Algorithms}
+\Crefname{algorithm}{Algorithm}{Algorithms}
 \crefname{theorem}{Theorem}{Theorems}
 \Crefname{theorem}{Theorem}{Theorems}
 \crefname{lemma}{Lemma}{Lemmas}
@@ -60,6 +64,7 @@
 \newcommand{\texit}{t_{\mathrm{exit}}}
 \newcommand{\trel}{t_{\mathrm{release}}}
 \newcommand{\Ar}{\mathcal{A}}                      % area acumulada
+\newcommand{\Tep}{T_{\mathrm{ep}}}                 % duracao do episodio (NAO o horizonte H)
 \newcommand{\hyb}{\mathrm{hyb}}
 
 % Slot para os cinco estimandos da etapa-5. Enquanto o argumento for vazio, nada
@@ -441,8 +446,11 @@ $1/\beta$; the line is the proved slope
 $K=1/(c|R^{\hyb}(\thit)|)=7.04$ (\cref{lem:corner-in}), not a fit. Right: the
 two-term release law (\cref{lem:bootstrap}, squares) against the coupled
 measurements (circles) over $\beta\in[3\cdot10^2,10^4]$; the dotted line is the
-universal first-order coefficient $-1/(cR^{\hyb}(\texit))=-14.81$. Script
-\texttt{t2-prova/figuras\_draft.py}.}
+universal first-order coefficient $-1/(cR^{\hyb}(\texit))=-14.81$. Every coupled
+run uses the explicit Euler step $dt=\min(10^{-5},0.02/\beta)$, so
+$dt=10^{-5}$ at $\beta=3\cdot10^{2}$ and $10^{3}$, $6.7\cdot10^{-6}$ at
+$3\cdot10^{3}$ and $2\cdot10^{-6}$ at $10^{4}$; \cref{tab:dt} refines that step at
+$\beta=10^{4}$. Script \texttt{t2-prova/figuras\_draft.py}.}
 \label{fig:constantes}
 \end{figure}
 
@@ -459,6 +467,37 @@ $\beta=3\cdot10^2\ldots10^4$, with universal coefficient
 $1/(cR_{\mathrm{exit}})=14.815$ (against $-14.68$ the leading coefficient alone
 is at $0.9\%$); the tangential drift is at machine zero. All numerics are this
 single two-neuron instance, and breadth is future work.
+
+The measured coefficient is a discretization, not a fit, so it must be shown to
+converge. \Cref{tab:dt} refines the Euler step at the stiffest point of the
+sweep, $\beta=10^{4}$, keeping everything else fixed.
+
+\begin{table}[h]
+\centering
+\caption{Convergence in the time step at $\beta=10^{4}$: the measured release
+offset converges to the proved coefficient
+$-1/(cR^{\hyb}(\texit))=-14.815$, reaching $0.1\%$ at the finest step. The
+correction term of \cref{lem:bootstrap} is $\mathrm{corr}=0.00977$ at every step,
+so what is refining is the quadrature and not the law. At $dt=10^{-5}$ the
+measurement is quantized in units of $\beta\,dt=0.1$, which is the whole of that
+row's error. The sweep of \cref{sec:numerics} and \cref{fig:constantes} uses
+$dt=\min(10^{-5},0.02/\beta)$, that is $dt=2\cdot10^{-6}$ at $\beta=10^{4}$.}
+\label{tab:dt}
+\begin{tabular}{lrr}
+\toprule
+$dt$ & $\beta(t_{\mathrm{rel}}-\texit)$ & deviation from $-14.815$ \\
+\midrule
+$10^{-5}$          & $-14.000$ & $5.5\%$ \\
+$2\cdot10^{-6}$    & $-14.680$ & $0.9\%$ \\
+$10^{-6}$          & $-14.760$ & $0.4\%$ \\
+$5\cdot10^{-7}$    & $-14.805$ & $0.1\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent It converges to the proved coefficient: $0.1\%$ at the finest step.
+The driver reuses \texttt{roda\_acoplado} from
+\texttt{t2-prova/prova\_L5\_verificacao.py} verbatim, overriding only the step.
 
 \subsection{Independence of the smoothing}\label{sec:regularization}
 
@@ -611,7 +650,8 @@ distribution as softplus at $T>0$, which is impossible by gradient, since a dead
 ReLU unit has exactly zero gradient; these were noise threshold-crossings. The
 real physics lives at $T\to0$: the only genuinely long episodes sit in the $T=0$
 arm, where just $2$ of $461$ episodes completed inside the $10^{5}$-step horizon
-($672$ and $1548$ steps; $99.6\%$ censored). The calibrated null held its false-positive rate near
+($672$ and $1548$ steps; $99.6\%$ censored). The calibrated null (\cref{alg:nulo}, whose retention step is the
+clean-episode filter of that ruler) held its false-positive rate near
 $\alpha$ in i.i.d.\ worlds, but the real world has per-neuron heterogeneity.
 
 \begin{figure}[t]
@@ -707,8 +747,9 @@ sp-$\beta300$, ReLU$\}\times m\in\{4,6\}\times50$ held-out seeds
 ($1900$--$1949$, not used in any pilot), for 400 runs at $T=0$ and
 $H=5\cdot10^{5}$. The eligibility window is $[0,307{,}536]$, that is $H-\tau$
 with $\tau$ the $q_{0.9}$ return time of the pilot. The instrument is a single
-ground-truth clock with bit-exact parity to the pilot motor, and the area of the
-leader-datum residual is accumulated on that clock, so temporal ordering is
+ground-truth clock with bit-exact parity to the pilot motor (\cref{alg:regua}),
+read by the pre-registered decision procedure of \cref{alg:decisao}, and the area
+of the leader-datum residual is accumulated on that clock, so temporal ordering is
 structural and the only empirical failure mode of the area test is a return
 without area.
 
@@ -871,8 +912,8 @@ have.
 A rate pilot of 160 runs (commit \texttt{2dba27d}) then fixed the design. Natural
 FFN death is $\approx0$, since units with $d=16$ input do not die on their own,
 so the confirmatory is necessarily injection-conditional; the non-stationary
-channel chatters, forcing a hysteresis instrument with $\delta_h\approx0.0476$
-calibrated from data; and the return time is slow, $\tau\approx60$--$66$k, forcing
+channel chatters, forcing the hysteresis instrument of \cref{alg:hist}, with
+$\delta_h\approx0.0476$ calibrated from data; and the return time is slow, $\tau\approx60$--$66$k, forcing
 $H=2\cdot10^{5}$. The upstream channel was already clean in the pilot: the
 difference between training and frozen attention was $+6/+6/+6/+8$ returns, and
 ReLU went from $0$ to $8$ with own-move $0$.
@@ -884,32 +925,9 @@ $\{$sp-$\beta3$, sp-$\beta10$, GELU, ReLU$\}\times\{$attn-train,
 attn-frozen$\}\times$ injection $\{-0.3,-2.0\}\times50$ seeds $2000$--$2049$,
 with $H=2\cdot10^{5}$ and $T=0$. At the time this section was frozen the grid
 was still executing; its results are inserted below upon completion, with no
-change to the estimands. We state the five pre-registered estimands here so
-that the protocol is on record ahead of the data.
-
-% Quando os numeros chegarem: preencher o argumento de cada \eresult{} abaixo.
-\begin{itemize}
-\item \textbf{E-A, validity.} Any sustained return in the relu-frozen arm will
-invalidate the run, since an own-gradient identically zero together with a fixed
-input makes death terminal. The pilot gave $0/40$.\eresult{}
-\item \textbf{E-B, upstream channel.} We will estimate
-$\Delta=p_{\mathrm{sust}}(\text{train})-p_{\mathrm{sust}}(\text{frozen})$ per
-arm, and will call the effect reproduced if the bootstrap lower bound is
-positive. Under the hysteresis instrument the test is stricter than in the
-pilot.\eresult{}
-\item \textbf{E-C, transfer of the theorem class.} For sp-$\beta3$ frozen under
-shallow injection we will estimate
-$p(\text{sustained return}\mid\text{injection})$, and will call the class
-transferred if there are at least $n^\ast=6$ sustained returns. This is the
-direct analogue of C2 in the MLP.\eresult{}
-\item \textbf{E-D, GELU barrier.} For gelu-frozen we will compare deep injection
-($-2.0$) against shallow ($-0.3$); the barrier predicts shallow far above deep in
-the own channel, with a depth-matched control against sp-$\beta3$. The pilot at
-$-1.0$ was a tie and did not decide.\eresult{}
-\item \textbf{E-E, $\beta$ staircase.} We will estimate
-$p(\text{sustained return})$ across $\beta\in\{3,10\}$, frozen and training, as
-an estimation with no kill condition.\eresult{}
-\end{itemize}
+change to the estimands. The decision procedure is \cref{alg:decisao}. The five pre-registered estimands E-A to E-E are stated
+verbatim in \cref{app:estimands}, so that the protocol is on record ahead of the
+data.
 
 The scoping verdict is itself a result: the MLP mechanism does not transfer
 directly to the GELU feed-forward block, because the sign-flip barrier obstructs
@@ -1016,14 +1034,16 @@ repository is not public at the time of writing; no external data were used, and
 all data are generated by the scripts listed in \cref{sec:repro}.
 
 \section*{Declaration of LLM usage}
-Large language models were used throughout this work: to draft and copy-edit the
-text, to run adversarial reviews of each experimental design before its
-pre-registration (those referee reports are committed in the repository), to
-write the experiment and verification code, and to work out the derivations of
-\cref{app:lemmas}. Every lemma was then re-checked by an independent executable
-symbolic or numerical script, committed alongside it. The hypotheses, the
+Every lemma of \cref{app:lemmas} is re-checked by an independent executable
+symbolic or numerical script, committed alongside it, and every experimental
+design was put through an adversarial review before its pre-registration, with
+those referee reports committed in the repository. The hypotheses, the
 pre-registered kill conditions, the decision to declare a design or a hypothesis
 dead, and the reading of the cited sources are the author's.
+
+Within that frame, large language models were used throughout the work: to draft
+and copy-edit the text, to run the adversarial reviews, to write the experiment
+and verification code, and to work out the derivations of \cref{app:lemmas}.
 
 \begin{thebibliography}{99}
 
@@ -1147,7 +1167,9 @@ intermediate value theorem is harmless.
 $w=1/u$ with $u=c\beta|\Ar(t)|(1+o(1))$ away from neighbourhoods of the endpoints
 (\cref{lem:release}(i)). In the bulk, where $|\Ar|\ge a_0(\delta)$, one has
 $\log(1+w)\le w\le 1/(c\beta a_0)$, so that stretch contributes at most
-$H/(\beta a_0)=O(\beta^{-1})$. Near $\thit$ and $\texit$ the function $\Ar$ has
+$\Tep/(\beta a_0)=O(\beta^{-1})$, where $\Tep=\texit-\thit$ is the duration of the
+episode, not the training horizon $H$: the bulk stretch lies inside the episode by
+construction. Near $\thit$ and $\texit$ the function $\Ar$ has
 transversal zeros, with derivatives $cR(\thit)\ne0$ and $cR(\texit)\ne0$, so
 $|\Ar(t)|\ge\kappa|t-t_\ast|$ locally and
 \[
@@ -1157,7 +1179,7 @@ $|\Ar(t)|\ge\kappa|t-t_\ast|$ locally and
 on the $O(\beta^{-1})$-wide stretches glued to the endpoints one has $w=O(1)$ and
 $\log(1+w)\le\log2+O(1)$, contributing $O(\beta^{-1})$. Summing the three windows
 gives $O(\log\beta/\beta)$ with constant
-$C_4=2/\bigl(c\min(|R(\thit)|,R(\texit))\bigr)+H/a_0$.
+$C_4=2/\bigl(c\min(|R(\thit)|,R(\texit))\bigr)+\Tep/a_0$.
 \end{proof}
 
 \begin{remark}[consequence used downstream]\label{rem:L1cons}
@@ -1170,8 +1192,13 @@ the release at $\texit+O(\beta^{-1})$, and it is what
 
 \noindent\emph{Verification.} \texttt{prova\_L1\_verificacao.py} confirms the
 additive identity symbolically, and the integral correction with the normalized
-metric is stable in $[8.2,10.6]$, below the theoretical $C_4\approx30$, for
-$\beta\in[3\cdot10^2,10^4]$.
+metric is stable in $[8.2,10.6]$, below the leading theoretical term
+$2/\bigl(cR^{\hyb}(\texit)\bigr)=2/(0.625\times0.108)=29.6$, for
+$\beta\in[3\cdot10^2,10^4]$. The full theoretical constant adds the bulk term:
+with $\Tep=\texit-\thit=1.1325-0.1114=1.021$ and $a_0\approx0.02$ in the instance,
+$C_4=29.6+1.021/0.02=80.7$. Using the training horizon $H=1.7$ in place of $\Tep$
+would give $114.6$ instead; the bound of \cref{lem:gauge} is over the episode,
+so $\Tep$ is the correct length.
 
 \subsection{The \texorpdfstring{$B$}{B}-subsystem and the feedback}\label{app:L2}
 
@@ -1380,8 +1407,9 @@ $1.9\%/0.7\%/0.2\%/0.1\%$ for $\beta=3\cdot10^2\ldots10^4$, and that the univers
 coefficient is $1/(cR_{\mathrm{exit}})=14.815$; the chain of constants is
 exhibited with $M_2=440.8$ from the empirical $C_4=10.6$, against
 $M_2\le1233$ from the leading theoretical term $2/(cR^{\hyb}(\texit))=29.6$ alone
-and $M_2\lesssim3300$ from the full theoretical $C_4\approx80$, which adds the
-bulk term $H/a_0$ with $a_0\approx0.02$ in the instance. The strict layer is
+and $M_2\lesssim3300$ from the full theoretical $C_4=80.7$, which adds the
+bulk term $\Tep/a_0$ with $\Tep=\texit-\thit=1.021$ and $a_0\approx0.02$ in the
+instance. The strict layer is
 confirmed at $\beta=10^4$. One honest caveat: with the conservative
 $C_\varepsilon$ the inner window of the layer check is empty for
 $\beta\le3\cdot10^3$, so the check is vacuous there, and at those $\beta$ the
@@ -1440,5 +1468,321 @@ fell into the frozen Filippov branch, with a constant gap of $\approx0.039$. The
 correct reference requires exact projection onto the face together with an
 activating nudge larger than the overshoot. Branch selection is a real condition
 of the statement.
+
+\section{Algorithms}\label{app:algorithms}
+
+Four routines carry the experimental claims of \cref{sec:experiments}: the
+ground-truth area clock (\cref{alg:regua}), the truncated calibrated null
+(\cref{alg:nulo}), the hysteresis counter (\cref{alg:hist}) and the
+pre-registered decision procedure (\cref{alg:decisao}). They are given here in
+full, because each of them is an instrument built for this paper and each of them
+has already falsified one of its own predecessors. Smaller routines are folded
+into the algorithm that consumes them: the clean-episode filter inside
+\cref{alg:nulo}, the Clopper--Pearson bisection and the gate $n^\ast$ inside
+\cref{alg:decisao}.
+
+\subsection{The ground-truth area clock}\label{app:alg1}
+
+The ruler of \cref{sec:negatives} was replaced, after it failed its own null, by
+a clock with no ruler at all: death and return are read directly off the margin
+over all data, with no threshold, no debounce and no dwell. The single free
+choice left is the accumulator, and it runs on the same clock, so the temporal
+ordering $\thit\le t_{\mathrm{area}}<t_{\mathrm{res}}$ is structural rather than
+measured; the only empirical failure mode left is a return with no area.
+
+\begin{algorithm}[h]
+\caption{Ground-truth area clock (deterministic MLP, $T=0$)}
+\label{alg:regua}
+\begin{algorithmic}[1]
+\REQUIRE width $m$, activation $g_\beta$, rate $\eta$, horizon $H$, seed; data
+$(x,y)$ with $n$ points
+\ENSURE for every episode: $(k,\text{class},t_{\mathrm{death}},
+t_{\mathrm{area}},t_{\mathrm{res}},\text{revived},z_{\mathrm{park}})$
+\STATE initialise $(w,b,v)$ from the seed; $\mathrm{open}_k\leftarrow\textsc{false}$ for all $k$
+\FOR{$t=0$ \TO $H-1$}
+  \STATE $z\leftarrow xw^\top+b$; \; $a\leftarrow g_\beta(z)$; \;
+         $f\leftarrow av$; \; $\mathrm{res}\leftarrow f-y$
+  \STATE $z^{\max}_k\leftarrow\max_{j\le n}z_{jk}$; \;
+         $j^\ast_k\leftarrow\arg\max_{j\le n}z_{jk}$
+  \STATE $\mathrm{dead}_k\leftarrow[\,z^{\max}_k<0\,]$
+         \COMMENT{ground truth: the unit is off on \emph{every} datum}
+  \STATE $\hat R_k\leftarrow v_k\bigl[(y-f)_{j^\ast_k}+v_k\,a_{j^\ast_k k}\bigr]$
+         \COMMENT{leader-datum residual drive}
+  \FORALL{$k$ with $\mathrm{dead}_k\wedge\neg\mathrm{open}_k$}
+    \STATE open an episode: $\mathrm{open}_k\leftarrow\textsc{true}$,
+           $\hat{\Ar}_k\leftarrow0$, $t_{\mathrm{area}}^{k}\leftarrow-1$,
+           $t_{\mathrm{death}}^{k}\leftarrow t$,
+           $z^k_{\mathrm{park}}\leftarrow z^{\max}_k$
+    \STATE class $\leftarrow$ \textsc{born} if $t=0$, else \textsc{dyn}
+  \ENDFOR
+  \FORALL{$k$ with $\mathrm{open}_k\wedge\mathrm{dead}_k$}
+    \STATE $\hat{\Ar}_k\leftarrow\hat{\Ar}_k+\hat R_k\,\eta$
+           \COMMENT{the area accrues only on dead steps}
+    \IF{$t_{\mathrm{area}}^{k}<0$ \AND $\hat{\Ar}_k>0$}
+      \STATE $t_{\mathrm{area}}^{k}\leftarrow t$ \COMMENT{the gate opens}
+    \ENDIF
+    \STATE $z^k_{\mathrm{park}}\leftarrow\min(z^k_{\mathrm{park}},z^{\max}_k)$
+  \ENDFOR
+  \FORALL{$k$ with $\mathrm{open}_k\wedge(z^{\max}_k>0)$}
+    \STATE close the episode with $t_{\mathrm{res}}\leftarrow t$,
+           $\text{revived}\leftarrow\textsc{true}$;
+           $\mathrm{open}_k\leftarrow\textsc{false}$
+  \ENDFOR
+  \STATE $\theta\leftarrow\theta-\eta\nabla_\theta\tfrac12\overline{\mathrm{res}^2}$
+         \COMMENT{plain gradient descent; the instrument never touches the dynamics}
+\ENDFOR
+\STATE close every still-open episode as \textbf{censored}:
+       $t_{\mathrm{res}}\leftarrow\textsc{none}$,
+       $\text{revived}\leftarrow\textsc{false}$
+       \COMMENT{never recorded as ``permanent''}
+\end{algorithmic}
+\end{algorithm}
+
+\noindent Two guards are asserted before any run is used. Bit-exact parity: the
+loss trace must agree with the pilot engine to $10^{-12}$, so the clock is known
+to be a pure observer. And the episode count must equal the number of born-dead
+units plus the number of dynamic deaths, so no episode is silently dropped.
+
+\noindent\textit{Executable: \texttt{pilotos-4a2/pressao/taxa/motor\_4a3.py},
+config SHA in \texttt{results-4a3/manifest-4a3.json}.}
+
+\subsection{The truncated calibrated null}\label{app:alg2}
+
+This is the methodological repair of \cref{sec:negatives}, and it is the one
+piece of the paper we would offer for reuse. The instrument stops measuring the
+area at the resurrection, so $t_{\mathrm{area}}\le t_{\mathrm{res}}$ holds
+mechanically and a naive permuted-delay placebo, which does not inherit that
+truncation, inflates the false-positive rate by up to $58\times$ the nominal
+$\alpha$. The repair is to put the truncation \emph{inside} the null: fit the
+delay distribution treating non-firing as right censoring, then reproduce the
+truncation in every bootstrap replicate, so the structural bias sits on both
+sides of the comparison and cancels.
+
+\begin{algorithm}[h]
+\caption{Truncated calibrated null for the area-delay statistic}
+\label{alg:nulo}
+\begin{algorithmic}[1]
+\REQUIRE episodes grouped by seed; $B$ replicates; cell key $(i_b,i_m)$
+\ENSURE $p$, $T_{\mathrm{obs}}$, effective number of seeds
+\STATE \textbf{Retention (clean-episode filter).} Keep an episode iff it
+completed ($t_{\mathrm{res}}\ge0$) and: at most $q$ switching events of
+\emph{other} units in $(t_{\mathrm{death}},t_{\mathrm{res}}]$; the readout $v_k$
+did not change sign; $\min_t|v_k|\ge\varphi_v$, which excludes death by a
+vanishing readout; and no change of the leader $j^\ast$. Drop seeds with fewer
+than three surviving episodes.
+\STATE for each episode: duration $d_i\leftarrow t_{\mathrm{res}}-t_{\mathrm{death}}$;
+       delay $a_i\leftarrow t_{\mathrm{area}}-t_{\mathrm{death}}$ if the area
+       fired, else $-1$; \; $f_i\leftarrow[\,a_i\ge0\,]$
+\STATE \textbf{Survival encoding.} $\mathrm{obs}_i\leftarrow a_i$ if $f_i$ else
+       $d_i$; \; $\mathrm{ev}_i\leftarrow f_i$
+       \COMMENT{non-firing $=$ right censoring at the episode's own duration}
+\STATE $T_{\mathrm{obs}}\leftarrow\textsc{Stat}(\{(d,a,f)\})$ with one
+       independent stream per seed
+\STATE $\hat F\leftarrow\textsc{KaplanMeier}(\mathrm{obs},\mathrm{ev})$, pooled
+       over the seeds of the cell
+\STATE $\mathrm{exceed}\leftarrow0$
+\FOR{$b=1$ \TO $B$}
+  \FORALL{seeds, holding the durations $d$ \emph{fixed}}
+    \STATE draw $A_i\leftarrow\hat F^{-1}(u_i)$, $u_i\sim U[0,1)$, and set
+           $A_i\leftarrow\infty$ when $u_i$ exceeds $\hat F$ at the last observed
+           event \COMMENT{the censored mass stays censored}
+    \STATE $f^\dagger_i\leftarrow[\,A_i\le d_i\,]$; \;
+           $a^\dagger_i\leftarrow A_i$ if $f^\dagger_i$ else $-1$
+           \COMMENT{the truncation is reproduced, replicate by replicate}
+  \ENDFOR
+  \STATE $T_b\leftarrow\textsc{Stat}(\{(d,a^\dagger,f^\dagger)\})$; \;
+         $\mathrm{exceed}\mathrel{+}=[\,T_b\ge T_{\mathrm{obs}}\,]$
+\ENDFOR
+\RETURN $p=(1+\mathrm{exceed})/(B+1)$
+\medskip
+\STATE \textbf{function} \textsc{Stat}: for each seed, restrict to the fired
+episodes; if fewer than two, the seed contributes nothing. Otherwise draw for
+each $i$ an index $j_i$ uniform on the other fired episodes of that seed and put
+$W=\frac1n\sum_i\bigl[\,(d_i-a_i)<|d_i-a_{j_i}|\,\bigr]$. Return the mean of $W$
+over the surviving seeds.
+\end{algorithmic}
+\end{algorithm}
+
+\noindent Under $H_0$ the delay is independent of the duration, which is exactly
+what the resampling imposes: the durations are never resampled, only the delays
+are, and they are drawn from the pooled $\hat F$. The level and the power are
+demonstrated on synthetic truncated worlds before the procedure is applied to
+data.
+
+\noindent\textit{Executable: \texttt{etapa4-mlp-populacao/analise.py}
+(\texttt{p\_calibrado}, \texttt{\_km}, \texttt{\_amostra\_km}), config SHA in
+\texttt{etapa4-mlp-populacao/results/manifest.json}.}
+
+\subsection{The hysteresis counter}\label{app:alg3}
+
+In the transformer the input of the block is non-stationary, so the margin
+chatters across zero and a bare threshold counts noise as resurrection. The
+counter therefore commits a transition only outside a band $\pm\delta_h$
+calibrated from data, and a return counts only if the unit is still alive at the
+horizon.
+
+\begin{algorithm}[h]
+\caption{Hysteresis counter with sustained return (transformer block)}
+\label{alg:hist}
+\begin{algorithmic}[1]
+\REQUIRE arm, attention factor \textsc{train}/\textsc{frozen}, injection depth
+$\kappa\in\{0.3,2.0\}$, band $\delta_h$, horizon $H$, seed
+\ENSURE per unit: $(\text{revived},\text{sustained},\text{hover},
+t_{\mathrm{res}},t_{\mathrm{area}},\Ar_{\mathrm{drive}},\Ar_{\mathrm{mlp}},
+\text{own-move},\text{channel})$
+\STATE \textbf{Calibration of $\delta_h$ (offline, once).} Run the frozen flow
+with no injection; on units alive throughout, take the half peak-to-peak
+amplitude of $z^{\max}$ in windows of $200$ steps and set $\delta_h$ to the
+$q_{0.99}$ of that amplitude. This gives $\delta_h=0.0476$, and it is frozen in
+the config before the grid runs.
+\STATE \textbf{Injection.} Compute $z^{\max,0}_k$ and pick the unit $k$ of lowest
+initial margin; shift $b_1[k]$ by $-\kappa-z^{\max,0}_k$, so that
+$z^{\max}_k=-\kappa$ exactly. The depth is a two-level factor across the grid,
+shallow $-0.3$ against deep $-2.0$, straddling the GELU sign-flip barrier
+$z^\ast=-0.752$.
+\STATE $\mathrm{alive}_k\leftarrow\textsc{true}$ for all $k$
+\FOR{$t=0$ \TO $H-1$}
+  \STATE forward pass; $z^{\max}_k\leftarrow\max_j z_{jk}$ over all $N\!\cdot\!S$
+         tokens; $j^\ast_k\leftarrow\arg\max_j z_{jk}$
+  \FORALL{$k$ with $\mathrm{alive}_k\wedge(z^{\max}_k<-\delta_h)$}
+    \STATE \textbf{confirmed death}: $\mathrm{alive}_k\leftarrow\textsc{false}$;
+           open an episode and snapshot $(W_1[k],b_1[k])$
+  \ENDFOR
+  \FORALL{$k$ with an open episode}
+    \STATE $c_k\leftarrow(w_{\mathrm{out}}W_2)_k$;
+           $\Ar^{\mathrm{mlp}}_k\mathrel{+}=
+            c_k\bigl[(y-\hat y)_{j^\ast_k}+c_k a_{j^\ast_k k}\bigr]\eta$;
+           $\Ar^{\mathrm{drive}}_k\mathrel{+}=
+            c_k(y-\hat y)_{j^\ast_k}\,g'_\beta(z^{\max}_k)\,\eta$
+    \STATE record the first $t$ at which each area turns positive
+  \ENDFOR
+  \FORALL{$k$ with $\neg\mathrm{alive}_k\wedge(z^{\max}_k>+\delta_h)$}
+    \STATE \textbf{confirmed return}: $\mathrm{alive}_k\leftarrow\textsc{true}$,
+           $t_{\mathrm{res}}\leftarrow t$; close the episode
+    \STATE own-move $\leftarrow\|(W_1[k],b_1[k])-(W_1,b_1)_{\mathrm{death}}\|_2$;
+           channel $\leftarrow$ \textsc{upstream} if own-move $<10^{-9}$, else
+           \textsc{own}
+  \ENDFOR
+  \STATE gradient step on the trainable parameters only (under
+         \textsc{frozen}, attention and the readout are held fixed)
+\ENDFOR
+\STATE close every open episode as censored, and per unit set
+       $\text{sustained}\leftarrow\text{revived}\wedge\mathrm{alive}_k$,
+       $\text{hover}\leftarrow\text{revived}\wedge\neg\mathrm{alive}_k$
+\end{algorithmic}
+\end{algorithm}
+
+\noindent Inside the band $[-\delta_h,+\delta_h]$ the state is held, which is
+what kills the chatter; the test that the band is doing work is that the return
+count at $\delta_h=0.05$ is strictly below the count at $\delta_h=0$ on a seed
+known to chatter. One disclosure is on record: under \textsc{train} the same
+calibration gives $\delta_h\approx0.07$--$0.08$, about $1.7\times$ larger, so
+every estimand that depends on $\delta_h$ being decidable is confined to the
+\textsc{frozen} cells.
+
+\noindent\textit{Executable: \texttt{etapa5-transformer/motor\_e5\_conf.py},
+config SHA in \texttt{results-e5/manifest-e5.json}.}
+
+\subsection{The pre-registered decision procedure}\label{app:alg4}
+
+The same procedure serves \cref{sec:confirmatory} and \cref{sec:transformer},
+with the estimand-specific thresholds read from the frozen config. Its one
+structural commitment is the last line: insufficient evidence returns
+\textsc{inconclusive} and never a negative.
+
+\begin{algorithm}[h]
+\caption{Pre-registered decision procedure}
+\label{alg:decisao}
+\begin{algorithmic}[1]
+\REQUIRE runs; horizon $H$; return-time quantile $\tau=q_{0.9}$ of the pilot;
+gate $n^\ast$; kill threshold $\vartheta$; floor $\pi_0$; $\alpha=0.05$
+\ENSURE per estimand, one of
+\textsc{reproduces}/\textsc{sustains}/\textsc{kills}/\textsc{inconclusive}
+\STATE \textbf{Classification.} For each dynamic death:
+\begin{itemize}\itemsep0pt
+\item \emph{return} if the unit revived on the ground-truth clock; it is
+\emph{ordered} if moreover $t_{\mathrm{death}}\le t_{\mathrm{area}}<t_{\mathrm{res}}$
+with $t_{\mathrm{area}}\ge0$;
+\item \emph{censored} if it did not revive but its area had opened;
+\item \emph{terminal} if it did not revive and its area never opened.
+\end{itemize}
+\STATE \textbf{Eligibility.} The death is eligible iff
+$t_{\mathrm{death}}\in[0,H-\tau]$, the only window in which a typical return
+still fits inside the horizon. In the transformer the injected deaths all occur
+at $t=0$, so there the window is applied to $t_{\mathrm{res}}$ instead and yields
+a secondary robustness count, not the primary estimand.
+\STATE \textbf{Gate.} $n^\ast\leftarrow$ the $\alpha$-quantile of
+$\mathrm{Poisson}(\mu)$, with $\mu$ the expected number of deaths implied by the
+pilot's bootstrap lower bound on the death rate; here $n^\ast=10$ for the MLP and
+$6$ for the transformer. It is fixed before the run.
+\STATE \textbf{Interval.} $(\hat p,\ell,u)\leftarrow\textsc{ClopperPearson}(k,N,\alpha)$,
+where $\ell$ solves $\Pr[X\ge k\mid\mathrm{Bin}(N,p)]=\alpha/2$ and $u$ solves
+$\Pr[X\le k\mid\mathrm{Bin}(N,p)]=\alpha/2$, each by $200$ bisection steps on the
+exact binomial tail; $\ell=0$ when $k=0$ and $u=1$ when $k=N$.
+\STATE \textbf{Rate estimand} ($k$ eligible returns out of $N$ eligible deaths):
+\IF{$N<n^\ast$}
+  \RETURN \textsc{inconclusive} \COMMENT{never negative on insufficient $N$}
+\ELSIF{$u<\vartheta$}
+  \RETURN \textsc{kills}
+\ELSE
+  \RETURN \textsc{reproduces}
+\ENDIF
+\STATE \textbf{Ordering estimand} ($k$ ordered out of $N$ returns):
+\IF{$N<n^\ast$} \RETURN \textsc{inconclusive}
+\ELSIF{$\ell<\pi_0$} \RETURN \textsc{kills}
+\ELSE \RETURN \textsc{sustains}
+\ENDIF
+\STATE \textbf{Validity control.} If any run of the zero-gradient arm (ReLU in
+the MLP, relu-frozen in the transformer) records a return, declare the whole run
+\textbf{invalid}; no verdict on any substantive estimand may then be claimed.
+\STATE \textbf{Staircase estimands} are reported with intervals and carry no kill
+condition, by pre-registration.
+\end{algorithmic}
+\end{algorithm}
+
+\noindent The thresholds are derived, not chosen: $\vartheta$ is half the pilot's
+Clopper--Pearson lower bound on the same proportion, and $\tau$ is the pilot's
+$q_{0.9}$ return time. Both are read from the config committed before the grid
+ran. One honest disclosure: at $N=50$ the transformer's \textsc{kills} branch is
+nearly unreachable, since the Clopper--Pearson upper bound on $0/50$ already
+exceeds $\vartheta$; the operative decision there is
+\textsc{transfers} against \textsc{inconclusive}, and it would take $N\gtrsim800$
+for the kill to become available.
+
+\noindent\textit{Executables:
+\texttt{pilotos-4a2/pressao/taxa/analise\_4a3.py} and
+\texttt{etapa5-transformer/analise\_e5.py}, config SHAs in
+\texttt{results-4a3/manifest-4a3.json} and
+\texttt{results-e5/manifest-e5.json}.}
+
+\section{Pre-registered estimands of the transformer confirmatory}\label{app:estimands}
+
+The following five estimands were frozen at commit \texttt{1b45498}, ahead of the
+data, and are reproduced here verbatim; \cref{sec:transformer} carries the two
+scoping findings S1 and S2 that motivated them.
+
+% Quando os numeros chegarem: preencher o argumento de cada \eresult{} abaixo.
+\begin{itemize}
+\item \textbf{E-A, validity.} Any sustained return in the relu-frozen arm will
+invalidate the run, since an own-gradient identically zero together with a fixed
+input makes death terminal. The pilot gave $0/40$.\eresult{}
+\item \textbf{E-B, upstream channel.} We will estimate
+$\Delta=p_{\mathrm{sust}}(\text{train})-p_{\mathrm{sust}}(\text{frozen})$ per
+arm, and will call the effect reproduced if the bootstrap lower bound is
+positive. Under the hysteresis instrument the test is stricter than in the
+pilot.\eresult{}
+\item \textbf{E-C, transfer of the theorem class.} For sp-$\beta3$ frozen under
+shallow injection we will estimate
+$p(\text{sustained return}\mid\text{injection})$, and will call the class
+transferred if there are at least $n^\ast=6$ sustained returns. This is the
+direct analogue of C2 in the MLP.\eresult{}
+\item \textbf{E-D, GELU barrier.} For gelu-frozen we will compare deep injection
+($-2.0$) against shallow ($-0.3$); the barrier predicts shallow far above deep in
+the own channel, with a depth-matched control against sp-$\beta3$. The pilot at
+$-1.0$ was a tie and did not decide.\eresult{}
+\item \textbf{E-E, $\beta$ staircase.} We will estimate
+$p(\text{sustained return})$ across $\beta\in\{3,10\}$, frozen and training, as
+an estimation with no kill condition.\eresult{}
+\end{itemize}
 
 \end{document}
