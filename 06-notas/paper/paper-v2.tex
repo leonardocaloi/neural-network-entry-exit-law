@@ -923,9 +923,7 @@ A confirmatory run for the transformer was pre-registered at commit
 \texttt{1b45498}: 800 runs over
 $\{$sp-$\beta3$, sp-$\beta10$, GELU, ReLU$\}\times\{$attn-train,
 attn-frozen$\}\times$ injection $\{-0.3,-2.0\}\times50$ seeds $2000$--$2049$,
-with $H=2\cdot10^{5}$ and $T=0$. At the time this section was frozen the grid
-was still executing; its results are inserted below upon completion, with no
-change to the estimands. The decision procedure is \cref{alg:decisao}. The five pre-registered estimands E-A to E-E are stated
+with $H=2\cdot10^{5}$ and $T=0$. The grid completed with $800/800$ runs (manifest \texttt{manifest-e5.json}); the results are attached to each estimand below, with no change to the estimands. The decision procedure is \cref{alg:decisao}. The five pre-registered estimands E-A to E-E are stated
 verbatim in \cref{app:estimands}, so that the protocol is on record ahead of the
 data.
 
@@ -1765,24 +1763,24 @@ scoping findings S1 and S2 that motivated them.
 \begin{itemize}
 \item \textbf{E-A, validity.} Any sustained return in the relu-frozen arm will
 invalidate the run, since an own-gradient identically zero together with a fixed
-input makes death terminal. The pilot gave $0/40$.\eresult{}
+input makes death terminal. The pilot gave $0/40$.\eresult{\textbf{Result: VALID.} $0/100$ sustained returns in relu-frozen across both injection depths.}
 \item \textbf{E-B, upstream channel.} We will estimate
 $\Delta=p_{\mathrm{sust}}(\text{train})-p_{\mathrm{sust}}(\text{frozen})$ per
 arm, and will call the effect reproduced if the bootstrap lower bound is
 positive. Under the hysteresis instrument the test is stricter than in the
-pilot.\eresult{}
+pilot.\eresult{\textbf{Result: REPRODUCED in all four arms.} $\Delta=0.210$ $[0.120,0.300]$ (sp-$\beta3$), $0.200$ $[0.110,0.280]$ (sp-$\beta10$), $0.220$ $[0.120,0.320]$ (GELU), $0.200$ $[0.120,0.280]$ (ReLU, $20/100$ vs.\ $0/100$): the non-stationary FFN input is a real resurrection channel, of comparable size across activations.}
 \item \textbf{E-C, transfer of the theorem class.} For sp-$\beta3$ frozen under
 shallow injection we will estimate
 $p(\text{sustained return}\mid\text{injection})$, and will call the class
 transferred if there are at least $n^\ast=6$ sustained returns. This is the
-direct analogue of C2 in the MLP.\eresult{}
+direct analogue of C2 in the MLP.\eresult{\textbf{Result: TRANSFERRED.} $22/50$ sustained returns, $\hat p=0.440$ $[0.300,0.587]$, $3.7\times$ the gate $n^\ast=6$; the area of the leader drive opened before the return in $21/22$ of them. The memory gate of Theorem~2 operates in a transformer FFN through the own channel.}
 \item \textbf{E-D, GELU barrier.} For gelu-frozen we will compare deep injection
 ($-2.0$) against shallow ($-0.3$); the barrier predicts shallow far above deep in
 the own channel, with a depth-matched control against sp-$\beta3$. The pilot at
-$-1.0$ was a tie and did not decide.\eresult{}
+$-1.0$ was a tie and did not decide.\eresult{\textbf{Result: consistent with the barrier, confounded with depth} (the three-way label frozen at pre-registration). Intra-GELU: shallow $29/50$ vs.\ deep $0/50$; but the depth-matched control sp-$\beta3$-frozen at $-2.0$ also gave $0/50$, so depth alone accounts for the deep zero and the sustained-barrier claim is not licensed by this design. The S1 signature remains sharp: $\mathrm{sign}(\mathcal A_{\mathrm{drive}})\neq\mathrm{sign}(\mathcal A_{\mathrm{mlp}})$ in $92\%$ of deep vs.\ $4\%$ of shallow episodes --- the barrier is present in the drive field; its terminality is not separable from depth here.}
 \item \textbf{E-E, $\beta$ staircase.} We will estimate
 $p(\text{sustained return})$ across $\beta\in\{3,10\}$, frozen and training, as
-an estimation with no kill condition.\eresult{}
+an estimation with no kill condition.\eresult{\textbf{Result:} $\beta=3$ above $\beta=10$ in both factors (frozen $0.220$ $[0.143,0.314]$ vs.\ $0.090$ $[0.042,0.164]$; training $0.430$ $[0.331,0.533]$ vs.\ $0.290$ $[0.204,0.389]$). GELU itself is the most revivable arm (shallow frozen $0.580$ $[0.432,0.718]$; with the upstream channel $0.860$ $[0.733,0.942]$): the activation used in practice sits at the open end of the channel.}
 \end{itemize}
 
 \end{document}
