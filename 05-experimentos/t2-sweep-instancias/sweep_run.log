@@ -1,0 +1,17 @@
+
+=== SWEEP T2' — 600 instancias, beta=1e+04, dt0=1e-05, H=1.8, 11.8 min ===
+sorteadas .................. 600
+passaram (H1)-(H4) ......... 57  (9.5%)
+motivos de exclusao:
+    340  sem morte no horizonte
+    162  H2 falha: area nao volta a zero em [t_hit,H]
+     41  morte antes de t=0.05 (fora da janela)
+
+erro relativo |medido - predito|/|predito|  (predito = -1/(c*R_exit)):
+   mediana .... 2.68%
+   p90 ........ 7.26%
+   max ........ 12.01%
+   R_exit range .. [0.0145, 0.2670]
+   predito range . [-91.76, -4.53]
+
+jsonl: /home/caloi/Projects/j-space/05-experimentos/t2-sweep-instancias/sweep_instancias.jsonl

@@ -1,6 +1,9 @@
-% paper-v3.tex -- lista adjudicada (estrutural + microtipografia + normas)
-% aplicada sobre paper-v2.tex, que fica como registro.
-% arXiv, campo Comments (C17): "39 pages, 7 figures, 4 tables. Comments welcome."
+% paper-v3.tex -- lista adjudicada (estrutural + microtipografia + normas),
+% mais a 4a revisao externa aplicada in-place (sweep de 600 instancias, conta
+% do canal 117x, C3 post-hoc, escopo do readout fixo, BP21/Lu20).
+% Estado atual: 42 paginas, 7 figuras, 4 tabelas; 0 undefined, 0 overfull,
+% 0 float-too-large em 3 passes de pdflatex.
+% arXiv, campo Comments (C17): "42 pages, 7 figures, 4 tables. Comments welcome."
 % Versao canonica arXiv (autor visivel). Submissao TMLR = conversao p/ tmlr.sty
 % ANONIMIZADA (ver 06-notas/paper/submissao-checklist.md).
 % Categoria primaria math.DS, cross-list cs.LG.
@@ -101,24 +104,23 @@ Paran\'a, Brazil. \texttt{leonardo@ventros.com.br}.}}
 \maketitle
 
 \begin{abstract}
-A neuron dies when its pre-activation margin is negative on every datum; under
-hard ReLU its gradient is zero and it never returns. What replaces this under
-smoothed activations? In the sharp-activation limit of a shallow softplus
-network under gradient flow we prove the dynamics is hybrid with memory: the
-dead unit freezes and reactivates exactly when the signed time integral of the
-excluded residual returns to zero --- the entry--exit function --- at
-rate $O(\log\beta/\beta)$, with a universal first-order release coefficient;
-every constant is verified on a two-neuron instance. The two limit orders do not
-commute: the generalized-gradient flow freezes dead units forever, the smoothed
-flow revives them. A pre-registered ladder follows: a reduced
-stochastic-schedule model is falsified, two instruments are negatives, and a
-confirmatory MLP run of 400 runs reproduces resurrection, the
-area opening before 13 of 16 returns, hard ReLU structurally zero, the return
-probability monotone in the stiffness. A transformer confirmatory of 800
-pre-registered runs transfers the class to the feed-forward block through the
-unit's own channel ($\hat p=0.440$, area before 21 of 22 returns) and reproduces
-a second, upstream channel in all four arms: with a non-stationary block input,
-hard-ReLU units return, 20 of 100 against 0 of 100 with attention frozen.
+A neuron dies when its pre-activation margin is negative on every datum, and
+under hard ReLU its gradient is exactly zero, so it never returns. In the
+sharp-activation limit of a shallow softplus network under gradient flow we
+prove the dynamics is instead hybrid with memory: the dead unit is
+released exactly when the signed time integral of the residual excluding it
+returns to zero, at rate $O(\log\beta/\beta)$ and with a first-order release
+coefficient in which the arrival speed has cancelled. A sweep of 600
+instances isolates 57 that satisfy the hypotheses; the law holds in all 57,
+with median relative error $2.7\%$ over coefficients spanning a factor of 20. A
+pre-registered ladder follows: a reduced stochastic-schedule model is
+falsified, two instruments are negatives, and a confirmatory MLP
+run of 400 runs reproduces resurrection, the area in fact turning positive in
+13 of 16 returns, hard ReLU structurally zero, the return probability monotone in
+$\beta$. A transformer confirmatory of 800 pre-registered runs
+transfers the class to the feed-forward block through the unit's own channel
+($\hat p=0.440$) and reproduces a second, upstream channel in all four arms:
+hard-ReLU units return 20 of 100 against 0 of 100 with attention frozen.
 \end{abstract}
 
 \noindent\textbf{Keywords:} entry--exit function; geometric singular
@@ -151,10 +153,19 @@ an absorbing stratum: it freezes and is released exactly when the signed time
 integral of the residual that excludes it returns to zero. The stratum is a
 memory gate rather than a trap. The convergence to that hybrid limit is uniform
 away from the two switching instants, at the rate $O(\log\beta/\beta)$ in the
-activation stiffness $\beta$, and the release time carries the universal
-first-order coefficient $-1/(cR(\texit))$, in which the arrival speed has
-cancelled. The precise statement is \cref{thm:main}.
+activation stiffness $\beta$, and the release time carries the first-order
+coefficient $-1/(cR(\texit))$, in which the arrival speed has cancelled: the
+residual at death drops out, while the coefficient still depends on the datum
+constant $c$ and on the residual at the exit. The precise statement is
+\cref{thm:main}.
 \end{theorem*}
+
+\paragraph{Scope of the proved object.} The theorem covers the minimal case:
+one unit, one active datum at a time, a \emph{fixed} readout and a
+one-dimensional input. The experiments of \cref{sec:experiments} train the
+readout $v_k$ along with everything else, so the object that is proved and the
+object that is measured differ in that dimension. The transfer between them is
+empirical, not deduced.
 
 The contributions are:
 
@@ -164,19 +175,23 @@ $\beta\to\infty$ of a shallow softplus network under gradient flow, the death an
 resurrection of a neuron is the entry--exit problem of a slow--fast
 system~\cite{DMS16}: the dead unit freezes and reactivates when $\int R\,dt=0$,
 where $R$ is the residual excluding that unit. The uniform rate is
-$O(\log\beta/\beta)$ and the release time carries a universal first-order
-coefficient $-1/(cR(\texit))$. The proof is organized as six lemmas
-(\cref{app:lemmas}); each carries, in addition, an independent executable
-symbolic or numerical verification, which is not standard practice and which we
-therefore state explicitly. For the erf smoothing we verify numerically that the
-release criterion is unchanged; the proof is written for softplus, and GELU is
-outside the class because its derivative is non-monotone.
+$O(\log\beta/\beta)$ and the release time carries the first-order coefficient
+$-1/(cR(\texit))$, from which the arrival speed has cancelled. The proof is
+organized as six lemmas (\cref{app:lemmas}), each with an independent executable
+symbolic or numerical verification. A consequence of the same construction is
+that the two limit orders, smooth-then-sharp against the pointwise
+generalized-gradient flow, do not commute (\cref{sec:noncomm}): the field-first
+order is the frozen branch of Eberle, Jentzen, Riekert and Weiss~\cite{EJRW23},
+our flow-first limit resurrects, and the autodiff convention that fixes the
+branch is discussed in \cref{sec:related}. For the erf smoothing we verify
+numerically that the release criterion is unchanged; the proof is written for
+softplus, and GELU is outside the class because its derivative is non-monotone.
 
-\item \textbf{Non-commutation (\cref{sec:noncomm}).} The two limit orders,
-smooth-then-sharp against the pointwise generalized-gradient flow, do not
-commute. The field-first order is the frozen branch of Eberle, Jentzen, Riekert
-and Weiss~\cite{EJRW23}; our flow-first limit resurrects. This is the exact
-mathematical content of ``dead ReLU units stay dead, smooth units come back.''
+\item \textbf{A sweep from one instance to a law (\cref{sec:sweep}).} Every
+constant is verified on a reference two-neuron instance, and a sweep of 600
+random instances then tests the release law against the dynamics on the 57 that
+satisfy the hypotheses: it holds in all 57, with a median relative error of
+$2.68\%$ over predicted coefficients ranging from $-91.8$ to $-4.5$.
 
 \item \textbf{A pre-registered experimental ladder (\cref{sec:experiments}).}
 Organized by prediction, with the null controls and the negatives shown: a
@@ -203,10 +218,14 @@ attention frozen); and the GELU barrier is left confounded with injection depth
 under the pre-registered three-way label. \Cref{tab:e5} carries the five rows.
 \end{itemize}
 
-The theorem covers one two-neuron instance; the two confirmatories, the MLP
-(4a.3) and the transformer (\texttt{etapa-5}), cover two small architectures at
-zero noise; the stochastic regime is open and, where we probed it, it breaks the
-deterministic schedule (\cref{sec:falsification}).
+The theorem is proved for the minimal configuration above and its constants
+are verified on one reference instance and on a sweep of 600 drawn instances;
+the two confirmatories, the MLP (4a.3) and the transformer
+(\texttt{etapa-5}\footnote{Artifact, commit and script names are in
+Portuguese, the project's lab language; they are kept verbatim because the
+commit hashes and manifests reference them.}), cover two small architectures
+at zero noise; the stochastic regime is open and, where we probed it, it
+breaks the deterministic schedule (\cref{sec:falsification}).
 
 The paper is organized as follows. \Cref{sec:setup} fixes the model and the four
 hypotheses. \Cref{sec:theorem} states the entry--exit theorem, the six lemmas
@@ -294,11 +313,13 @@ The $\log\beta$ in \eqref{eq:sup} is sharp and is carried solely by the normal
 coordinate of $\theta_A$ inside the episode, whose sticking depth is
 $z\sim-\beta^{-1}\log\beta$ (\cref{lem:release}); $\theta_B$ obeys
 $O(\log\beta/\beta^{2})$ (\cref{lem:gronwall}) and the tangential components of
-$\theta_A$ are exponentially frozen (\cref{lem:corner-out}). The first-order
-coefficient in \eqref{eq:release} is universal: in the product of the entry delay
-by the area it cuts, the arrival speed cancels, leaving the reciprocal exit
-speed, so each corner contributes the reciprocal of its own transversal speed
-(\cref{lem:bootstrap}). The remainder is $o(\beta^{-1})$; the numerics suggest
+$\theta_A$ are exponentially frozen (\cref{lem:corner-out}). In the first-order
+coefficient of \eqref{eq:release} the arrival speed cancels: in the product of
+the entry delay by the area it cuts, the residual at death drops out and only
+the reciprocal exit speed survives, so each corner contributes the reciprocal of
+its own transversal speed (\cref{lem:bootstrap}). What does not cancel is the
+dependence on $c$ and on $R^{\hyb}(\texit)$, which are instance
+quantities. The remainder is $o(\beta^{-1})$; the numerics suggest
 $O(\log\beta/\beta^{2})$, which would follow from quantifying the $o(1)$ of
 \cref{lem:corner-in} with $\delta_z=\log\beta/\beta$, and we leave it as a stated
 refinement. \Cref{fig:mecanismo} draws the three stages this remark
@@ -354,6 +375,12 @@ identity
 Under \eqref{H1}--\eqref{H2} the additive correction satisfies
 $\int_{\thit}^{\trel}c\log(1+w)\,ds=O(\log\beta/\beta)$.
 \end{lemma}
+
+\noindent The bound $|E_\beta|\le\log(1+w)/(\beta|R|)$ in
+\eqref{eq:normalform} degenerates at the interior zero of $R$ that
+\eqref{H1}--\eqref{H2} force, since $R$ changes sign inside the episode; that
+is precisely why the proof switches to the quadrature $\Psi$ of
+\eqref{eq:quadrature}, which never divides by $R$.
 
 \begin{lemma}[$B$-subsystem and feedback]\label{lem:gronwall}
 Under \eqref{H4} the $B$-field is affine with Lipschitz constant
@@ -418,10 +445,11 @@ t^\beta_{\mathrm{release}}
 \end{equation}
 obtained by continuation with strict margins, with the constant
 $M_2=e^{L_BH}C_fC_4/c$ independent of the continuation hypothesis for
-$\beta\ge\beta_0$. The first-order coefficient is universal: in the product
-$K\,|R^{\hyb}(\thit)|/R^{\hyb}(\texit)$ of the entry delay by the area it cuts,
-the factor $|R^{\hyb}(\thit)|$ cancels against $K=1/(c|R^{\hyb}(\thit)|)$ of
-\cref{lem:corner-in}.
+$\beta\ge\beta_0$. In the first-order coefficient the arrival speed cancels: in
+the product $K\,|R^{\hyb}(\thit)|/R^{\hyb}(\texit)$ of the entry delay by the
+area it cuts, the factor $|R^{\hyb}(\thit)|$ cancels against
+$K=1/(c|R^{\hyb}(\thit)|)$ of \cref{lem:corner-in}, leaving a coefficient that
+still depends on $c$ and on $R^{\hyb}(\texit)$.
 \end{lemma}
 
 \begin{lemma}[exit corner, branch selection and scalar reduction]\label{lem:corner-out}
@@ -489,7 +517,8 @@ $1/\beta$; the line is the proved slope
 $K=1/(c|R^{\hyb}(\thit)|)=7.04$ (\cref{lem:corner-in}), not a fit. Right: the
 two-term release law (\cref{lem:bootstrap}, squares) against the coupled
 measurements (circles) over $\beta\in[3\cdot10^2,10^4]$; the dotted line is the
-universal first-order coefficient $-1/(cR^{\hyb}(\texit))=-14.81$. Every coupled
+speed-independent first-order coefficient
+$-1/(cR^{\hyb}(\texit))=-14.81$. Every coupled
 run uses the explicit Euler step $dt=\min(10^{-5},0.02/\beta)$, so
 $dt=10^{-5}$ at $\beta=3\cdot10^{2}$ and $10^{3}$, $6.7\cdot10^{-6}$ at
 $3\cdot10^{3}$ and $2\cdot10^{-6}$ at $10^{4}$; \cref{tab:dt} refines that step at
@@ -506,10 +535,11 @@ predicted by the proofs: the entry coefficient is $K_{\mathrm{teo}}=7.04$ agains
 $7.13$ fitted ($1.2\%$); the coupled two-term law
 $(-1+\mathrm{corr})/(cR_{\mathrm{exit}})$ reproduces the fine-grid coupled sweep
 $-12.74/-13.93/-14.38/-14.68$ to $1.9\%/0.7\%/0.2\%/0.1\%$ for
-$\beta=3\cdot10^2\ldots10^4$, with universal coefficient
-$1/(cR_{\mathrm{exit}})=14.815$ (against $-14.68$ the leading coefficient alone
-is at $0.9\%$); the tangential drift is at machine zero. All numerics are this
-single two-neuron instance, and breadth is future work.
+$\beta=3\cdot10^2\ldots10^4$, with the coefficient
+$1/(cR_{\mathrm{exit}})=14.815$ that the cancellation leaves (against
+$-14.68$ the leading coefficient alone
+is at $0.9\%$); the tangential drift is at machine zero. This subsection is one
+instance; \cref{sec:sweep} tests the same law on a sweep of drawn instances.
 
 The measured coefficient is a discretization, not a fit, so it must be shown to
 converge. \Cref{tab:dt} is that test: it refines the Euler step at the stiffest
@@ -545,6 +575,43 @@ $5\cdot10^{-7}$    & $-14.805$ & $0.1\%$ \\
 \noindent It converges to the proved coefficient: $0.1\%$ at the finest step.
 The driver reuses \path{roda_acoplado} verbatim from
 \path{t2-prova/prova_L5_verificacao.py}, overriding only the step.
+
+\subsection{From one instance to a law}\label{sec:sweep}
+
+A single instance cannot distinguish a law from a coincidence of constants, so
+we ran the same test over drawn instances. The script \path{sweep_instancias.py}
+samples 600 triples $(X,Y,\theta(0))$ from a prior fixed in advance and
+documented in the script, integrates each with the same $dt$, the same
+integrator and the same $\beta=10^{4}$ as the canonical run --- the coupled
+driver is copied verbatim from \path{passo4_verificacao.py} --- and compares the
+measured release offset $\beta(\trel-\texit)$ against the prediction
+$-1/(c\,R^{\hyb}(\texit))$ formed from that instance's own constants. As a
+sanity check the reference instance of \cref{sec:numerics} is reproduced inside
+the sweep, at $2.9\%$.
+
+Of the 600 draws, 57 satisfy \eqref{H1}--\eqref{H4}. The exclusions are
+accounted for exactly: 340 have no death within the horizon, 162 fail
+\eqref{H2} because the area never returns to zero, and 41 die outside the
+detector's window. On the 57 admissible instances the resurrection occurs in
+$57/57$ --- the release always precedes the hybrid $\texit$ --- and the relative
+error of the release coefficient against the instance's own
+$-1/(c\,R^{\hyb}(\texit))$ has median $2.68\%$, ninetieth percentile $7.26\%$
+and maximum $12.01\%$. The predicted coefficients themselves range over
+$[-91.8,-4.5]$, a factor of 20, so the agreement is not the agreement of one
+number repeated. The worst quartile, those with $|{\rm predicted}|$ between
+$4.5$ and $7.1$, has median error $6.7\%$.
+
+Two caveats belong with those numbers. First, the residual error is not
+centred: the median ratio of measured to predicted is $0.975$ and $55$ of the
+$57$ instances have $|{\rm measured}|<|{\rm predicted}|$. That systematic
+shortfall is the $o(\beta^{-1})$ remainder of \cref{thm:main} at a finite
+$\beta$, not sampling noise, and it is reported as a bias rather than absorbed
+into a tolerance. Second, the fraction $57/600$ is a property of the prior and
+measures nothing about how large the set \eqref{H1}--\eqref{H2} is. The
+geometric number is the conditional one: of the 219 deaths that fall inside the
+detector's window, 57, that is $26\%$, satisfy \eqref{H2}. The memory gate is a
+real and restrictive condition, not a formality that a generic trajectory
+satisfies.
 
 \subsection{Independence of the smoothing}\label{sec:regularization}
 
@@ -623,20 +690,33 @@ Szmolyan~\cite{KS01}, but there the forcing is autonomous, whereas here the
 residual is generated by the very trajectory it gates. We are not aware of an
 analogue of that coupling in the entry--exit literature.
 
-\paragraph{Gradient flows of ReLU networks.}
-Existence, uniqueness and convergence rates for gradient flows of ReLU networks
-are established in~\cite{EJRW23}, whose selected solution is the field-first
-branch of \cref{prop:noncomm}: once a neuron is degenerate it stays degenerate.
-Our result is the complementary, flow-first, selection, and the two disagree.
+\paragraph{Gradient flows of ReLU networks.} Existence, uniqueness and
+convergence rates for gradient flows of ReLU networks are established
+in~\cite{EJRW23}, whose selected solution is the field-first branch of
+\cref{prop:noncomm}: once a neuron is degenerate it stays degenerate. Our
+result is the complementary, flow-first, selection, and the two disagree. The
+branch is fixed in practice by a convention of the differentiator, and that
+convention has a name: in the framework of Bolte and Pauwels~\cite{BP21} the
+derivative returned by automatic differentiation is a definable selection of a
+conservative field for the loss, and $\mathrm{ReLU}'(0)=0$ is one such
+selection. Their Remark~13 also shows that the nondifferentiability locus
+$z=0$ is reached with nonzero probability, so which branch the implementation
+picks is not a detail of measure zero: it is the choice that
+\cref{prop:noncomm} shows the two limits disagree about.
 
-\paragraph{Dormant neurons and loss of plasticity.}
-Dead or dormant units are a measured pathology of trained networks: the dormant
-neuron phenomenon in deep reinforcement learning~\cite{Sokar23}, the loss of
-plasticity under distribution shift~\cite{Lyle23}, and its persistence in deep
-continual learning~\cite{Dohare24}. The practical mitigations are recycling dead
-units and smoothing the activation. \Cref{thm:main} and \cref{prop:noncomm} say
-what the second mitigation buys: a channel of width $e^{\beta z}$ and a return
-time set by an area.
+\paragraph{Dormant neurons and loss of plasticity.} Dead or dormant units are
+a measured pathology of trained networks: the dormant neuron phenomenon in
+deep reinforcement learning~\cite{Sokar23}, the loss of plasticity under
+distribution shift~\cite{Lyle23}, and its persistence in deep continual
+learning~\cite{Dohare24}. Death at initialization is a separate and better
+understood matter: Lu, Shin, Su and Karniadakis~\cite{Lu20} prove born-dead
+results for ReLU networks at initialization and study the initializations that
+avoid them. We invoke them only for that regime; every confirmatory count in
+this paper conditions on \emph{dynamical} deaths, units that die during
+training, and born-dead units are excluded by the instrument. The practical
+mitigations are recycling dead units and smoothing the activation.
+\Cref{thm:main} and \cref{prop:noncomm} say what the second mitigation buys: a
+channel of width $e^{\beta z}$ and a return time set by an area.
 
 \paragraph{Dormancy is not death.} The two objects should not be conflated.
 Dormancy in~\cite{Sokar23} is a normalized activation score falling below a
@@ -776,8 +856,9 @@ coordinates the theorem talks about: time, margin, accumulated area. The
 qualitative shape of \cref{fig:mecanismo} --- dive, sticking layer, debt,
 zero of the area, release --- appears in a trained network with no scalar
 reduction and no smoothing of the data, only with the return lagging the gate by
-the finite-$\beta$ rise time instead of by $O(1/\beta)$. We state the scope of
-this transfer explicitly: in this episode $68\%$ of the lifetime elapses
+the finite-$\beta$ rise time instead of by $O(1/\beta)$. The scope of this
+transfer is
+narrow: in this episode $68\%$ of the lifetime elapses
 \emph{after} the gate opens, so at $\beta=10$ the asymptotic release formula is
 far from its regime. What transfers to the trained network is the
 \emph{ordering} $t_{\mathrm{death}}<t_{\mathrm{area}}<t_{\mathrm{res}}$ and
@@ -894,24 +975,39 @@ conditionings of one count, not two estimates of one quantity.
 
 \item \textbf{C2, the area law, sp-$\beta3$: sustains.} The leader-drive area
 opens before the return in $13/16$ dynamical resurrections, with lower
-Clopper--Pearson bound $0.544>0.5$ on $\ge6$ returns. The 3 returns without area
-are real and are counted against the law: they are returns driven off the
+Clopper--Pearson bound $0.544>0.5$ on $\ge6$ returns. The ordering itself is
+partly structural: the clock accumulates the area only on dead steps and closes
+at the return, so $t_{\mathrm{area}}<t_{\mathrm{res}}$ cannot fail whenever the
+area opens at all (\cref{app:alg1}). The empirical content is that the area in
+fact turned positive in $13/16$ cases; the 3 returns without area are real and
+are counted against the law: they are returns driven off the
 leader datum, which the single-datum hypothesis (H3) does not cover; a
-per-datum area $\mathcal A_i$ is the natural extension.
+per-datum area $\mathcal A_i$ is the natural extension. What this instrument can
+say about the gate stops there, as the post-hoc aggregation of
+\cref{app:c3} makes explicit.
 
 \item \textbf{C3, the rise gap: estimation, not aggregated.} C3 was
 pre-registered as an estimation-only quantity with no kill condition, relating
 the gap $t_{\mathrm{res}}-t_{\mathrm{area}}$ to the park depth
 $z_{\mathrm{park}}$ and to the channel $\sigma(\beta z_{\mathrm{park}})$. Those
 quantities are recorded per episode by the instrument, but the frozen analysis
-script contains no aggregate for C3, and we report that rather than compute one
-after the fact.
+script contains no aggregate for C3. A post-hoc aggregation, produced after the
+confirmatory data were seen and labelled as such, is reported in
+\cref{app:c3}: it finds no evidence that the opening of the area predicts the
+return time beyond the onset of the episode. The episode's mean drive was never
+persisted by the instrument, which is why the question cannot be pushed
+further; persisting the drive series is inherited as a requirement for future
+experiments.
 
 \item \textbf{C4, channel staircase: estimation, monotone in $\beta$.}
 $\hat p_{\mathrm{death}}$ falls $0.457>0.370>0.211>0.000$ from $\beta=3$ to hard
 ReLU, with the intervals of \cref{tab:4a3}. The pairwise intervals overlap;
 the pre-registered protocol declared C4 an estimation with no kill condition,
-so no trend test was frozen in advance. As \emph{post-hoc supporting analysis}
+so no trend test was frozen in advance. Conditioning on death when $\beta$ also
+moves the death rate ($35/27/19/17$ dynamical deaths across the four arms)
+introduces a collider bias in $\hat p_{\mathrm{death}}$; C4 was already
+estimation-only, and this note makes the caveat explicit. As \emph{post-hoc
+supporting analysis}
 we report the Cochran--Armitage trend test across the four ordered arms:
 $z=-3.49$, $p=4.9\cdot10^{-4}$ (pairwise Fisher, $\beta=3$ vs.\ ReLU:
 $p=8.1\cdot10^{-4}$; $\beta=3$ vs.\ $\beta=300$ alone: $p=0.086$, not
@@ -1126,6 +1222,20 @@ barrier's terminality could not be separated from injection depth, and it is
 reported that way (E-D of \cref{tab:e5}); the upstream channel is established in
 all four arms (E-B).
 
+\paragraph{The deep zero is what the channel law predicts.} The own channel of
+sp-$\beta3$ is $\sigma(3z)$, which is $0.289$ at the shallow injection
+$z=-0.3$ and $0.00247$ at the deep one $z=-2.0$: a ratio of about $117$. The
+return time measured in the shallow cells is $\tau\approx60\,000$--$66\,000$
+steps, so scaling it by that ratio projects a deep return at roughly
+$7\cdot10^{6}$ steps, about $35$ times the horizon $H=2\cdot10^{5}$. The
+$0/50$ of sp-$\beta3$ frozen at $z=-2.0$ is therefore predicted by the channel
+law itself, at this horizon, and is not a failure of the transfer. It also
+disarms part of the E-D confound: the deep suppression of softplus is
+starvation of a quantitatively predicted size, so the depth-matched control
+gives $0/50$ for a reason that has nothing to do with the GELU barrier, and
+the two mechanisms remain separable only by the depth sweep around
+$z^\ast=-0.752$ that \cref{app:estimands} specifies.
+
 \subsection{Deviations from the pre-registered protocol}\label{sec:deviations}
 
 (i) None for 4a.3: the analysis frozen at \texttt{a8f8f8c} was run unchanged at
@@ -1135,8 +1245,9 @@ floor $n^\ast=10$ for C1 and the floor of $\ge6$ returns for C2 were all derived
 programmatically from the rate pilot (\texttt{995a87c}) and frozen in
 \path{config_4a3.json} before the run; none was chosen after seeing the
 confirmatory data.
-(iii) C3 was pre-registered as estimation-only; its per-episode quantities are
-recorded but no aggregate is reported (\cref{sec:confirmatory}).
+(iii) C3 was pre-registered as estimation-only; the frozen script reports no
+aggregate for it, and the post-hoc aggregation of \cref{app:c3} is labelled as
+such (\cref{sec:confirmatory}).
 (iv) For the transformer, the pre-registered package was revised once before
 freezing: an earlier candidate was rejected in adversarial review for a
 confound between injection depth and the GELU barrier, and was replaced by the
@@ -1145,8 +1256,15 @@ was executed under the rejected package.
 
 \section{Limitations}\label{sec:limits}
 
-\textbf{(i)} The theorem is proved for one two-neuron instance; every constant is
-verified there and breadth is future work.
+\textbf{(i)} The theorem is proved for the minimal configuration: one unit, one
+active datum at a time, a fixed readout and a one-dimensional input. Every
+constant is verified on a reference instance and the release law holds on
+$57/57$ of the admissible instances of a 600-draw sweep (\cref{sec:sweep}), with
+a residual bias, $55/57$ measured offsets smaller in modulus than predicted,
+that we read as the $o(\beta^{-1})$ remainder at finite $\beta$. The experiments
+train the readout $v_k$, so the transfer from the proved object to the measured
+one is empirical; we are explicit about this rather than treating the two as the
+same object.
 \textbf{(ii)} The regime is $T=0$ deterministic gradient flow throughout the
 theorem and the confirmatory; the stochastic gate is open and, where probed,
 falsifies the deterministic schedule (\cref{sec:falsification}), since late
@@ -1160,8 +1278,10 @@ that a single unit can be tracked with a ground-truth clock.
 blocked below $z^\ast=-0.752$, and in the confirmatory the barrier could not be
 separated from depth (the pre-registered three-way label), because at the deep
 injection $z=-2.0$ the softplus own channel is starved to $0.9\%$ of its shallow
-value while $\mathrm{GELU}'$ is adverse, so both mechanisms predict the same
-zero; the separating design, a sweep of injection depths around
+value --- a factor of about $117$, which projects the deep return past $35$
+horizons (\cref{sec:transformer-gelu}) --- while $\mathrm{GELU}'$ is adverse, so
+both mechanisms predict the same zero at this horizon; the separating design,
+a sweep of injection depths around
 $z^\ast=-0.752$, is stated in \cref{app:estimands} and left as future work. The
 upstream channel is established; the barrier's terminality remains open.
 \textbf{(v)} The cone apex, of corank $\ge2$, where weight decay produces genuine
@@ -1172,8 +1292,10 @@ monotone-sigmoid class.
 
 \section{Conclusion}\label{sec:conclusion}
 
-We derived an entry--exit law for the death and resurrection of a smoothed unit
-and verified each of its constants on a two-neuron instance. We measured the law
+We derived an entry--exit law for the death and resurrection of a smoothed unit,
+verified each of its constants on a two-neuron instance, and tested the release
+law over a sweep of 600 drawn instances, where it holds on all 57 that satisfy
+the hypotheses, with a median relative error of $2.7\%$. We measured the law
 in a small MLP under a pre-registered protocol: resurrection occurs, the residual
 area opens before the return in 13 of 16 cases, hard ReLU gives a structural
 zero, and the return probability is monotone in the activation stiffness. In a
@@ -1186,24 +1308,22 @@ label, reported as frozen.
 
 \section{Reproducibility}\label{sec:repro}
 
-All code, configs, per-run manifests and aggregate JSON needed to reproduce every
-number and figure in this note are in a single Git repository. One policy governs
-the raw data, in both confirmatories: the per-episode trace files
-(\path{results-4a3/*.jsonl.gz}, \path{results-e5/*.jsonl.gz}) are kept out of
-version control, while the manifests that checksum them
+All code, configs, per-run manifests and aggregate JSON needed to reproduce
+every number and figure in this note are in a single Git repository. One
+policy governs the raw data, in both confirmatories: the per-episode trace
+files (\path{results-4a3/*.jsonl.gz}, \path{results-e5/*.jsonl.gz}) are kept
+out of version control, while the manifests that checksum them
 (\path{results-4a3/manifest-4a3.json}, \path{results-e5/manifest-e5.json}) are
 versioned. The traces are byte-reproducible from the pinned configs
 (deterministic single-threaded CPU runs), so the versioned SHA256 list is what
-makes a regenerated file verifiable.
-That repository is private at the time of writing, so the commit hashes below,
-while they resolve in it and fix the state of every experiment, are not
-independently checkable today; public release under the MIT licence is a
-precondition for submission, and we state this rather than let the reader
-discover it by clicking.
-All runs are deterministic on CPU with per-run manifests (SHA256, git hash,
-config), and pre-registration commits precede every confirmatory run in the
-repository history. No external data were used; every dataset in this note is
-generated by the scripts listed below.
+makes a regenerated file verifiable. That repository is private at the time of
+writing, so the commit hashes below, while they resolve in it and fix the
+state of every experiment, are not independently checkable today; public
+release under the MIT licence is a precondition for submission. All runs are
+deterministic on CPU with per-run manifests (SHA256, git hash, config), and
+pre-registration commits precede every confirmatory run in the repository
+history. No external data were used; every dataset in this note is generated
+by the scripts listed below.
 
 {\sloppy
 \begin{itemize}
@@ -1258,17 +1378,24 @@ per-run manifests and aggregate JSON --- is held at the commits cited in
 \cref{sec:repro}, under the trace-file policy stated there. The repository is
 not public at the time of writing; no external data were used.
 
-\section*{Declaration of LLM usage}
-Every lemma of \cref{app:lemmas} is re-checked by an independent executable
-symbolic or numerical script, committed alongside it, and every experimental
-design was put through an adversarial review before its pre-registration, with
-those referee reports committed in the repository. The hypotheses, the
-pre-registered kill conditions, the decision to declare a design or a hypothesis
-dead, and the reading of the cited sources are the author's.
+\section*{Declaration of LLM usage} Large language models were used throughout
+the work: to draft and copy-edit the text, to run the adversarial reviews, to
+write the experiment and verification code, and to work out the derivations of
+\cref{app:lemmas}. The hypotheses, the pre-registered kill conditions, the
+decision to declare a design or a hypothesis dead, and the reading of the
+cited sources are the author's.
 
-Within that frame, large language models were used throughout the work: to draft
-and copy-edit the text, to run the adversarial reviews, to write the experiment
-and verification code, and to work out the derivations of \cref{app:lemmas}.
+A review that only re-read the derivation would be circular, so the checks
+that carry weight here are the ones that do not read it. Each lemma is
+re-derived symbolically from scratch by a committed script (SymPy), which
+recomputes the identity rather than confirming the prose; the convergence
+table \cref{tab:dt} refines the integrator until the measured coefficient
+meets the proved one; and the sweep of \cref{sec:sweep} confronts the release
+law with 600 independently drawn trajectories. These routes test the law
+against the dynamics, not against the text that describes it, and any of them
+can fail while the prose stands. The central identity, \cref{lem:gauge}, is in
+addition a computation of about ten lines and is presented in that form so
+that a reader can redo it by hand.
 
 \begin{thebibliography}{99}
 
@@ -1337,6 +1464,15 @@ arXiv:1603.01821.
 perturbation theory to nonhyperbolic points---fold and canard points in two
 dimensions}, SIAM J.~Math.\ Anal.\ 33 (2001) no.~2, 286--314.
 doi:10.1137/S0036141099360919.
+
+\bibitem{BP21} J.~Bolte, E.~Pauwels, \emph{Conservative set valued fields,
+automatic differentiation, stochastic gradient method and deep learning},
+Math.\ Program.\ 188 (2021) no.~1, 19--51. doi:10.1007/s10107-020-01501-5.
+arXiv:1909.10300.
+
+\bibitem{Lu20} L.~Lu, Y.~Shin, Y.~Su, G.~E.~Karniadakis, \emph{Dying ReLU and
+initialization: theory and numerical examples}, Commun.\ Comput.\ Phys.\ 28
+(2020) no.~5, 1671--1706. doi:10.4208/cicp.OA-2020-0165. arXiv:1903.06733.
 
 \bibitem{CP34} C.~J.~Clopper, E.~S.~Pearson, \emph{The use of confidence or
 fiducial limits illustrated in the case of the binomial}, Biometrika 26 (1934)
@@ -1637,8 +1773,9 @@ In the coupled system the initial datum comes from the entry corner, so by
 \cref{lem:corner-in} the episode starts with a delay $K/\beta$ that cuts an
 initial negative area $\approx R(\thit)K/\beta$. Item (ii) then gives
 $\beta\,(\trel-\texit^{\hyb})\to-K\,|R(\thit)|/R(\texit)$. With the theoretical
-$K=1/(c|R(\thit)|)$ this is exactly $-1/(cR(\texit))=-14.81$, the universal
-coefficient of \eqref{eq:release}; with the empirical $K=7.13$ it is
+$K=1/(c|R(\thit)|)$ this is exactly $-1/(cR(\texit))=-14.81$, the
+coefficient of \eqref{eq:release} left by the cancellation; with the
+empirical $K=7.13$ it is
 $-(7.13\times0.2272)/0.1080=-15.0$, against $-14.38$ measured, a deviation of
 $4\%$ whose residue is the positive correction of item~(ii).
 \end{remark}
@@ -1665,10 +1802,11 @@ t^\beta_{\mathrm{release}}
 \end{equation*}
 obtained by continuation with strict margins, with the constant
 $M_2=e^{L_BH}C_fC_4/c$ independent of the continuation hypothesis for
-$\beta\ge\beta_0$. The first-order coefficient is universal: in the product
-$K\,|R^{\hyb}(\thit)|/R^{\hyb}(\texit)$ of the entry delay by the area it cuts,
-the factor $|R^{\hyb}(\thit)|$ cancels against $K=1/(c|R^{\hyb}(\thit)|)$ of
-\cref{lem:corner-in}.
+$\beta\ge\beta_0$. In the first-order coefficient the arrival speed cancels: in
+the product $K\,|R^{\hyb}(\thit)|/R^{\hyb}(\texit)$ of the entry delay by the
+area it cuts, the factor $|R^{\hyb}(\thit)|$ cancels against
+$K=1/(c|R^{\hyb}(\thit)|)$ of \cref{lem:corner-in}, leaving a coefficient that
+still depends on $c$ and on $R^{\hyb}(\texit)$.
 \end{lemmarep}
 
 \begin{proof}[Proof of \cref{lem:bootstrap}]
@@ -1725,7 +1863,8 @@ arrival speed cancelling against $K=1/(c|R(\thit)|)$. Summing gives
 
 \noindent\emph{Verification.} \path{prova_L5_verificacao.py} checks that the
 two-term law reproduces the whole coupled sweep, with deviations
-$1.9\%/0.7\%/0.2\%/0.1\%$ for $\beta=3\cdot10^2\ldots10^4$, and that the universal
+$1.9\%/0.7\%/0.2\%/0.1\%$ for $\beta=3\cdot10^2\ldots10^4$, and that
+the surviving
 coefficient is $1/(cR_{\mathrm{exit}})=14.815$; the chain of constants is
 exhibited with $M_2=440.8$ from the empirical $C_4=10.6$, against
 $M_2\le1233$ from the leading theoretical term $2/(cR^{\hyb}(\texit))=29.6$ alone
@@ -2196,5 +2335,34 @@ $0.580\,[0.432,0.718]$; with the upstream channel
 $0.860\,[0.733,0.942]$): the activation used in practice sits at the open end
 of the channel.}
 \end{itemize}
+
+\section{Post-hoc aggregation of C3}\label{app:c3}
+
+C3 was pre-registered as estimation-only, with no kill condition, and the
+frozen analysis script contains no aggregate for it (\cref{sec:confirmatory}).
+The paragraph below was produced after the confirmatory data were seen, at the
+request of an external reviewer, and is exploratory throughout: nothing in it
+tests a pre-registered hypothesis, and with 13 episodes over 10 seeds the rank
+intervals are wide by construction.
+
+\begin{quote}
+In 10 of the 13 episodes with an open area the gate is open at the moment of
+death, $t_{\mathrm{area}}=t_{\mathrm{death}}$ exactly, so in those episodes the
+lead time $t_{\mathrm{res}}-t_{\mathrm{area}}$ is identical to the duration of
+the episode and carries no information of its own. Controlling for when the
+episode began, the partial Spearman correlation between $t_{\mathrm{area}}$ and
+$t_{\mathrm{res}}$ given $t_{\mathrm{death}}$ is $+0.10$, with a $95\%$
+seed-clustered bootstrap interval $[-0.43,+0.78]$ that crosses zero: there is no
+evidence that the zero of the area predicts the return time beyond the onset of
+the episode. Under this clock the gate does not warm up; in most episodes it is
+already open at death, and what varies is how long the rise takes. The mean
+drive of the episode is not recoverable from the instrument, which persists only
+the triple of times, $z_{\mathrm{park}}$ and the channel value, so the question
+cannot be pushed further with these runs. Persisting the drive series per
+episode is inherited as a requirement for the next stage.
+\end{quote}
+
+\noindent Generated by \path{agrega_c3_posthoc.py} in the confirmatory's
+directory.
 
 \end{document}
