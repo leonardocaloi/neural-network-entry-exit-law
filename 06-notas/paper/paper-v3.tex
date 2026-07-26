@@ -1313,11 +1313,17 @@ label, reported as frozen.
 What this is, and is not. The value of the law is understanding: it replaces
 ``dead units are terminal'' with a mechanism --- a gate with memory --- in the
 regime where the mechanism is provable. It is not a training tool. The
-asymptotics live on the channel $e^{\beta z}$ being exponentially small, and an
-adaptive optimizer that divides by the running RMS of the gradient rescales
-precisely that smallness, so we expect none of the quantitative schedule ---
-sticking depth, release time, the coefficient $-1/(cR(\texit))$ --- to survive
-Adam; this expectation is stated here as reasoning, not measurement. What does
+asymptotics live on the channel $e^{\beta z}$ being exponentially small, and one
+would expect an adaptive optimizer that divides by the running RMS of the
+gradient to rescale precisely that smallness. An exploratory pilot on the toy
+instances (13 instances, \path{e7-adam-portao} in the repository) measured
+this expectation instead of assuming it, and it fails in an instructive way:
+under Adam the gate survives, parked deeper by the optimizer's floor --- the
+release moves to where the channel crosses $\epsilon$, empirically
+$\beta z_{\mathrm{park}}\approx-\ln(1/\epsilon)+\mathrm{const}$ --- and the
+area law itself reappears as $\epsilon$ grows, with relative error $0.24\%$ at
+$\epsilon=1$ against $0.017\%$ for plain gradient descent. This is a pilot,
+not a confirmatory, and momentum-rich production regimes remain unmeasured. What does
 transfer is smaller and sharper: the sign structure of the activation
 derivative, which is an exact fact about GELU (\cref{sec:transformer-gelu})
 and, with the zero at $z^\ast=-1.2785$ instead of $-0.7518$, about SiLU; the
