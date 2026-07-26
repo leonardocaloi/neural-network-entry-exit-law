@@ -1,5 +1,5 @@
 % paper-v2.tex -- gap-list editorial aplicada sobre paper-v1.tex (que fica como registro).
-% arXiv, campo Comments (C17): "25 pages, 5 figures, 2 tables. Comments welcome."
+% arXiv, campo Comments (C17): "32 pages, 5 figures, 3 tables. Comments welcome."
 % Categoria primaria math.DS, cross-list cs.LG.
 % Convencoes da casa fixadas: Psi = quadratura log u + u (Phi reservado para a
 % parametrizacao); H = horizonte de treino (tempo no fluxo, passos no experimento);
@@ -8,6 +8,7 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage[text={6in,8in},centering]{geometry}   % F22: limite SIADS
 \usepackage{graphicx}
+\usepackage{url}
 \usepackage{booktabs}
 \usepackage{microtype}
 \usepackage{aliascnt}
@@ -105,8 +106,10 @@ negatives, and a confirmatory MLP run (400 runs, noiseless gradient descent)
 reproduces resurrection in half of the deaths observable within the horizon
 ($\hat p=0.50$, 15/30; $\hat p=0.457$ over all 35 deaths), the area opening before 13 of 16
 returns, hard ReLU giving a structural zero, and return probability monotone in
-the stiffness. Transfer to a transformer feed-forward block is a
-pre-registered protocol, not established here.
+the stiffness. A pre-registered transformer confirmatory ($800$ runs)
+transfers the theorem class to the feed-forward block ($\hat p=0.44$, area
+opening before $21/22$ returns) and reproduces a second, upstream resurrection
+channel in all four arms, hard ReLU included.
 \end{abstract}
 
 \noindent\textbf{Keywords:} entry--exit function; geometric singular
@@ -274,7 +277,7 @@ to be removable at the cost of bookkeeping; we have not done it.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.60\linewidth]{fig1-mecanismo}
+\includegraphics[width=0.72\linewidth]{fig1-mecanismo}
 \caption{The memory gate at $\beta=10^3$ (coupled system, reference instance).
 Top: the margin $z(t)$ dies at $\thit$, hugs the sticking layer of depth
 $\sim\beta^{-1}\log\beta$, and releases. Bottom: the hybrid area
@@ -439,7 +442,7 @@ $O(\log\beta/\beta)$. Taking the maximum of the four stage bounds gives
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.95\linewidth]{fig2-constantes}
+\includegraphics[width=0.88\linewidth]{fig2-constantes}
 \caption{Predicted constants against measurements (deterministic runs; the
 uncertainty is discretization). Left: entry-corner crossing times against
 $1/\beta$; the line is the proved slope
@@ -817,8 +820,9 @@ conditionings of one count, not two estimates of one quantity.
 \item \textbf{C2, the area law, sp-$\beta3$: sustains.} The leader-drive area
 opens before the return in $13/16$ dynamical resurrections, with lower
 Clopper--Pearson bound $0.544>0.5$ on $\ge6$ returns. The 3 returns without area
-are real and are counted against the law: they are returns driven off the leader
-datum, and they are an object of study.
+are real and are counted against the law: they are returns driven off the
+leader datum, which the single-datum hypothesis (H3) does not cover; a
+per-datum area $\mathcal A_i$ is the natural extension.
 
 \item \textbf{C3, the rise gap: estimation, not aggregated.} C3 was
 pre-registered as an estimation-only quantity with no kill condition, relating
@@ -851,7 +855,7 @@ plasticity practice of \cref{sec:noncomm}.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.60\linewidth]{fig-escada-4a3}
+\includegraphics[width=0.72\linewidth]{fig-escada-4a3}
 \caption{The channel staircase (C4, confirmatory 4a.3, 400 runs, $T=0$).
 $\hat p_{\mathrm{death}}$ is monotone in the activation stiffness and reaches a
 structural zero at hard ReLU, where the gradient vanishes identically; the smooth
@@ -927,11 +931,16 @@ with $H=2\cdot10^{5}$ and $T=0$. The grid completed with $800/800$ runs (manifes
 verbatim in \cref{app:estimands}, so that the protocol is on record ahead of the
 data.
 
-The scoping verdict is itself a result: the MLP mechanism does not transfer
-directly to the GELU feed-forward block, because the sign-flip barrier obstructs
-self-resurrection and the upstream channel is a new route. The confirmatory tests
-the theorem class, softplus-$\beta$, on the block, and treats the GELU barrier
-and the upstream channel as estimands of their own.
+The MLP mechanism does not port directly to the GELU feed-forward block: the
+sign-flip barrier obstructs self-resurrection, and the non-stationary input
+adds a route the MLP does not have. The confirmatory therefore tests the
+theorem class, softplus-$\beta$, on the block, and treats the GELU barrier and
+the upstream channel as estimands of their own. \textbf{Verdicts} (frozen
+analysis, $800$ runs): validity clean; upstream channel reproduced in all four
+arms ($\Delta\approx0.20$--$0.22$); the theorem class transferred through the
+own channel ($22/50$, area before the return in $21/22$); the barrier
+consistent-with but confounded with depth; $\beta=3$ above $\beta=10$ in both
+factors. \Cref{app:estimands} attaches each number to its frozen estimand.
 
 \section{Limitations}\label{sec:limits}
 
@@ -946,8 +955,10 @@ leading candidate driver.
 \textbf{(iii)} Scale: the confirmatories are small networks ($m\le6$ MLP units,
 $m_{\mathrm{ffn}}=4$ block units) with rich one-dimensional targets, chosen so
 that a single unit can be tracked with a ground-truth clock.
-\textbf{(iv)} GELU is outside the monotone class, and transfer of the law to a
-transformer feed-forward block is stated as a protocol and left open.
+\textbf{(iv)} GELU is outside the monotone class; its own-channel revival is
+blocked below $z^\ast=-0.752$, and in the confirmatory the barrier could not be
+separated from depth (the pre-registered three-way label). The upstream channel
+is established; the barrier's terminality remains open.
 \textbf{(v)} The cone apex, of corank $\ge2$, where weight decay produces genuine
 sliding toward the most singular stratum, is untouched.
 \textbf{(vi)} The independence of the law from the smoothing is proved for
@@ -960,15 +971,20 @@ We derived an entry--exit law for the death and resurrection of a smoothed unit
 and verified each of its constants on a two-neuron instance. We measured the law
 in a small MLP under a pre-registered protocol: resurrection occurs, the residual
 area opens before the return in 13 of 16 cases, hard ReLU gives a structural
-zero, and the return probability is monotone in the activation stiffness. We
-provided evidence that the mechanism does not transfer unchanged to a GELU
-feed-forward block, where the derivative changes sign and where a non-stationary
-input opens a second route; that transfer is stated as a protocol and left open.
+zero, and the return probability is monotone in the activation stiffness. In a pre-registered transformer confirmatory the theorem class transferred to
+the feed-forward block through the own channel ($22/50$, area before the return
+in $21/22$), a second upstream channel reproduced in all four arms, and GELU's
+sign-changing derivative left its signature in $92\%$ of deep episodes while its
+terminality remained confounded with depth --- the pre-registered three-way
+label, reported as frozen.
 
 \section{Reproducibility}\label{sec:repro}
 
-All code, per-run manifests, raw episode files and aggregate JSON needed to
-reproduce every number and figure in this note are in a single Git repository.
+All code, per-run manifests and aggregate JSON needed to reproduce every
+number and figure in this note are in a single Git repository; raw episode
+files are excluded from version control by policy but are byte-reproducible
+from the pinned configs (deterministic CPU runs) and are checksummed in the
+versioned manifests.
 That repository is private at the time of writing, so the commit hashes below,
 while they resolve in it and fix the state of every experiment, are not
 independently checkable today; public release under the MIT licence is a
@@ -1541,8 +1557,8 @@ loss trace must agree with the pilot engine to $10^{-12}$, so the clock is known
 to be a pure observer. And the episode count must equal the number of born-dead
 units plus the number of dynamic deaths, so no episode is silently dropped.
 
-\noindent\textit{Executable: \texttt{pilotos-4a2/pressao/taxa/motor\_4a3.py},
-config SHA in \texttt{results-4a3/manifest-4a3.json}.}
+\noindent\textit{Executable: \path{pilotos-4a2/pressao/taxa/motor_4a3.py},
+config SHA in \path{results-4a3/manifest-4a3.json}.}
 
 \subsection{The truncated calibrated null}\label{app:alg2}
 
@@ -1607,9 +1623,9 @@ are, and they are drawn from the pooled $\hat F$. The level and the power are
 demonstrated on synthetic truncated worlds before the procedure is applied to
 data.
 
-\noindent\textit{Executable: \texttt{etapa4-mlp-populacao/analise.py}
-(\texttt{p\_calibrado}, \texttt{\_km}, \texttt{\_amostra\_km}), config SHA in
-\texttt{etapa4-mlp-populacao/results/manifest.json}.}
+\noindent\textit{Executable: \path{etapa4-mlp-populacao/analise.py}
+(\path{p_calibrado}, \path{_km}, \path{_amostra_km}), config SHA in
+\path{etapa4-mlp-populacao/results/manifest.json}.}
 
 \subsection{The hysteresis counter}\label{app:alg3}
 
@@ -1678,8 +1694,8 @@ calibration gives $\delta_h\approx0.07$--$0.08$, about $1.7\times$ larger, so
 every estimand that depends on $\delta_h$ being decidable is confined to the
 \textsc{frozen} cells.
 
-\noindent\textit{Executable: \texttt{etapa5-transformer/motor\_e5\_conf.py},
-config SHA in \texttt{results-e5/manifest-e5.json}.}
+\noindent\textit{Executable: \path{etapa5-transformer/motor_e5_conf.py},
+config SHA in \path{results-e5/manifest-e5.json}.}
 
 \subsection{The pre-registered decision procedure}\label{app:alg4}
 
@@ -1696,6 +1712,9 @@ structural commitment is the last line: insufficient evidence returns
 gate $n^\ast$; kill threshold $\vartheta$; floor $\pi_0$; $\alpha=0.05$
 \ENSURE per estimand, one of
 \textsc{reproduces}/\textsc{sustains}/\textsc{kills}/\textsc{inconclusive}
+(for the barrier estimand the three-way label
+\textsc{sustains}/\textsc{consistent-confounded}/\textsc{kills} of the
+depth-matched rule)
 \STATE \textbf{Classification.} For each dynamic death:
 \begin{itemize}\itemsep0pt
 \item \emph{return} if the unit revived on the ground-truth clock; it is
@@ -1748,10 +1767,10 @@ exceeds $\vartheta$; the operative decision there is
 for the kill to become available.
 
 \noindent\textit{Executables:
-\texttt{pilotos-4a2/pressao/taxa/analise\_4a3.py} and
-\texttt{etapa5-transformer/analise\_e5.py}, config SHAs in
-\texttt{results-4a3/manifest-4a3.json} and
-\texttt{results-e5/manifest-e5.json}.}
+\path{pilotos-4a2/pressao/taxa/analise_4a3.py} and
+\path{etapa5-transformer/analise_e5.py}, config SHAs in
+\path{results-4a3/manifest-4a3.json} and
+\path{results-e5/manifest-e5.json}.}
 
 \section{Pre-registered estimands of the transformer confirmatory}\label{app:estimands}
 
@@ -1763,24 +1782,24 @@ scoping findings S1 and S2 that motivated them.
 \begin{itemize}
 \item \textbf{E-A, validity.} Any sustained return in the relu-frozen arm will
 invalidate the run, since an own-gradient identically zero together with a fixed
-input makes death terminal. The pilot gave $0/40$.\eresult{\textbf{Result: VALID.} $0/100$ sustained returns in relu-frozen across both injection depths.}
+input makes death terminal. The pilot gave $0/40$.\eresult{\textbf{VALID.} $0/100$ sustained returns in relu-frozen across both injection depths.}
 \item \textbf{E-B, upstream channel.} We will estimate
 $\Delta=p_{\mathrm{sust}}(\text{train})-p_{\mathrm{sust}}(\text{frozen})$ per
 arm, and will call the effect reproduced if the bootstrap lower bound is
 positive. Under the hysteresis instrument the test is stricter than in the
-pilot.\eresult{\textbf{Result: REPRODUCED in all four arms.} $\Delta=0.210$ $[0.120,0.300]$ (sp-$\beta3$), $0.200$ $[0.110,0.280]$ (sp-$\beta10$), $0.220$ $[0.120,0.320]$ (GELU), $0.200$ $[0.120,0.280]$ (ReLU, $20/100$ vs.\ $0/100$): the non-stationary FFN input is a real resurrection channel, of comparable size across activations.}
+pilot. The hysteresis band was calibrated on frozen runs only; alive units in training runs fluctuate up to $1.7\times$ wider, which if anything makes the sustained-return count conservative in the training arms.\eresult{\textbf{REPRODUCED in all four arms.} $\Delta=0.210$ $[0.120,0.300]$ (sp-$\beta3$), $0.200$ $[0.110,0.280]$ (sp-$\beta10$), $0.220$ $[0.120,0.320]$ (GELU), $0.200$ $[0.120,0.280]$ (ReLU, $20/100$ vs.\ $0/100$): the non-stationary FFN input is a real resurrection channel, of comparable size across activations.}
 \item \textbf{E-C, transfer of the theorem class.} For sp-$\beta3$ frozen under
 shallow injection we will estimate
 $p(\text{sustained return}\mid\text{injection})$, and will call the class
 transferred if there are at least $n^\ast=6$ sustained returns. This is the
-direct analogue of C2 in the MLP.\eresult{\textbf{Result: TRANSFERRED.} $22/50$ sustained returns, $\hat p=0.440$ $[0.300,0.587]$, $3.7\times$ the gate $n^\ast=6$; the area of the leader drive opened before the return in $21/22$ of them. The memory gate of Theorem~2 operates in a transformer FFN through the own channel.}
+direct analogue of C2 in the MLP.\eresult{\textbf{TRANSFERRED.} $22/50$ sustained returns, $\hat p=0.440$ $[0.300,0.587]$, $3.7\times$ the gate $n^\ast=6$; the area of the leader drive opened before the return in $21/22$ of them. The memory gate of Theorem~2 operates in a transformer FFN through the own channel.}
 \item \textbf{E-D, GELU barrier.} For gelu-frozen we will compare deep injection
 ($-2.0$) against shallow ($-0.3$); the barrier predicts shallow far above deep in
 the own channel, with a depth-matched control against sp-$\beta3$. The pilot at
-$-1.0$ was a tie and did not decide.\eresult{\textbf{Result: consistent with the barrier, confounded with depth} (the three-way label frozen at pre-registration). Intra-GELU: shallow $29/50$ vs.\ deep $0/50$; but the depth-matched control sp-$\beta3$-frozen at $-2.0$ also gave $0/50$, so depth alone accounts for the deep zero and the sustained-barrier claim is not licensed by this design. The S1 signature remains sharp: $\mathrm{sign}(\mathcal A_{\mathrm{drive}})\neq\mathrm{sign}(\mathcal A_{\mathrm{mlp}})$ in $92\%$ of deep vs.\ $4\%$ of shallow episodes --- the barrier is present in the drive field; its terminality is not separable from depth here.}
+$-1.0$ was a tie and did not decide.\eresult{\textbf{Consistent with the barrier, confounded with depth} (the three-way label frozen at pre-registration). Intra-GELU: shallow $29/50$ vs.\ deep $0/50$; but the depth-matched control sp-$\beta3$-frozen at $-2.0$ also gave $0/50$, so depth alone accounts for the deep zero and the sustained-barrier claim is not licensed by this design. The S1 signature remains sharp: $\mathrm{sign}(\mathcal A_{\mathrm{drive}})\neq\mathrm{sign}(\mathcal A_{\mathrm{mlp}})$ in $92\%$ of deep vs.\ $4\%$ of shallow episodes --- the barrier is present in the drive field; its terminality is not separable from depth here.}
 \item \textbf{E-E, $\beta$ staircase.} We will estimate
 $p(\text{sustained return})$ across $\beta\in\{3,10\}$, frozen and training, as
-an estimation with no kill condition.\eresult{\textbf{Result:} $\beta=3$ above $\beta=10$ in both factors (frozen $0.220$ $[0.143,0.314]$ vs.\ $0.090$ $[0.042,0.164]$; training $0.430$ $[0.331,0.533]$ vs.\ $0.290$ $[0.204,0.389]$). GELU itself is the most revivable arm (shallow frozen $0.580$ $[0.432,0.718]$; with the upstream channel $0.860$ $[0.733,0.942]$): the activation used in practice sits at the open end of the channel.}
+an estimation with no kill condition.\eresult{$\beta=3$ above $\beta=10$ in both factors (frozen $0.220$ $[0.143,0.314]$ vs.\ $0.090$ $[0.042,0.164]$; training $0.430$ $[0.331,0.533]$ vs.\ $0.290$ $[0.204,0.389]$). GELU itself is the most revivable arm (shallow frozen $0.580$ $[0.432,0.718]$; with the upstream channel $0.860$ $[0.733,0.942]$): the activation used in practice sits at the open end of the channel.}
 \end{itemize}
 
 \end{document}
