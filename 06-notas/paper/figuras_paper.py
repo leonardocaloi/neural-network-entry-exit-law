@@ -45,7 +45,7 @@ for i in range(len(ARMS)):
 ax.axhline(0, color="k", lw=0.5, alpha=0.4)
 ax.set_xticks(x)
 ax.set_xticklabels(labels, fontsize=8)
-ax.set_ylabel(r"$p(\mathrm{return}\mid\mathrm{death})$  [CP 95\%]")
+ax.set_ylabel(r"$p(\mathrm{return}\mid\mathrm{death})$  [CP 95%]")
 ax.set_xlabel(r"activation stiffness (channel $e^{\beta z}$ closes as $\beta\to\infty$)")
 ax.set_ylim(-0.05, 0.72)
 ax.set_title(r"Channel staircase, MLP 4a.3 (400 runs, $T=0$)", fontsize=8)
@@ -56,17 +56,18 @@ print("fig-escada-4a3.{pdf,png} escritas")
 
 # --- achatamento das figuras externas (B1 da gap-list) -----------------------
 AQUI = Path(__file__).resolve().parent
-EXTERNAS = {
-    "fig1-mecanismo.pdf": AQUI / ".." / "t2-prova" / "fig1-mecanismo.pdf",
-    "fig2-constantes.pdf": AQUI / ".." / "t2-prova" / "fig2-constantes.pdf",
-    "fig3-diagnostico.pdf": (AQUI / ".." / ".." / "05-experimentos"
-                             / "etapa4-mlp-populacao"
-                             / "fig-diagnostico-duracoes.pdf"),
+T2 = AQUI / ".." / "t2-prova"
+E4 = AQUI / ".." / ".." / "05-experimentos" / "etapa4-mlp-populacao"
+EXTERNAS = {                                   # destino (sem extensao): origem
+    "fig1-mecanismo": T2 / "fig1-mecanismo",
+    "fig2-constantes": T2 / "fig2-constantes",
+    "fig3-diagnostico": E4 / "fig-diagnostico-duracoes",
 }
 for destino, origem in EXTERNAS.items():
-    origem = origem.resolve()
-    if origem.is_file():
-        shutil.copyfile(origem, AQUI / destino)
-        print(f"{destino} <- {origem}")
-    else:
-        print(f"AVISO: origem ausente, {destino} nao atualizada ({origem})")
+    for ext in ("pdf", "png"):
+        o = Path(str(origem) + f".{ext}").resolve()
+        if o.is_file():
+            shutil.copyfile(o, AQUI / f"{destino}.{ext}")
+            print(f"{destino}.{ext} <- {o}")
+        else:
+            print(f"AVISO: origem ausente, {destino}.{ext} nao atualizada ({o})")

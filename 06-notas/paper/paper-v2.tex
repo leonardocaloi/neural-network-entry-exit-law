@@ -1,5 +1,5 @@
 % paper-v2.tex -- gap-list editorial aplicada sobre paper-v1.tex (que fica como registro).
-% arXiv, campo Comments (C17): "24 pages, 4 figures, 2 tables. Comments welcome."
+% arXiv, campo Comments (C17): "25 pages, 5 figures, 2 tables. Comments welcome."
 % Categoria primaria math.DS, cross-list cs.LG.
 % Convencoes da casa fixadas: Psi = quadratura log u + u (Phi reservado para a
 % parametrizacao); H = horizonte de treino (tempo no fluxo, passos no experimento);
@@ -73,11 +73,11 @@
 
 \title{An entry--exit law for the resurrection of dead neurons
 under smoothed ReLU activation}
-% DECISAO PENDENTE (B3): forma canonica do nome, endereco de e-mail a divulgar,
+% B3 resolvido: nome/e-mail/cidade confirmados pelo autor em 2026-07-26: forma canonica do nome, endereco de e-mail a divulgar,
 % e cidade a declarar. O que esta abaixo satisfaz a norma (nome + afiliacao +
-% e-mail + financiamento); os tres campos sao decisao do autor.
-\author{Leonardo Caloi Santos\thanks{Independent researcher, Brazil.
-\texttt{joaovcaloiv@gmail.com}. No funding was received for this work.}}
+\author{Leonardo Caloi Santos\thanks{Independent researcher, Maring\'a,
+Paran\'a, Brazil. \texttt{leonardo@ventros.com.br}. No funding was received
+for this work.}}
 \date{July 25, 2026}
 
 \begin{document}
@@ -609,19 +609,25 @@ the physical death of the theorem. Of all episodes $59\%$ lasted $\le5$ steps,
 and hard ReLU ``resurrected'' at the same rate and with the same duration
 distribution as softplus at $T>0$, which is impossible by gradient, since a dead
 ReLU unit has exactly zero gradient; these were noise threshold-crossings. The
-real physics lives at $T\to0$: the only genuinely long episodes, with median
-$\sim1110$ steps, sit in the $T=0$ arm and are $99.6\%$ censored at the
-$10^{5}$-step horizon. The calibrated null held its false-positive rate near
+real physics lives at $T\to0$: the only genuinely long episodes sit in the $T=0$
+arm, where just $2$ of $461$ episodes completed inside the $10^{5}$-step horizon
+($672$ and $1548$ steps; $99.6\%$ censored). The calibrated null held its false-positive rate near
 $\alpha$ in i.i.d.\ worlds, but the real world has per-neuron heterogeneity.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.60\linewidth]{fig3-diagnostico}
-\caption{Why \texttt{etapa-4a} is an instrument negative (post-hoc diagnostic, $m=64$, 20
-seeds). Episode-duration densities: at $T>0$ hard ReLU coincides with softplus
-(median $\sim4$ steps, shaded chatter band), a signature of noise rather than of
-the zero-gradient theorem; the real physics is the $T=0$ arm ($\sim10^{3}$ steps,
-$99.6\%$ censored). Script
+\includegraphics[width=0.72\linewidth]{fig3-diagnostico}
+\caption{Why \texttt{etapa-4a} is an instrument negative (post-hoc diagnostic,
+$m=64$, 20 seeds). Episode durations as the fraction of episodes per logarithmic
+bin; the bands are $\pm1$ standard error across the 20 seeds. At $T=10^{-3}$
+hard ReLU (dashed) lies on top of softplus (solid) --- same median of $4$ steps
+inside the shaded chatter band, same tail --- which cannot be the zero-gradient
+theorem at work, since a dead ReLU unit has exactly zero gradient; these are
+noise threshold-crossings. The $T=0$ arm completed only $2$ of its $461$
+episodes within the same horizon, so those two are drawn as individual markers
+rather than as a density, and the remaining $99.6\%$ are censored at $H=10^{5}$;
+that is where the real physics sits and why the confirmatory moved to $T=0$ with
+a longer horizon. Script
 \texttt{etapa4-mlp-populacao/figuras\_diagnostico.py}.}
 \label{fig:diagnostico}
 \end{figure}
@@ -653,6 +659,38 @@ $2/2$. The gap between gate and return is the finite-$\beta$ rise time,
 $\sim|z_{\mathrm{park}}|/\mathrm{drift}$, rather than the asymptotic $O(1/\beta)$
 correction. The bottleneck was quantified as an event rate of $\sim0.1$ per run,
 and that number set the entire sizing of the confirmatory.
+
+\Cref{fig:traj3d} shows the $\beta=10$ episode as it happened, in the three
+coordinates the theorem talks about: time, margin, accumulated area. The
+qualitative shape of \cref{fig:mecanismo} --- dive, sticking layer, debt,
+zero of the area, release --- appears in a trained network with no scalar
+reduction and no smoothing of the data, only with the return lagging the gate by
+the finite-$\beta$ rise time instead of by $O(1/\beta)$.
+
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=0.88\linewidth]{fig5-trajectory3d}
+\caption{One real resurrection, drawn from the recorded trajectory of the run
+described above (pressure pilot, softplus $\beta=10$, $m=4$, $n=16$,
+$\eta=10^{-3}$, $T=0$, $H=2\cdot10^{5}$, seed 42, unit $k=1$). The axes are the
+training step $t$, the leader margin $z_1(t)$ whose sign decides life or death,
+and the ruler's accumulated area
+$\Ar_1(t)=\eta\sum_{s=\thit}^{t}\hat R_1(s)$; the pale curves on the two walls
+are the $(t,z_1)$ and $(t,\Ar_1)$ projections. The unit dives and dies at
+$t=781$ ($\thit$). The area then runs into debt while the projected residual
+$\hat R_1$ is adverse, turns at $t=33\,905$ where $\hat R_1$ changes sign
+(inset), and comes back to zero at $t=45\,098$: the gate. The margin only then
+crawls up out of the sticking layer and crosses zero at $t=139\,179$, so the
+gate opens $94\,081$ steps before the return --- the ordering
+$\thit<t_{\mathrm{area}}<t_{\mathrm{res}}$ of \cref{thm:main}, with the lag
+being the finite-$\beta$ rise time. The ruler stops accumulating at the return,
+which is why $\Ar_1$ is flat afterwards. Nothing is fitted or smoothed: the
+curve is the trajectory itself, sub-sampled every $40$ steps, and the four
+marked steps are exact. Script \texttt{figura\_trajetoria3d.py}, which re-runs
+the cell and refuses to plot unless the committed triple
+$(781,\,45\,098,\,139\,179)$ is reproduced exactly.}
+\label{fig:traj3d}
+\end{figure}
 
 \subsection{The area law reproduces under a pre-registered confirmatory}\label{sec:confirmatory}
 
@@ -918,7 +956,11 @@ verifications \texttt{passo0--6.py} and \texttt{prova\_L1--L6.py}; figures via
 \texttt{figuras\_draft.py}.
 \item \textbf{MLP mechanism (pilot).}
 \texttt{etapa4-mlp-populacao/pilotos-4a2/pressao/} (the \emph{pressure} regime:
-sub-parametrized, plateau $\sim0.15$); commit \texttt{b48b527}.
+sub-parametrized, plateau $\sim0.15$); commit \texttt{b48b527}. The trajectory of
+\cref{fig:traj3d} is re-run and plotted by
+\texttt{06-notas/paper/figura\_trajetoria3d.py}, which asserts the committed
+triple before drawing anything; the diagnostic of \cref{fig:diagnostico} is
+\texttt{etapa4-mlp-populacao/figuras\_diagnostico.py}.
 \item \textbf{MLP confirmatory (4a.3).} \texttt{.../pressao/taxa/} (the
 event-rate pilot and the confirmatory built on it): pre-registration
 \texttt{a8f8f8c}, run \texttt{5a961cb}. \\
