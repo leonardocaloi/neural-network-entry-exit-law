@@ -98,7 +98,7 @@ revives them. A pre-registered experimental ladder follows: a reduced
 stochastic-schedule model is falsified, two instrument designs are recorded as
 negatives, and a confirmatory MLP run (400 runs, noiseless gradient descent)
 reproduces resurrection in half of the deaths observable within the horizon
-($p=0.50$, 15/30; $p=0.457$ over all 35 deaths), the area opening before 13 of 16
+($\hat p=0.50$, 15/30; $\hat p=0.457$ over all 35 deaths), the area opening before 13 of 16
 returns, hard ReLU giving a structural zero, and return probability monotone in
 the stiffness. Transfer to a transformer feed-forward block is a
 pre-registered protocol, not established here.
@@ -577,7 +577,7 @@ schedule survives noise. A reduced ``race'' model, pre-registered at commit
 falsifying run of 2700 runs under SGLD~\cite{WT11} rejected it. The
 predicted-zero window was violated decisively: 139 late captures occurred where
 the model gives exactly zero, and the bin $[0,0.1)$ saw 150 captures against
-$1.4$ predicted (Poisson $z=+131$ against the model's own expected count, under
+$1.4$ predicted (Poisson $z=+126$ against the model's own expected count, under
 the model's own independence assumption). The model is well calibrated where it
 says capture is likely, in the $(0.5,0.9)$ bin, with $z=-0.26$; the entire error
 is on the ``impossible'' side. The theorem-part of the model held: in all nine
@@ -601,7 +601,7 @@ The first attempt to see the law in a real MLP failed on the instrument, and the
 failure was caught by a pre-registered null (the first MLP stage, labelled
 \texttt{etapa-4a} in the repository; commit \texttt{6411ac8}, 600 runs, MLP with
 $m\in\{16,64,256\}$, SGLD with $\eta=3\cdot10^{-4}$). The
-pure-diffusion arm passed the calibrated test ($m=16$, $p=0.002$); by the
+pure-diffusion arm \emph{fired the calibrated null} ($m=16$, $p=0.002$) --- the control that must stay silent did not; by the
 pre-registered rule the ruler is then biased and no scientific verdict on the
 substantive predictions may be claimed, so the run is invalid. The diagnosis is
 in \cref{fig:diagnostico}: the ruler was measuring boundary chatter rather than
@@ -665,7 +665,12 @@ coordinates the theorem talks about: time, margin, accumulated area. The
 qualitative shape of \cref{fig:mecanismo} --- dive, sticking layer, debt,
 zero of the area, release --- appears in a trained network with no scalar
 reduction and no smoothing of the data, only with the return lagging the gate by
-the finite-$\beta$ rise time instead of by $O(1/\beta)$.
+the finite-$\beta$ rise time instead of by $O(1/\beta)$. We state the scope of
+this transfer explicitly: in this episode $68\%$ of the lifetime elapses
+\emph{after} the gate opens, so at $\beta=10$ the asymptotic release formula is
+far from its regime. What transfers to the trained network is the
+\emph{ordering} $t_{\mathrm{death}}<t_{\mathcal A=0}<t_{\mathrm{return}}$ and
+the gate's necessity, not the $O(1/\beta)$ release-time expansion.
 
 \begin{figure}[!tbp]
 \centering
@@ -784,7 +789,17 @@ after the fact.
 
 \item \textbf{C4, channel staircase: estimation, monotone in $\beta$.}
 $\hat p_{\mathrm{death}}$ falls $0.457>0.370>0.211>0.000$ from $\beta=3$ to hard
-ReLU, with the intervals of \cref{tab:4a3}. The activation smoothness controls
+ReLU, with the intervals of \cref{tab:4a3}. The pairwise intervals overlap;
+the pre-registered protocol declared C4 an estimation with no kill condition,
+so no trend test was frozen in advance. As \emph{post-hoc supporting analysis}
+we report the Cochran--Armitage trend test across the four ordered arms:
+$z=-3.49$, $p=4.9\times10^{-4}$ (pairwise Fisher, $\beta=3$ vs.\ ReLU:
+$p=8.1\times10^{-4}$; $\beta=3$ vs.\ $\beta=300$ alone: $p=0.086$, not
+significant --- the trend test, not pairwise comparison, is the appropriate
+instrument for an ordered dose--response). Likewise for C2, a post-hoc exact
+binomial test of $13/16$ against $0.5$ gives one-sided $p=0.011$ (two-sided
+$0.021$); the pre-registered criterion was the Clopper--Pearson bound, which
+these tests corroborate but did not replace. The activation smoothness controls
 the return channel, and $\beta=3$, the stiffness scale of the GELU family, is the
 arm with the highest return probability. This is the direct bridge to the
 plasticity practice of \cref{sec:noncomm}.
@@ -867,10 +882,10 @@ A confirmatory run for the transformer was pre-registered at commit
 \texttt{1b45498}: 800 runs over
 $\{$sp-$\beta3$, sp-$\beta10$, GELU, ReLU$\}\times\{$attn-train,
 attn-frozen$\}\times$ injection $\{-0.3,-2.0\}\times50$ seeds $2000$--$2049$,
-with $H=2\cdot10^{5}$ and $T=0$. Its results are not part of this note; the
-confirmatory run pre-registered at commit \texttt{1b45498} is reported in v2 of
-this note. We state the five pre-registered estimands here so that the protocol
-is on record ahead of the data.
+with $H=2\cdot10^{5}$ and $T=0$. At the time this section was frozen the grid
+was still executing; its results are inserted below upon completion, with no
+change to the estimands. We state the five pre-registered estimands here so
+that the protocol is on record ahead of the data.
 
 % Quando os numeros chegarem: preencher o argumento de cada \eresult{} abaixo.
 \begin{itemize}

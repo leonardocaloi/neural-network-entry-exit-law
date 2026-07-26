@@ -79,3 +79,5 @@ ordem de grandeza. O candidato dominante passa a ser o que esta nota listava
 como "adicional": **back-reaction de A** (ativações transitórias de A seguram o
 resíduo compartilhado, retardando o ajuste de B — sinal correto para AMBOS os
 efeitos). O ciclo v3 testa o modelo 3.0 (acoplado) em vez do 2.0.
+
+**ERRATA 2026-07-26:** com 150 observadas vs 1.4 previstas, z de Poisson = 125.6, não +131 como acima (+131 exigiria esperado ≈1.30). Corrigido no paper para z≈+126; igualmente devastador para o modelo reduzido. Apontado por revisão externa independente.
