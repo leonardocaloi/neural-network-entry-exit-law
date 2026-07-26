@@ -90,26 +90,26 @@ for this work.}}
 \maketitle
 
 \begin{abstract}
-A neuron dies when its pre-activation margin is negative on every datum; under a
-hard ReLU it then has zero gradient and never returns. We ask what replaces this
-under smoothed activations. For a shallow softplus network with scalar input and
-unit output weights under gradient flow we prove that, in the sharp-activation
-limit, the dynamics is a hybrid system with memory: the dead unit freezes, and
-reactivates exactly when the signed time integral of the residual excluding it
-returns to zero, the classical entry--exit function, with a universal first-order
-release coefficient; all constants are verified on one two-neuron instance. The
+A neuron dies when its pre-activation margin is negative on every datum; under
+hard ReLU it has zero gradient and never returns. What replaces this under
+smoothed activations? For a shallow softplus network with scalar input and
+unit output weights under gradient flow we prove that in the sharp-activation
+limit the dynamics is a hybrid system with memory: the dead unit freezes and
+reactivates exactly when the signed time integral of the excluded residual
+returns to zero --- the classical entry--exit function --- with a universal
+first-order release coefficient; all constants are verified on a two-neuron
+instance. The
 two limit orders do not commute: the
 pointwise generalized-gradient flow freezes dead units forever, the smoothed flow
-revives them. A pre-registered experimental ladder follows: a reduced
-stochastic-schedule model is falsified, two instrument designs are recorded as
-negatives, and a confirmatory MLP run (400 runs, noiseless gradient descent)
-reproduces resurrection in half of the deaths observable within the horizon
-($\hat p=0.50$, 15/30; $\hat p=0.457$ over all 35 deaths), the area opening before 13 of 16
-returns, hard ReLU giving a structural zero, and return probability monotone in
+revives them. A pre-registered experimental ladder follows: a reduced stochastic-schedule
+model is falsified, two instrument designs are recorded as negatives, and a
+confirmatory MLP run (400 runs, noiseless descent) reproduces resurrection
+($\hat p=0.50$ eligible, $0.457$ over all deaths), the area opening before 13
+of 16 returns, hard ReLU structurally zero, and return probability monotone in
 the stiffness. A pre-registered transformer confirmatory ($800$ runs)
 transfers the theorem class to the feed-forward block ($\hat p=0.44$, area
 opening before $21/22$ returns) and reproduces a second, upstream resurrection
-channel in all four arms, hard ReLU included.
+channel in all four arms, including hard ReLU.
 \end{abstract}
 
 \noindent\textbf{Keywords:} entry--exit function; geometric singular
@@ -1008,9 +1008,9 @@ sub-parametrized, plateau $\sim0.15$); commit \texttt{b48b527}. The trajectory o
 \texttt{06-notas/paper/figura\_trajetoria3d.py}, which asserts the committed
 triple before drawing anything; the diagnostic of \cref{fig:diagnostico} is
 \texttt{etapa4-mlp-populacao/figuras\_diagnostico.py}.
-\item \textbf{MLP confirmatory (4a.3).} \texttt{.../pressao/taxa/} (the
+\item \textbf{MLP confirmatory (4a.3).} \path{.../pressao/taxa/} (the
 event-rate pilot and the confirmatory built on it): pre-registration
-\texttt{a8f8f8c}, run \texttt{5a961cb}. \\
+\texttt{a8f8f8c}, run \texttt{5a961cb}.\\
 \texttt{python run\_4a3.py --workers 4} then \texttt{python analise\_4a3.py},
 which reads \texttt{results-4a3/} and \texttt{config\_4a3.json}. Rate pilot
 \texttt{995a87c}. Staircase figure: \texttt{06-notas/paper/figuras\_paper.py}.
@@ -1694,8 +1694,8 @@ calibration gives $\delta_h\approx0.07$--$0.08$, about $1.7\times$ larger, so
 every estimand that depends on $\delta_h$ being decidable is confined to the
 \textsc{frozen} cells.
 
-\noindent\textit{Executable: \path{etapa5-transformer/motor_e5_conf.py},
-config SHA in \path{results-e5/manifest-e5.json}.}
+{\sloppy\noindent\textit{Executable:} \path{etapa5-transformer/motor_e5_conf.py},
+\textit{config SHA in} \path{results-e5/manifest-e5.json}.\par}
 
 \subsection{The pre-registered decision procedure}\label{app:alg4}
 
@@ -1787,12 +1787,12 @@ input makes death terminal. The pilot gave $0/40$.\eresult{\textbf{VALID.} $0/10
 $\Delta=p_{\mathrm{sust}}(\text{train})-p_{\mathrm{sust}}(\text{frozen})$ per
 arm, and will call the effect reproduced if the bootstrap lower bound is
 positive. Under the hysteresis instrument the test is stricter than in the
-pilot. The hysteresis band was calibrated on frozen runs only; alive units in training runs fluctuate up to $1.7\times$ wider, which if anything makes the sustained-return count conservative in the training arms.\eresult{\textbf{REPRODUCED in all four arms.} $\Delta=0.210$ $[0.120,0.300]$ (sp-$\beta3$), $0.200$ $[0.110,0.280]$ (sp-$\beta10$), $0.220$ $[0.120,0.320]$ (GELU), $0.200$ $[0.120,0.280]$ (ReLU, $20/100$ vs.\ $0/100$): the non-stationary FFN input is a real resurrection channel, of comparable size across activations.}
+pilot. The hysteresis band was calibrated on frozen runs only; alive units in training runs fluctuate up to $1.7\times$ wider, so in the training arms the band is narrow relative to the arm's own noise and crossings are easier --- an anti-conservative direction for $\Delta$. The sustained-return filter is the measured containment: five returns failed sustainment (hover), all five in training cells and none in frozen, and none entered the counts.\eresult{\textbf{REPRODUCED in all four arms.} $\Delta=0.210$ $[0.120,0.300]$ (sp-$\beta3$), $0.200$ $[0.110,0.280]$ (sp-$\beta10$), $0.220$ $[0.120,0.320]$ (GELU), $0.200$ $[0.120,0.280]$ (ReLU, $20/100$ vs.\ $0/100$): the non-stationary FFN input is a real resurrection channel, of comparable size across activations.}
 \item \textbf{E-C, transfer of the theorem class.} For sp-$\beta3$ frozen under
 shallow injection we will estimate
 $p(\text{sustained return}\mid\text{injection})$, and will call the class
 transferred if there are at least $n^\ast=6$ sustained returns. This is the
-direct analogue of C2 in the MLP.\eresult{\textbf{TRANSFERRED.} $22/50$ sustained returns, $\hat p=0.440$ $[0.300,0.587]$, $3.7\times$ the gate $n^\ast=6$; the area of the leader drive opened before the return in $21/22$ of them. The memory gate of Theorem~2 operates in a transformer FFN through the own channel.}
+direct analogue of C2 in the MLP.\eresult{\textbf{TRANSFERRED.} $22/50$ sustained returns, $\hat p=0.440$ $[0.300,0.587]$, $3.7\times$ the gate $n^\ast=6$; the area of the leader drive opened before the return in $21/22$ of them. The memory gate of the theorem operates in a transformer FFN through the own channel.}
 \item \textbf{E-D, GELU barrier.} For gelu-frozen we will compare deep injection
 ($-2.0$) against shallow ($-0.3$); the barrier predicts shallow far above deep in
 the own channel, with a depth-matched control against sp-$\beta3$. The pilot at
