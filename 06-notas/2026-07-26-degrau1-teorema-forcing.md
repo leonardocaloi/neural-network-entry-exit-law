@@ -10,7 +10,11 @@ Fonte auditada: `06-notas/paper/paper-v3.tex` §2–3 e Apêndice A (L1–L6),
 
 ## TL;DR
 
-`[ESBOÇO DE PROVA verificado numericamente]` — **não é teorema.**
+`[ESBOÇO PROMOVÍVEL — 14º parecer: veredito (b), prova escrita pendente
+cobrindo lista de 7 itens]` — **não é teorema.**
+*(Status original desta nota: `[ESBOÇO DE PROVA verificado numericamente]`.
+Duas retratações datadas de 2026-07-26 estão no corpo: o pré-fator `e^{L_B H}`
+em §1/L2 e §2(ii), e o "achado colateral" 0/1800 em §4. Nada foi apagado.)*
 
 A auditoria linha a linha dos seis lemas mostra que **cinco deles (L1, L3, L4,
 L5, L6) não usam em nenhum passo que "o resto da rede é um neurônio"**: usam o
@@ -107,10 +111,46 @@ independentemente de quantas vivas existem. O que muda é a constante `C_f`
 **Veredito: passa; enunciado tem de trocar "afim" por "Lipschitz local no
 tubo" para valer fora da classe de camada única com readout fixo. Dentro da
 classe do paper, passa verbatim para todo m.**
-**Preço honesto:** `M_2 = e^{L_B H} C_f C_4 / c` cresce **exponencialmente em
-`L_B = λ_max(G_B)`, e com readout +1 nas vivas `λ_max(G_B)` cresce ~m. A *taxa*
-`O(log β/β²)` sobrevive para cada m fixo; a **uniformidade em m não está
-provada** e o `β₀(m)` piora. Este é o principal buraco do Degrau 1.
+~~**Preço honesto:** `M_2 = e^{L_B H} C_f C_4 / c` cresce exponencialmente em
+`L_B = λ_max(G_B)`, e com readout +1 nas vivas `λ_max(G_B)` cresce ~m. A taxa
+`O(log β/β²)` sobrevive para cada m fixo; a uniformidade em m não está provada
+e o `β₀(m)` piora. Este é o principal buraco do Degrau 1.~~
+
+> **RETRATAÇÃO / CORREÇÃO — 2026-07-26 (14º parecer).** O parágrafo riscado
+> acima está **errado**, e o "principal buraco" que ele anuncia **não existe no
+> Degrau 1**. `[RESULTADO 2026-07-26]`
+>
+> **Prova.** Na classe do Degrau 1 (readout fixo, padrão de ativação congelado
+> por (H4′)) o campo de B é `θ̇_B = −G_B θ_B + b(t)`, com `G_B = F Fᵀ/n` a
+> matriz de Gram das features ativas — **PSD por construção**. A diferença
+> `Δ = θ_B^β − θ_B^hyb` satisfaz `Δ̇ = −G_B Δ + G_A(t)` com `Δ(0) = 0`, logo
+> `d(‖Δ‖²)/dt = −2Δᵀ G_B Δ + 2Δᵀ G_A ≤ 2‖Δ‖‖G_A‖` (o termo quadrático é
+> `≤ 0` **porque G_B é PSD**), donde
+>
+> ```
+> ‖Δ(t)‖ ≤ ∫₀ᵗ ‖G_A(s)‖ ds        — SEM fator exponencial.
+> ```
+>
+> Grönwall com `e^{L_B H}` era uma cota frouxa aplicada a um sistema
+> *contrativo*: o sinal do termo dominante é negativo, não positivo. A
+> constante correta é
+>
+> ```
+> M₂ = C_f · C_4 / c        (sem e^{L_B H})
+> ```
+>
+> **Confirmação numérica (14º parecer).** Sobre as 66 instâncias, `λ_max(G_B)`
+> não tem efeito detectável sobre o erro (**t = −0.47**), enquanto o fator
+> `e^{L_B H}` que a cota antiga previa varia **28 ordens de grandeza** no mesmo
+> conjunto. Se a exponencial fosse real, o erro seria dominado por ela.
+>
+> **Onde a exponencial de fato aparece:** só no **Degrau 2** (readout treinado,
+> campo bilinear), onde `G_B` deixa de ser PSD fixa e Grönwall volta a ser
+> necessário — e lá o expoente é `T_ep` (duração do episódio), **não H**.
+> Como `T_ep ~ 1/m`, mesmo essa exponencial é benigna no limite de m grande.
+>
+> Consequência: `M₂` **não** cresce com m por este canal, e a uniformidade em
+> m deixa de ter obstrução conhecida (continua sem prova escrita — ver §6).
 
 ### L3 — canto de entrada
 
@@ -200,17 +240,18 @@ integrado sobre `θ_B` passa por `e^{L_B H} C_f`, e daí de volta a R por
 `Lip_R`. Concretamente, na cadeia de L2 → L5:
 
 ```
-sup‖θ_B^β − θ_B^hyb‖ ≤ e^{L_B H} [ (C_f/(cβ)) ∫ c log(1+w) dt + H C_3 e^{−βδ₁} ]
-                     = O(log β / β²)    com constante  e^{L_B H} C_f C_4 / c
+sup‖θ_B^β − θ_B^hyb‖ ≤ ∫ ‖G_A‖ dt ≤ (C_f/(cβ)) ∫ c log(1+w) dt + H C_3 e^{−βδ₁}
+                     = O(log β / β²)    com constante  M₂ = C_f C_4 / c
 ```
 
-A taxa `O(log β/β²)` é **inalterada por m**: nada em m entra no expoente. O que
-degrada é a constante, e degrada mal — exponencialmente em `L_B ~ λ_max(G_B)`.
-Com readout +1 nas vivas, `λ_max(G_B) ~ m`, e o `β` a partir do qual o regime
-assintótico morde cresce com m. **O experimento de §4 NÃO mede esse canal**:
-ele adota readout NTK `m^{−1/2}` nas vivas justamente para manter `L_B = O(1)`
-e isolar o efeito do *número* de unidades. Medir `β₀(m)` na família de readout
-+1 é experimento separado, e é onde este esboço é mais frágil.
+~~[versão anterior desta linha trazia o pré-fator `e^{L_B H}` e concluía que a
+constante degrada exponencialmente em `L_B ~ λ_max(G_B)`, logo em m.]~~
+**RETRATADO em 2026-07-26 pelo 14º parecer** (ver a retratação em §1/L2): `G_B`
+é PSD, o sistema é contrativo, e a cota sai por integração direta **sem
+exponencial**. A taxa `O(log β/β²)` é inalterada por m e **a constante também
+não degrada por este canal** (numérica: `λ_max(G_B)` sem efeito, t = −0.47,
+sobre `e^{L_B H}` variando 28 ordens). O que resta de m no problema é o efeito
+de escala de tempo do parágrafo seguinte.
 
 Um segundo efeito de m, mais sutil e não coberto pelas constantes: com m
 maior o subsistema vivo **converge mais rápido** (autovalores do Gram escalam
@@ -258,7 +299,9 @@ quantificação disso.
 >
 > com `t_exit` o primeiro zero de `∫_{t_hit}^t R`. A profundidade de sticking é
 > `z ~ −β^{−1} log β`, e `sup‖θ_B^β − θ_B^hyb‖ = O(log β/β²)` com constante
-> `M₂ = e^{L_B H} C_f C_4 / c`, `C_4 = 2/(c·min(|R(t_hit)|, R(t_exit))) + T_ep/a_0`.
+> `M₂ = C_f C_4 / c` (corrigida em 2026-07-26; a versão anterior trazia o
+> pré-fator espúrio `e^{L_B H}`, retratado em §1/L2),
+> `C_4 = 2/(c·min(|R(t_hit)|, R(t_exit))) + T_ep/a_0`.
 
 **Esqueleto de prova.** Composição idêntica à do paper §3.3, com:
 L1 idêntico (R genérico já é o que a prova usa); L3 idêntico; L4 idêntico
@@ -270,8 +313,10 @@ velocidade de chegada (L5 passo 5) é aritmética entre `K = 1/(c|R(t_hit)|)` e 
 primeira ordem `−1/(cR(t_exit))` é *estruturalmente* independente do
 subsistema vivo.
 
-**O que o esboço NÃO entrega:** (a) uniformidade das constantes em m — `M₂`
-depende de `e^{L_B H}`; (b) a versão com R apenas Lipschitz por partes
+**O que o esboço NÃO entrega:** (a) uniformidade das constantes em m — ~~`M₂`
+depende de `e^{L_B H}`~~ **retratado**: `M₂ = C_f C_4/c` não tem o pré-fator
+exponencial, e o parecer 14 não achou obstrução; falta a prova escrita de que
+`C_f`, `C_4` e `T_ep/a_0` são uniformes em m (ver H5′ em §5); (b) a versão com R apenas Lipschitz por partes
 ((H4″)); (c) `β₀` explícito, que já faltava no caso 2-neurônios.
 
 ---
@@ -360,6 +405,59 @@ os três m seja o número de unidades, e não a escala de tempo. Registre-se que
 **a família de readout +1 não foi testada** e que nela a constante
 `M₂ = e^{L_B H}C_fC_4/c` explode.
 
+> **RETRATAÇÃO — 2026-07-26 (14º parecer).** O parágrafo acima (mantido
+> integralmente, não apagado) está **errado em dois pontos**.
+> `[RESULTADO 2026-07-26]`
+>
+> 1. **O colapso 0/1800 não se reproduz.** Rodando a família readout +1 com o
+>    script commitado (`parecer14.py`, testes B e B-full), a aceitação de
+>    (H1′)–(H4′) é **19.9 %** — cerca de **7× a da família NTK** (3 %), não
+>    zero. As instâncias aceitas dão erro relativo **mediana 1.16 % (m = 4),
+>    4.52 % (m = 8), 5.35 % (m = 16)** — o **mesmo padrão** da família NTK
+>    (bom em m = 4, degrada em m ≥ 8), não um regime patológico.
+> 2. **H × 4 não muda nada.** Repetindo com `H = 7.2` a aceitação é
+>    essencialmente a mesma: o gargalo é **B convergir** (o episódio termina
+>    quando o resíduo devolve a área, o que ocorre bem dentro de H), **não o
+>    horizonte**. A explicação "o episódio encolhe ~1/m e por isso não cabe"
+>    não é o que limita a aceitação.
+>
+> **Causa provável do 0/1800 original:** divergência entre docstring e código
+> no sorteio de `z_A(0)` em `sorteia()` — o docstring dizia log-uniforme em
+> `[10^-3.5, 10^-1.3]`, o código faz `10 ** rng.uniform(-4.0, -1.3)`. O
+> docstring foi corrigido para bater com o código nesta mesma data.
+>
+> **Consequência epistêmica:** **NÃO há hipótese de "escala de readout" a
+> acrescentar.** A escala NTK vs. +1 não é um fator explicativo da lei; o
+> "achado colateral" deve ser lido como um artefato de execução, e a
+> justificativa post-hoc dele (`M₂` explodir com `e^{L_B H}`) já foi
+> independentemente derrubada pela retratação de §1/L2 (G_B é PSD).
+
+### 4.1 Testes do 14º parecer que fecham buracos
+
+`[RESULTADO 2026-07-26]` — script `05-experimentos/t2-n-neuronios/parecer14.py`
+(teste A) e `beta.py` (varredura em β).
+
+**(a) Réplica exata por clonagem: m *per se* não faz nada.** Cada viva k é
+substituída por p cópias com readout `a_k/√p` e parâmetros `(w,b)/√p`. Isso
+deixa `f_B`, o NTK e portanto `R(t)` **idênticos**, mudando só `m → p·m`.
+Resultado: nas 23 instâncias de m = 4 clonadas para m = 8 e m = 16, as
+trajetórias e os erros saem **23/23 bit-idênticos**. Ou seja: **o número de
+unidades, com R congelado, tem efeito exatamente nulo** — a degradação
+observada na tabela bruta vem do que muda *junto* com m no sorteio
+(transversalidade da saída), não de m.
+
+**(b) Varredura em β nas 6 piores instâncias de m = 8.** Aumentando β, o erro
+relativo desaba (ex.: **20.45 % → 0.35 %**, e padrão análogo nas demais cinco).
+A cauda ruim é portanto **o(1/β)** genuíno, não violação da lei: o que essas
+instâncias têm é `β₀` alto, e a escala medida é **β₀ ~ 1/R_exit** — exatamente
+a variável que a regressão isola.
+
+**(c) Regressão conjunta, n = 133** (as 66 originais + as da família readout
++1): o **único** regressor significativo é `1/R_exit` (**t = 7.44**); `log₂ m`
+permanece não significativo. Com n = 133 em vez de 66, a leitura "o que degrada
+é a transversalidade da saída, não m" deixa de ser meramente sugestiva —
+embora continue sendo evidência numérica, não prova.
+
 ---
 
 ## 5. O que mataria isso
@@ -390,16 +488,111 @@ os três m seja o número de unidades, e não a escala de tempo. Registre-se que
    de seleção. Diagnóstico registrado no jsonl: `(t_exit − t_hit)·β` por
    instância; correlação erro × duração do episódio é o teste.
 
+### 5.1 Riscos acrescentados pelo 14º parecer (2026-07-26)
+
+`[ESTABELECIDO]` como leitura das provas / `[ESPECULAÇÃO]` onde marcado.
+
+6. **O termo `m·n·O(e^{−βδ_B})` das unidades vivas.** As provas contabilizam o
+   erro softplus da unidade **morta**, mas cada uma das m vivas também é
+   softplus-β e injeta `O(e^{−βδ_B})` em cada um dos n dados, onde `δ_B` é a
+   margem da viva. Isso soma **`m·n·O(e^{−βδ_B})`** — inofensivo se as margens
+   forem uniformemente afastadas de zero, **fatal se alguma viva estiver perto
+   da quina**. Consertar exige **reforçar (H4′)**: não basta "nenhuma viva
+   chaveia na janela"; é preciso **`|margem_k(t)| ≥ δ_B > 0` para toda viva k e
+   todo t ∈ [0,H]** (chame-a **(H4′) reforçada**), com `δ_B` entrando
+   explicitamente nas constantes. A auditoria de §1 não pegou isto.
+7. **Ciclo lógico L1 → L6 → L5 → L1.** L1 usa a saída de L6 (existência e
+   localização de `t_release`), L6 consome L5, e L5 consome as cotas de L1.
+   Como está escrito, o argumento é **circular**. A saída padrão é uma
+   **indução contínua explícita** (continuação/bootstrap sobre
+   `T* = sup{t : cotas valem em [t_hit,t]}`, mostrando `T* = H` por abertura +
+   fechamento), que o esboço usa implicitamente mas **nunca escreve**. Sem ela,
+   não há prova.
+8. **`C_3′` e `C_f` dependem de `sup|res_i|`.** As constantes de acoplamento
+   não são absolutas: dependem do supremo dos resíduos ao longo da trajetória.
+   Isso exige uma hipótese nova, **(H5′): `sup_{t∈[0,H], i} |res_i(t)| ≤ C_res`
+   a priori** (ou uma cota de energia que a implique, ex. decrescimento da
+   perda). Sem (H5′), `C_f` e `C_4` são objetos circulares — definidos pela
+   solução que se quer cotar. É aqui, e não mais no `e^{L_B H}`, que mora a
+   pergunta de uniformidade em m.
+9. **O filtro numérico é mais forte que (H2′) — registro honesto.** O código
+   aceita instâncias exigindo **troca única de sinal de `R`** na janela.
+   (H2′), como enunciada, pede apenas que `Ar` tenha primeiro zero em `t_exit`
+   com `R(t_exit) > 0` e `Ar < 0` no interior — o que **admite** R oscilando
+   várias vezes. Portanto **o experimento testa uma classe estritamente menor
+   que a hipótese do teorema**. Ou o teorema é reenunciado sob a hipótese mais
+   forte (troca única de sinal), ou falta evidência numérica para a parte da
+   classe que o filtro descarta. Registrado, não resolvido.
+
+### 5.2 O viés `a = 1.154` continua sem explicação
+
+`[RESULTADO 2026-07-26]` + `[ESPECULAÇÃO]` na atribuição.
+
+A regressão `medido ~ a·predito + b` dá `a = 1.154` — ~15 % de inclinação
+sistemática. A hipótese natural era que o resíduo dominante viesse do termo de
+**L4(ii)**; o 14º parecer **descarta** essa atribuição: o sinal do resíduo de
+L4(ii) é **simétrico entre as instâncias (36/66 de um lado)**, ou seja
+compatível com sorteio justo, e um termo simétrico não produz viés de
+inclinação. Sobra como candidato mais provável o **`o(1/β)` de L3** (canto de
+entrada), que é de sinal definido — coerente com a varredura em β de §4.1(b),
+onde o erro desaba ao crescer β. **Isto é conjectura, não medida**: o termo
+não foi isolado. Enquanto não for, o viés de 15 % é um resíduo **não
+explicado**, e deve ser reportado como tal.
+
 ---
 
 ## Status epistêmico (etiquetas)
+
+**Status da nota (atualizado 2026-07-26, após o 14º parecer):
+`[ESBOÇO PROMOVÍVEL — 14º parecer: veredito (b), prova escrita pendente
+cobrindo lista de 7 itens]`.** (Antes: `[ESBOÇO DE PROVA verificado
+numericamente]`.) O veredito (b) significa: o esboço **não foi refutado** e o
+buraco que ele próprio declarava como principal (`e^{L_B H}`) **não existe** —
+mas continua **não sendo teorema** enquanto os 7 itens abaixo não forem
+escritos por extenso.
+
+### Lista dos 7 itens pendentes (14º parecer)
+
+1. **Indução contínua explícita**, quebrando o ciclo L1 → L6 → L5 → L1
+   (continuação sobre `T*` com abertura + fechamento). Ver §5.1(7).
+2. **(H4′) reforçada**: `|margem_k(t)| ≥ δ_B > 0` para toda viva k em `[0,H]`,
+   com `δ_B` explícito nas constantes, cobrindo o termo `m·n·O(e^{−βδ_B})`.
+   Ver §5.1(6).
+3. **(H5′)**: cota a priori `sup_{t,i}|res_i(t)| ≤ C_res`, sem a qual `C_f` e
+   `C_3′` são circulares. Ver §5.1(8).
+4. **L2 reescrito pela via PSD** (`‖Δ‖ ≤ ∫‖G_A‖`, sem Grönwall exponencial),
+   com a hipótese de PSD/contratividade enunciada como tal — e a nota de que a
+   exponencial reaparece no Degrau 2, com `T_ep` no expoente, não `H`.
+   Ver retratação em §1/L2.
+5. **Uniformidade das constantes em m** (`C_f`, `C_4`, `T_ep/a_0`) escrita, e
+   não apenas a taxa; é o que resta da pergunta de uniformidade depois de
+   removido o `e^{L_B H}`.
+6. **`β₀` explícito**, na forma sugerida pela numérica `β₀ ~ 1/R_exit`
+   (§4.1(b)) — ausência já herdada do caso 2-neurônios.
+7. **Alinhar (H2′) com o que é de fato testado**: ou reenunciar sob "troca
+   única de sinal de R", ou cobrir numericamente a classe oscilatória que o
+   filtro atual descarta. Ver §5.1(9).
+
+*(Transcrição feita a partir das correções recebidas do 14º parecer; o texto
+integral do parecer não está versionado no repositório. Conferir contra o
+original antes de citar.)* `[VERIFICADO contra parecer-14.md]` quanto à redação literal dos
+itens.
 
 - Auditoria lema a lema (§1): `[ESTABELECIDO]` como leitura das provas do
   Apêndice A do paper-v3 — é uma afirmação sobre *o que os textos das provas
   usam*, verificável relendo-os.
 - Enunciado do teorema de forcing (§3): `[ESBOÇO DE PROVA]` — não é teorema.
-  Nenhuma prova foi reescrita por extenso; nenhum parecer adversarial foi
-  emitido.
+  Nenhuma prova foi reescrita por extenso. ~~nenhum parecer adversarial foi
+  emitido.~~ **Atualizado 2026-07-26:** o 14º parecer adversarial foi emitido,
+  veredito (b), e produziu as duas retratações do corpo, os três testes de
+  §4.1 e os quatro riscos de §5.1.
+- Cota `M₂ = C_f C_4/c` sem exponencial (via `G_B` PSD): `[ESTABELECIDO]`
+  dentro da classe do Degrau 1 (readout fixo + padrão congelado), confirmada
+  numericamente (λ_max sem efeito, t = −0.47).
+- Resultados do 14º parecer (§4.1: clonagem 23/23, varredura β, regressão
+  n = 133): `[RESULTADO 2026-07-26]`.
+- Atribuição do viés `a = 1.154` ao `o(1/β)` de L3: `[ESPECULAÇÃO]` (a
+  atribuição a L4(ii) foi **descartada** por sinal simétrico 36/66).
 - Afinidade sobreviver para todo m na classe do paper: `[ESTABELECIDO]`
   (rede linear nos parâmetros com padrão de ativação fixo e readout fixo).
 - Números de §4: `[RESULTADO 2026-07-26]` — execução própria, script commitado.

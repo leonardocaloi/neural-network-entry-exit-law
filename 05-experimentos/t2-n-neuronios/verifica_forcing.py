@@ -94,7 +94,8 @@ def sorteia(seed, m):
       * o init das vivas leva escala 1/(tamanho da classe) para manter
         f_B = O(1) com readout fixo em +1. Os gradientes NAO sao reescalados,
         logo L_B ~ m cresce com m: e esse o canal de degradacao testado.
-      * z_A(0) e sorteada LOG-UNIFORME em [10^-3.5, 10^-1.3]. Motivo declarado:
+      * z_A(0) e sorteada LOG-UNIFORME em [10^-4, 10^-1.3] (rng.uniform(-4.0,
+        -1.3) no expoente). Motivo declarado:
         a morte exige z_A(0) < c * int_0^{t_c} e_j dt, e essa integral encolhe
         como ~1/m porque o subsistema vivo converge ~m vezes mais rapido; uma
         faixa log-uniforme fixa cobre os tres m sem sintonia por m.
