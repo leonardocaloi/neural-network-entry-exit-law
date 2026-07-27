@@ -1,0 +1,56 @@
+{
+ "A_HI": 1.1,
+ "A_LO": 0.9,
+ "B1": 0.9,
+ "BOOT": 10000,
+ "BOOT_SEED": 20270001,
+ "CELULAS": [
+  {
+   "b2": 0.999,
+   "beta": 10000.0,
+   "nome": "ancora",
+   "papel": "H-BARREIRA principal"
+  },
+  {
+   "b2": 0.999,
+   "beta": 1000.0,
+   "nome": "beta-baixo",
+   "papel": "secundaria (i) invariancia em beta"
+  },
+  {
+   "b2": 0.9,
+   "beta": 10000.0,
+   "nome": "b2-090",
+   "papel": "secundaria (ii) memoria de v"
+  },
+  {
+   "b2": 0.99,
+   "beta": 10000.0,
+   "nome": "b2-099",
+   "papel": "secundaria (ii) memoria de v"
+  }
+ ],
+ "DB2_POT": 1.0,
+ "DB2_TOL": 2.0,
+ "DT": 1e-05,
+ "EPS_GRID": [
+  1e-08,
+  1e-06,
+  0.0001,
+  0.01,
+  1.0
+ ],
+ "FACE": 0,
+ "H": 10.0,
+ "IT_CAL": 14,
+ "MIN_CELULAS_VALIDAS": 0.6,
+ "N_INST": 100,
+ "N_SEEDS_MAX": 1600,
+ "PLATO_DT": 0.5,
+ "PLATO_TOL": 0.5,
+ "REC": 200,
+ "SEED0": 20270000,
+ "T_CAL": 2.0,
+ "data_pre_registro": "2026-07-26",
+ "tag": "e7-confirmatorio-hbarreira"
+}

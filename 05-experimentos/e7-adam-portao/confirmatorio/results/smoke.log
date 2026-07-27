@@ -1,0 +1,7 @@
+# smoke test 2026-07-26 (2a passada, regra de plato corrigida) - 1 processo, nice -19
+beta=1e+04 b2=0.999 eps=1e-08: t_hit=0.1122 t_rel=3.5548700000148212 bz_park=-23.32 plato=True bz_ret=0.13219266420949616 trunc=False
+beta=1e+04 b2=0.9 eps=1e-08: t_hit=0.1107 t_rel=4.784669999988031 bz_park=-23.72 plato=True bz_ret=0.08802819945974427 trunc=False
+beta=1e+04 b2=0.999 eps=1e+00: t_hit=0.1121 t_rel=1.550620000001691 bz_park=-6.11 plato=True bz_ret=0.5450547335300593 trunc=False
+[smoke] 1.7 min
+[smoke] 1.7 min
+# 1a passada (regra de plato antiga; eps=1 reprovava com bz_ret=0.545 > 0.5) - ver README §7 disclosure 6
