@@ -58,14 +58,16 @@ original; não foi mexida pela emenda).
 > parecer) — uma ordem de grandeza abaixo de `CURV_TOL = 1,0`. Se ela disparar
 > mesmo assim, é achado, não artefato conhecido.
 
-**Resolução real do teste (corrigida — 17º parecer, forte 12).** A meia-largura
-do IC95 de `a` é **≈ 0,0066** (sintético, N = 100, 4 ε, resíduo 0,4). Não é
-0,01 (número alegado na versão anterior deste arquivo, folgado demais) nem
-0,003–0,004 (estimativa do parecer, otimista demais). O número honesto é 0,0066,
-e é ele que faz a regra ser bem posta: nem aceita qualquer coisa, nem exige
-igualdade numérica impossível. Em particular, um `a = 0,97 ± 0,007` **SUSTENTA
-a lei e EXCLUI `a = 1`** ao mesmo tempo — é exatamente esse o resultado que a
-derivação prevê.
+**Resolução real do teste (corrigida — 17º parecer, forte 12; os DOIS números
+em §7.3).** A meia-largura do IC95 de `a` é **≈ 0,0066** no mundo sintético
+(N = 100, 4 ε, `sd_ruido = 0,4`) e projeta-se em **≈ 0,004** para o dado real
+(resíduo within medido no piloto = 0,200). Não é 0,01 (número alegado na versão
+anterior deste arquivo, folgado demais). **Os dois números estão declarados em
+§7.3 justamente para que um IC real de ~0,004 não seja lido depois como
+"desvio".** Qualquer um dos dois faz a regra ser bem posta: nem aceita qualquer
+coisa, nem exige igualdade numérica impossível. Em particular, um
+`a = 0,97 ± 0,007` (ou ±0,004) **SUSTENTA a lei e EXCLUI `a = 1`** ao mesmo
+tempo — é exatamente esse o resultado que a derivação prevê.
 
 #### 1.1 Por que ε = 1 sai do primário (adjudicação (c) restrita do 17º parecer)
 
@@ -100,8 +102,18 @@ orçamento.
 Reportamos, com cada termo **medido**:
 
 ```
-    a = 1 + d ln(lr)/dL + d ln(K_morto)/dL + resto
+    a_diag = 1 + d ln(lr)/dL + d ln(K_morto)/dL + resto
 ```
+
+> **NOTAÇÃO — `a_diag` NÃO é o `a` do primário** (2ª rodada do 17º parecer,
+> item 2). `a_diag` (também dito `a_within`) é a inclinação estimada por
+> **efeitos fixos within-instância** sobre o **subconjunto sem os runs
+> truncados**; o `a` do primário é **OLS empilhado** sobre **todos** os runs com
+> platô válido. **São estimadores diferentes em amostras diferentes: diferem por
+> construção.** Nenhum dos dois "confirma" o outro, e a diferença entre eles não
+> é resultado. Na saída de `analise_hbarreira.py` a chave é `a_diag` e vem
+> acompanhada da própria definição; o `soma_confere` (resíduo da identidade
+> acima) vem rotulado **"~0 POR CONSTRUÇÃO (não é evidência de nada)"**.
 
 - `d ln(lr)/dL` — vazamento da recalibração de `lr` por ε (variável de desenho,
   registrada e medida; **não** é grau de liberdade de ajuste).
@@ -113,6 +125,11 @@ Reportamos, com cada termo **medido**:
 > investigar. **NÃO é MATA** — a física do resto não está derivada, e matar uma
 > hipótese por um termo cuja física não se sabe seria trocar ignorância por
 > veredito.
+>
+> **Franqueza obrigatória (disclosure §7.9):** `RESTO_TOL = 0,01` foi fixado
+> **sabendo** que o piloto dá `−0,018`. **O resultado esperado é, portanto,
+> ESTIMAÇÃO-COM-ALERTA.** O que se aprende não é "acendeu", e sim se o resto
+> **persiste** nas 100 instâncias novas e **de que tamanho e sinal** ele sai.
 
 **`K_morto`, definição operacional (obrigatória, 17º parecer item 3):**
 
@@ -199,6 +216,15 @@ honesto: `|Δb| < 0,1` fica como **predição-sob-teste com evidência contrári
 prévia declarada**; o critério **decisório é e continua sendo o teste de
 equivalência ±2 congelado**. Não se usa uma predição já contrariada como
 critério de morte, nem se apaga a contradição.
+
+> **ETIQUETA COMPLETA (2ª rodada do 17º parecer, item 3):** `|Δb| < 0,1` é
+> **predição-sob-teste, SEM POTÊNCIA POR DESENHO** — a meia-largura do IC95 de
+> `Δb` é **~0,4**, quatro vezes a tolerância de 0,1. **Este desenho não consegue
+> decidir 0,1 nem em princípio**, com ou sem dado. Adjudicado: a etiqueta é
+> preferível a re-parear o experimento (re-pareamento custaria um desenho novo
+> para responder uma pergunta que ninguém pré-registrou como decisória).
+> **O ±2 segue decisório e nada mais muda.** A etiqueta está também na saída de
+> `analise_hbarreira.py`, no campo `predicao_sob_teste_db_menor_0p1`.
 
 ### SECUNDÁRIA (iii) — SATURAÇÃO: ε = 1 e GD como âncoras
 
@@ -396,9 +422,23 @@ removidas EXPLICITAMENTE e o fato registrado em §9.
    regra de decisão [0,90; 1,10] foi escrita como equivalência **antes** de
    qualquer dado novo, e o piloto (0,973 na grade sem ε=1) está dentro dessa
    janela: **isto é assimétrico a favor de sustentar, e está declarado como
-   tal.** O que protege o teste é o IC estreito (meia-largura 0,0066): um `a` de
-   0,97 com IC [0,963; 0,977] SUSTENTA a lei mas **exclui** `a = 1` — o texto do
-   resultado terá de dizer as duas coisas.
+   tal.** O que protege o teste é o IC estreito: um `a` de 0,97 com IC
+   [0,963; 0,977] SUSTENTA a lei mas **exclui** `a = 1` — o texto do resultado
+   terá de dizer as duas coisas.
+
+   **OS DOIS NÚMEROS DA MEIA-LARGURA, declarados AGORA para que nenhum deles
+   vire "desvio" depois:**
+
+   | número | de onde vem |
+   |---|---|
+   | **0,0066** | mundo **sintético**, N=100, 4 ε, com `sd_ruido = 0,4` |
+   | **≈ 0,004** | **projeção para o dado real**: o resíduo within medido no piloto é **0,200**, não 0,4 — o sintético foi deliberadamente conservador |
+
+   Ambos são **15–25× mais estreitos que a janela ±0,10**. Portanto: se o
+   confirmatório entregar uma meia-largura de ~0,004, isso é **o esperado**, e
+   **não** um desvio a registrar em §9. O que iria para §9 seria uma
+   meia-largura **maior** que os 0,0066 do sintético — aí sim o instrumento
+   teria menos resolução do que o pré-registro previu.
 4. A calibração de lr usa uma instância que fica fora da análise, mas é a MESMA
    para as 100 — o lr não é ótimo por instância. Herança do piloto, declarada.
    É também a origem do vazamento `d ln(lr)/dL` medido no diagnóstico.
@@ -430,6 +470,16 @@ removidas EXPLICITAMENTE e o fato registrado em §9.
    **depois** de o sintético mostrar que o OLS empilhado não tinha resolução
    para o teste — e **antes** de qualquer dado real. É uma escolha de estimador
    feita contra um mundo simulado, não contra o dado. Declarada.
+9. **`RESTO_TOL = 0,01` foi fixado SABENDO que o piloto dá `resto = −0,018`.**
+   Não foi escolhido às cegas: foi escolhido logo abaixo do valor que já se
+   tinha na mão. **Logo o resultado ESPERADO do diagnóstico é
+   ESTIMAÇÃO-COM-ALERTA** — o teste está montado para acender a luz, e acendê-la
+   não será surpresa nem descoberta. O que o teste de fato mede é (a) se o resto
+   **persiste** nas 100 instâncias novas e (b) **de que tamanho e sinal** ele
+   sai, com IC. Um resto que ficasse **dentro** de 0,01 é que seria informação
+   nova. Mesma franqueza da lição de §A.5.2: uma tolerância calibrada no dado
+   que ela vai julgar tem de ser declarada como tal — e é precisamente por isso
+   que o resto **não mata, alerta**.
 
 ## 8. Smoke tests e validação sintética (só isto foi executado)
 

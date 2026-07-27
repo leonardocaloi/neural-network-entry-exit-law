@@ -1,6 +1,7 @@
 OK  mundo a=1 (mecanismo verdadeiro)                     -> SUSTENTA                 a=+0.994 IC95=(0.987, 1.0) |q|Lmax^2=0.185 (esperado SUSTENTA)
       meia-largura IC95(a) = 0.0066
-      diag: a=+0.9935 = 1 -0.0059(lr) -0.0020(K) +0.0015(resto)  identidade fecha em 2.2e-16
+      diag: a_diag=+0.9935 = 1 -0.0059(lr) -0.0020(K) +0.0015(resto)  identidade fecha em 2.2e-16 (POR CONSTRUCAO)
+      diag: a_diag e FE-within sem truncados; NAO e o a=+0.9937 do primario (OLS empilhado) -- diferem por construcao
       diag: RESTO DENTRO DA TOLERANCIA  IC95(resto)=(-0.0055, 0.0084)  n=366 truncados_excluidos=34
       sec(i)  INVARIANTE  delta_a=+0.001
       sec(ii) MECANISMO-V SUSTENTADO  b={0.9: 6.189562972682732, 0.99: 6.172197506008364, 0.999: 6.0927124124694965}

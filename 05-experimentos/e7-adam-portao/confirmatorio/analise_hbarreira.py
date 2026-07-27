@@ -175,10 +175,21 @@ def diagnostico(d):
     bs = np.array(bs)
     rlo, rhi = ic95(bs[~np.isnan(bs)] - 1.0)
     alerta = abs(resto) > RESTO_TOL and not (rlo <= 0 <= rhi)
-    return dict(a_bruto_no_subconjunto=float(a_ns),
+    return dict(a_diag=float(a_ns),
+                # NOTA DE NOTACAO (2a rodada do 17o parecer, item 2): `a_diag` NAO
+                # e o `a` do primario. E o estimador WITHIN (efeitos fixos) sobre o
+                # SUBCONJUNTO sem truncados; o primario e OLS empilhado sobre todos
+                # os runs com plato. Os dois DIFEREM POR CONSTRUCAO -- estimadores
+                # diferentes em amostras diferentes. Nao sao para ser comparados
+                # como se um "confirmasse" o outro.
+                a_diag_o_que_e="inclinacao WITHIN (FE) no subconjunto sem truncados"
+                               " -- NAO e o `a` do primario (OLS empilhado, todos"
+                               " os runs com plato); diferem por construcao",
                 d_ln_lr_dL=float(dlr), d_ln_K_dL=float(dK),
                 resto=float(resto), ic95_resto=(rlo, rhi),
-                soma_confere=float(a_ns - (1 + dlr + dK + resto)),  # ~0 por construcao
+                soma_confere=float(a_ns - (1 + dlr + dK + resto)),
+                soma_confere_o_que_e="residuo da identidade; ~0 POR CONSTRUCAO"
+                                     " (nao e evidencia de nada)",
                 n_usado=int(len(d["y_s"])), n_trunc=int(d["n_trunc"]),
                 veredito="ESTIMACAO-COM-ALERTA" if alerta else "RESTO DENTRO DA TOLERANCIA")
 
@@ -289,6 +300,11 @@ def decide(dados, gd=None, sat=None):
                              # Evidencia contraria previa: smoke deu -0.40 (README §7.5).
                              predicao_sob_teste_db_menor_0p1=dict(
                                  delta_b=db, cumpre=bool(abs(db) < CFG["DB2_PREV"]),
+                                 etiqueta="predicao-sob-teste, SEM POTENCIA POR DESENHO"
+                                          " (meia-largura do IC95(delta_b) ~0.4 contra"
+                                          " tolerancia 0.1): este desenho NAO consegue"
+                                          " decidir 0.1 nem em principio. NAO decisoria.",
+                                 meia_largura=meia((blo, bhi)),
                                  evidencia_contraria_previa="smoke 1 instancia: -0.40"))
     # --- (iii) saturacao: GD e eps=1 como ancoras
     if gd is not None and len(gd):
@@ -462,10 +478,12 @@ def sintetico():
         if nome.startswith("mundo a=1 "):
             dg = r["diagnostico"]
             print(f"      meia-largura IC95(a) = {r['meia_largura_ic_a']:.4f}")
-            print(f"      diag: a={dg['a_bruto_no_subconjunto']:+.4f} = 1 "
+            print(f"      diag: a_diag={dg['a_diag']:+.4f} = 1 "
                   f"{dg['d_ln_lr_dL']:+.4f}(lr) {dg['d_ln_K_dL']:+.4f}(K) "
                   f"{dg['resto']:+.4f}(resto)  identidade fecha em "
-                  f"{dg['soma_confere']:.1e}")
+                  f"{dg['soma_confere']:.1e} (POR CONSTRUCAO)")
+            print(f"      diag: a_diag e FE-within sem truncados; NAO e o "
+                  f"a={r['a']:+.4f} do primario (OLS empilhado) -- diferem por construcao")
             print(f"      diag: {dg['veredito']}  IC95(resto)="
                   f"{tuple(round(x,4) for x in dg['ic95_resto'])}  "
                   f"n={dg['n_usado']} truncados_excluidos={dg['n_trunc']}")
