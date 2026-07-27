@@ -1,0 +1,28 @@
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.prefix, expected /home/caloi/Projects/j-space/venv, got /home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios/../../venv
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.exec_prefix, expected /home/caloi/Projects/j-space/venv, got /home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios/../../venv
+peneira: 50 candidatas de 500 em 1.2 min
+
+=== DEGRAU 2 (readout treinavel), m=4, beta=1e+04, 9.2 min ===
+50 avaliadas, 43 passaram (H1')-(H4') + guarda de sinal
+      5  beta-run sem release no horizonte
+      1  sem morte no horizonte
+      1  morte antes de t_min (fora da janela)
+  err_naive: mediana 1.96% | p90 20.17% | max 69.73%
+  err_corr: mediana 1.96% | p90 20.17% | max 69.73%
+  baseline readout FIXO (verifica_forcing m=4): mediana 0.80%
+  v0_hit          min 1 | mediana 1 | max 1
+  T_ep            min 0.02034 | mediana 0.05785 | max 0.3883
+  L_B             min 1.9 | mediana 4.018 | max 6.852
+  Lambda_ck       min 1.9 | mediana 4.018 | max 6.852
+  gronwall        min 1.069 | mediana 1.309 | max 2.701
+  bal_hyb_drift   min 8.643e-06 | mediana 2.246e-05 | max 6.758e-05
+  bal_beta_drift  min 1.318e-06 | mediana 4.166e-06 | max 1.099e-05
+  R_exit          min 0.0486 | mediana 0.09378 | max 0.1861
+  v_min_live      min 0.0009467 | mediana 0.1185 | max 0.332
+  corr(log err_corr, log gronwall) = -0.633
+  corr(log err_corr, log L_B) = -0.340
+  corr(log err_corr, log T_ep) = -0.650
+  corr(log err_corr, log R_exit) = -0.604
+  corr(log err_corr, log 1/R_exit) = +0.604
+
+jsonl: /home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios/degrau2_readout.jsonl

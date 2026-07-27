@@ -1,0 +1,14 @@
+[v0=0.5] 8 candidatas (0.3 min)
+[v0=2.0] 8 candidatas (1.2 min)
+
+=== REPLICA INDEPENDENTE  ok=16/16  (1.9 min) ===
+v0=0.5 N=8: mu/naive med 1.9496 | mu/corr med 0.9748
+   err_naive med 94.96%  err_corr med 11.68%  wins 8/8
+   |v0_hit-v0|max 2.18e-07   max|L_B-Lambda| 7.11e-15
+v0=2.0 N=8: mu/naive med 0.4995 | mu/corr med 0.9991
+   err_naive med 50.05%  err_corr med 1.56%  wins 7/8
+   |v0_hit-v0|max 2.82e-06   max|L_B-Lambda| 1.78e-15
+########## M2 ##########
+m= 4 N= 4  Lambda med 5.03 range [2.86,6.20] | T_ep med 0.0829 | e^{LamTep} med 1.345 (0.1 min)
+m= 8 N= 4  Lambda med 5.70 range [4.29,6.35] | T_ep med 0.0486 | e^{LamTep} med 1.315 (0.2 min)
+m=16 N= 1  Lambda med 5.18 range [5.18,5.18] | T_ep med 0.0228 | e^{LamTep} med 1.125 (0.2 min)
