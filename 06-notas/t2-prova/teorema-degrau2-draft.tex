@@ -910,32 +910,45 @@ trajectories, and is therefore bounded through \hyplabel{H5$'$}-on-the-tube.
 Since $\|\Delta\|=O(\log\beta/\beta^2)$, the tube is thin and the distinction is
 immaterial in practice; but the bootstrap that makes it rigorous is the same
 continuity argument as in \cite[L4$'$]{paper} and we have not rewritten it.
-\item[(P7)] \textbf{The $m$-sweep of $\Lambda$ is a pilot, not a measurement.}
-The claim that survives proof is that the \emph{bound} $\Xmax\Cres$ is $m$-free;
-the claim that the \emph{realized} $\Lambda$ is flat in $m$ rests on $N=4,4,1$
-instances at $m=4,8,16$ (\cref{sec:lema}). The design that would settle it, and
-which we have not run: $N\approx20$ accepted instances per level,
-$m\in\{4,8,16,32\}$, same drawing family and the fine $dt$, reporting the median
-and the interquartile range of $\Lambda$ and of $\lambda_{\max}(G_B)$ per level,
-with the pre-registered prediction that the first is flat and the second linear.
-Note that $m=32$ needs a $96\times96$ Hessian per sample and a coarser
-\texttt{HESS\_EVERY}; cost is a few CPU-hours at two workers.
-\item[(P8)] \textbf{We measure $\Lambda$, not the quantity the estimate
-actually needs.} Step~3 of \cref{lem:L2} uses the Rayleigh quotient of the
-averaged Hessian \emph{along the realized $\Delta$},
-\[
-q(t)\ :=\ -\frac{\Delta^\top\bar H(t)\Delta}{\|\Delta\|^2}\ \le\ \Lambda_{\rm ep},
-\]
-and the Gr\"onwall factor that the argument truly pays is
-$\exp\bigl(\int q\,dt\bigr)$, not $e^{\Lambda\Tep}$. The two coincide only if
-$\Delta$ aligns with the minimizing eigenvector. \emph{Measuring $q(t)$ is the
-experiment that separates the two live explanations of \cref{sec:num}}: if
-$q\approx\Lambda$, the exponent is right and the estimate is tight, and the
-negative correlation of the residual error with $e^{\Lambda\Tep}$ is telling us
-the error lives elsewhere; if $q\ll\Lambda$, the Gr\"onwall step is simply loose
-and $\Lambda$ is an artefact of the worst-case direction. The instrumentation is
-cheap --- $\Delta$ and $\bar H$ are both already computed in
-\path{degrau2_readout.py} --- and it has not been done.
+\item[(P7)] \textbf{Resolved (2026-07-27), with one prediction falsified.}
+A sweep with $N=20$ accepted instances per level, $m\in\{4,8,16,32\}$, same
+drawing family and integrator (\path{p7_lambda_m.jsonl}), gives a realized
+$\Lambda$ that is \emph{flat in $m$}: medians $4.33$ / $4.23$ / $4.37$ /
+$5.24$, bootstrap CI$_{95}$ $[3.82,4.59]$, $[3.85,5.25]$, $[3.83,4.86]$,
+$[4.65,5.45]$; log--log exponent $+0.079$ $[0.008,0.143]$ against $1$ if
+linear. The identity $\max_k\|c_k\|=-\lambda_{\min}(\nabla^2U)$ of
+\cref{lem:curv} is reconfirmed in all $80$ cases with pointwise relative error
+$\le1.9\cdot10^{-15}$, including the $96\times96$ Hessian at $m=32$. The
+second half of the pre-registered prediction --- $\lambda_{\max}(G_B)$
+\emph{linear} in $m$ --- is \emph{false in this family}: medians $18.7$ /
+$20.1$ / $23.0$ / $24.0$, exponent $+0.111$ $[0.013,0.191]$. The reason is
+structural: with NTK readout $1/\sqrt m$ and per-unit scaled init,
+$\operatorname{tr}(J^\top J/n)=O(1)$ uniformly in $m$; the $N=4/4/1$ pilot
+figures ($10.2/18.7/37.7$) belong to the \emph{unit-readout} family, where the
+growth is real. What stands, and is cleaner: $\Lambda$ is flat and
+$\lambda_{\max}(G_B)/\Lambda\in[4.5,5.2]$ at every level in the NTK family ---
+the contrast of \cref{rem:O6} is one of object and magnitude, and of growth
+rate only in families whose Gram grows. Caveat: $dt=2\cdot10^{-4}$ (the
+pilot's, not the canonical $10^{-5}$); no disjoint-seed replication yet.
+\item[(P8)] \textbf{Resolved (2026-07-27): the Gr\"onwall exponent is loose,
+with the wrong sign.} Instrumenting the pair ($\beta$-run, hybrid) in lockstep
+($dt=2\cdot10^{-6}$, $N=18$, $m=4$, \path{p8_rayleigh.jsonl}), the quotient
+step~3 actually pays,
+$q(t)=-\Delta^\top\bar H\Delta/\|\Delta\|^2$, is \emph{negative at every
+sample of every instance}: $\sup_t q$ has median $-3.73$ $[-4.68,-2.55]$ and
+is negative in $18/18$. Hence $\int q\,dt=-0.414$ $[-0.465,-0.278]$ against
+$\Lambda_{\rm ep}\Tep=+0.306$ $[+0.183,+0.414]$; the realized factor
+$e^{\int q}=0.66$ is \emph{contractive}, against $e^{\Lambda_{\rm ep}\Tep}
+=1.36$ from the bound. The factor $e^{\Lambda_{\rm ep}\Tep}$ is therefore a
+directional worst-case artefact: $\Delta$ does not align with the minimizing
+eigenvector of $S$ --- explicit, $(e_c-e_3)/\sqrt2$ in the binding block ---
+which the softplus defect does not populate. Since $\|\Delta\|\sim10^{-7}$,
+the midpoint Hessian coincides with $\bar H$ to $\sim10^{-7}$ relative. The
+counterweight, recorded: $\|\Delta\|$ still grows $\times7.3$ over the episode
+($\log$-growth $+1.99$ $[+1.82,+2.10]$), \emph{entirely from the source terms}
+$G_A+G_S$. The measured mitigation is of the curvature amplification factor,
+not of the defect. Caveat: $m=4$, $v_0=1$, seeds from
+\path{degrau2_readout.jsonl}; no disjoint-seed replication yet.
 \item[(P9)] \textbf{Selection is conditional on the treatment.} See
 \cref{sec:num}: the acceptance filter rejected $8/30$ at $v_0(0)=0.5$ against
 $4/30$ at $v_0(0)=2.0$, so the two arms are not samples of the same population
