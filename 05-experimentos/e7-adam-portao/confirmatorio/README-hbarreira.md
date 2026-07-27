@@ -1,9 +1,14 @@
 # Confirmatório H-BARREIRA — pré-registro
 
 Status: **[PRÉ-REGISTRO]** — escrito ANTES de qualquer execução do confirmatório.
-Data: 2026-07-26. Herda do piloto **[EXPLORATÓRIO]** e7
+Data: 2026-07-26. **Emendado 2026-07-27 pelo 17º parecer** (`parecer-17.md`),
+ainda antes de qualquer execução. Herda do piloto **[EXPLORATÓRIO]** e7
 (`../README-e7.md`, `06-notas/2026-07-26-e7-piloto-adam.md`).
 Nada deste diretório foi rodado além dos *smoke tests* declarados em §8.
+
+Config congelado: `results/config_hbarreira.json`
+**sha256 `49c3051e323271d3428d025ae03f44587a9e77e3e7afd43aaca37843cf673ec7`**
+(regerado 2× byte-igual após a emenda; o SHA anterior à emenda está morto).
 
 ---
 
@@ -14,35 +19,120 @@ Nada deste diretório foi rodado além dos *smoke tests* declarados em §8.
 `β·z_park ≈ −0,94·ln(1/ε) − 6,1`; nesta convenção isso é
 `y ≈ +0,94·ln(1/ε) + 6,1`.
 
-### PRINCIPAL — H-BARREIRA
+### PRIMÁRIO — H-BARREIRA (ÚNICO; não há segundo primário)
 
-Na regressão sobre todas as instâncias e todos os ε da célula-âncora
-(β = 1e4, β₂ = 0,999):
+Na regressão sobre todas as instâncias e todos os ε da **grade primária** da
+célula-âncora (β = 1e4, β₂ = 0,999):
 
 ```
     y(i, ε) = −β·z_park(i, ε) = a·ln(1/ε) + b + u_i + ruído
 ```
 
-o mecanismo proposto — **o release acontece quando o canal `e^{βz}` cruza o piso
-`ε`**, isto é, `|g| ∝ e^{β z_park} ≈ ε` ⟹ `β·z_park = ln ε + const` — prediz
+com **grade primária ε ∈ {1e−8, 1e−6, 1e−4, 1e−2}** — **ε = 1 fica FORA do
+ajuste primário** (§1.1). O mecanismo proposto — o release acontece quando o
+canal `e^{βz}` fica **proporcional** ao piso `ε` (`|g|_park = θ·ε`, θ constante;
+ver Apêndice A.3, que corrige o "≈ ε" do texto original) — prediz `a = 1` como
+lei física, e o Apêndice A.4/A.5 mostra que **sob este desenho** o valor
+esperado é ligeiramente menor:
 
-> ### **a = 1 EXATO.** Sem parâmetro livre. `b` é livre (constante da proporcionalidade).
+> ### PREDIÇÃO PRINCIPAL DECLARADA: **`a ≈ 0,97`**.
+> A leitura esperada é **"SUSTENTA a lei, mas NÃO é `a = 1` exato"** — as duas
+> coisas terão de ser ditas no texto do resultado, não uma só.
+
+**Janela de decisão: [0,90; 1,10] — MANTIDA CONGELADA** (é a do pré-registro
+original; não foi mexida pela emenda).
 
 **MATA H-BARREIRA:** o IC95 de `a` (bootstrap de cluster sobre instâncias)
-**excluir** o intervalo [0,9; 1,1], isto é, ser disjunto dele.
+**excluir** o intervalo [0,90; 1,10], isto é, ser disjunto dele.
 
 | resultado | veredito congelado |
 |---|---|
-| IC95(a) ⊆ [0,9; 1,1] | **SUSTENTA** |
-| IC95(a) ∩ [0,9; 1,1] = ∅ | **MATA** |
+| IC95(a) ⊆ [0,90; 1,10] | **SUSTENTA** |
+| IC95(a) ∩ [0,90; 1,10] = ∅ | **MATA** |
 | IC95(a) cruza a fronteira | **INCONCLUSIVO** (não é vitória) |
 | curvatura significativa (§3) | **INCONCLUSIVO-CURVATURA** (sobrepõe as três acima) |
 
-O piloto deu `a = 0,94` com 4 pontos e 13 instâncias exploratórias. Note que
-`a = 0,94` **SUSTENTA** pela regra acima se o IC95 couber em [0,9; 1,1] — é um
-teste de **equivalência**, não de "≠ 1". Com N = 100 e 5 ε o IC de `a` deve ter
-meia-largura ~0,01 (verificado no sintético), então a regra é bem posta: nem
-aceita qualquer coisa, nem exige igualdade numérica impossível.
+> **Predição derivada sobre a guarda de curvatura: ela NÃO deve disparar.**
+> Sem o joelho de ε=1, o piloto dá `|q|·L²max` = **0,075** (recomputado por
+> `derivacao_a1.py ajuste`) / **0,096** (verificação independente do 17º
+> parecer) — uma ordem de grandeza abaixo de `CURV_TOL = 1,0`. Se ela disparar
+> mesmo assim, é achado, não artefato conhecido.
+
+**Resolução real do teste (corrigida — 17º parecer, forte 12).** A meia-largura
+do IC95 de `a` é **≈ 0,0066** (sintético, N = 100, 4 ε, resíduo 0,4). Não é
+0,01 (número alegado na versão anterior deste arquivo, folgado demais) nem
+0,003–0,004 (estimativa do parecer, otimista demais). O número honesto é 0,0066,
+e é ele que faz a regra ser bem posta: nem aceita qualquer coisa, nem exige
+igualdade numérica impossível. Em particular, um `a = 0,97 ± 0,007` **SUSTENTA
+a lei e EXCLUI `a = 1`** ao mesmo tempo — é exatamente esse o resultado que a
+derivação prevê.
+
+#### 1.1 Por que ε = 1 sai do primário (adjudicação (c) restrita do 17º parecer)
+
+Em ε = 1 o Adam já degenerou em GD: a própria fase VIVA está no regime linear, a
+recalibração de `lr` salta ×8,9 e `K_morto` cai pela metade (Apêndice A.4). O
+"joelho" que isso produz **não é curvatura da lei física — é vazamento de
+projeto**, e derrubaria o primário por artefato (`|q|L²max ≈ 1,7`, guarda
+disparando por motivo errado). Tirar ε = 1 do ajuste é a correção mínima:
+
+- **ε = 1 e o baseline GD continuam sendo RODADOS e REPORTADOS**, como
+  **pontos de saturação da secundária (iii)** — nunca no ajuste primário.
+- **O custo do experimento fica inalterado** (nada deixou de ser executado).
+
+A emenda proposta na versão anterior (§A.5) criava um **segundo** primário sobre
+`y* = y − ln(lr·K_morto)` com janela própria [0,95; 1,05]. **Foi negada**: dois
+primários com duas janelas são duas chances de sustentar. Um primário, uma
+janela, um veredito.
+
+#### 1.2 A lição da janela [0,95; 1,05] (registrada, e a janela abandonada)
+
+A janela [0,95; 1,05] foi apresentada como "derivada de um orçamento de erro".
+Ela **não era independente do piloto**: o orçamento que a produziu foi calibrado
+no mesmo dado (as 13 instâncias exploratórias) que produziu o `a* = 0,9985` que
+ela iria julgar. Isso é **auto-cumprimento do orçamento** — uma janela desenhada
+para caber no número que já se tinha. **Lição registrada; janela abandonada.**
+A janela vigente é a original [0,90; 1,10], escrita antes de qualquer conta de
+orçamento.
+
+### DIAGNÓSTICO (não mata) — decomposição de `a` e o RESTO INEXPLICADO
+
+`y*` não sumiu: virou **diagnóstico**, com um teste novo que tem resolução.
+Reportamos, com cada termo **medido**:
+
+```
+    a = 1 + d ln(lr)/dL + d ln(K_morto)/dL + resto
+```
+
+- `d ln(lr)/dL` — vazamento da recalibração de `lr` por ε (variável de desenho,
+  registrada e medida; **não** é grau de liberdade de ajuste).
+- `d ln(K_morto)/dL` — vazamento da duração da fase morta.
+- `resto` — **o que a derivação não explica.** No piloto: `resto = −0,018`.
+
+> **TESTE NOVO, PRÉ-REGISTRADO.** Se `|resto| > 0,01` **com IC95 excluindo 0**,
+> o veredito do diagnóstico é **ESTIMAÇÃO-COM-ALERTA**: achado real, a
+> investigar. **NÃO é MATA** — a física do resto não está derivada, e matar uma
+> hipótese por um termo cuja física não se sabe seria trocar ignorância por
+> veredito.
+
+**`K_morto`, definição operacional (obrigatória, 17º parecer item 3):**
+
+```
+    K_morto := (t_release − t_hit) / dt          [em PASSOS]
+```
+
+Logo **runs truncados (sem release) não têm `K_morto`** e são **EXCLUÍDOS DO
+DIAGNÓSTICO**, com a contagem `n_trunc` reportada. Eles **nunca** saem do
+primário — o primário usa `y` bruto, que existe para todo run com platô válido.
+
+**Estimador do resto: WITHIN-instância (efeitos fixos), e por quê.** Achado do
+próprio sintético ao aplicar a emenda: o OLS empilhado é não-viesado mesmo com
+desbalanceamento, mas quando as instâncias deixam de cobrir todos os ε — e a
+exclusão dos truncados é exatamente um desbalanceamento — o efeito de instância
+`u_i` (sd ≈ 3) deixa de ser ortogonal a `L` e **vaza para a variância** da
+inclinação: o IC95 do resto abre de ±0,0075 para **±0,02**, e um resto de
+−0,018 deixaria de ser detectável. O estimador within elimina `u_i` por
+construção. **Usado SÓ no diagnóstico; o primário continua sendo o OLS empilhado
+congelado.** Verificado nos dois sentidos no sintético (§8).
 
 ### SECUNDÁRIA (i) — invariância em β
 
@@ -54,14 +144,28 @@ O piloto rodou **β = 1e4 apenas** (confirmado em `../README-e7.md` §Setup e em
 > **Predição:** `a(β=1e3) = a(β=1e4)`. `b` pode mudar (é a constante da
 > proporcionalidade `|g| = C·e^{βz}`, e `C` depende de β).
 
-**MATA (i):** IC95 pareado de `Δa = a(1e3) − a(1e4)` excluir 0 **e** |Δa| ≥ 0,1.
-Se as duas condições não valerem juntas → INVARIANTE.
+**Confound declarado e tratado (17º parecer, blocker 6).** `Δa` e `Δb` entre
+células **misturam a recalibração de `lr`**: cada célula tem seu próprio `lr(ε)`,
+logo seu próprio vazamento `d ln(lr)/dL`. Comparar células sobre `y` bruto é
+comparar mecanismo + calibração. **Escolha implementada e documentada: a
+comparação pré-registrada é feita sobre a GRADE DESCONTADA `y*`**, que remove
+`ln(lr·K)` ponto a ponto. (A alternativa — forçar `lr` comum por par — exigiria
+abandonar a calibração de `t_hit`, que é justamente o que impede confundir a
+transição em ε com mudança de timescale; ficaria pior.) Consequência declarada:
+as secundárias herdam a exclusão dos truncados do diagnóstico.
+
+**Guarda de potência (nova, 17º parecer):** se a **meia-largura do IC95 de `Δa`
+> 0,1**, o teste é declarado **SEM POTÊNCIA** e não decide nada. Antes, um IC
+largo declarava INVARIANTE por omissão — o mesmo defeito que a (ii) já tratava.
+
+**MATA (i):** IC95 pareado de `Δa = a(1e3) − a(1e4)` excluir 0 **e** |Δa| ≥ 0,1,
+com potência suficiente. Se as duas condições não valerem juntas → INVARIANTE.
 
 ### SECUNDÁRIA (ii) — varredura de β₂ (a memória de `v`)
 
 O piloto atribuiu o colapso de `|m̂/(√v̂+ε)|` (3,6e−4, quatro ordens abaixo da
 saturação) à memória longa de `v` (τ₂ = 1/(1−β₂) ≈ 10³ passos). Varremos
-β₂ ∈ {0,9; 0,99; 0,999} em β = 1e4.
+β₂ ∈ {0,9; 0,99; 0,999} em β = 1e4. Também sobre a grade descontada `y*`.
 
 **O que o mecanismo do ε diz que muda — e o que ele diz que NÃO muda.** Sob o
 mecanismo do piso, o gate é `√v̂ ≲ ε`. Como `v` é uma média exponencial com
@@ -79,19 +183,24 @@ passos ⟹ β|ż|dt ≈ 7e−5 por passo) e Δτ₂ = τ₂(0,999) − τ₂(0,9
 > **Δb ≈ 0,07 unidades de β·z** — uma ordem de grandeza ABAIXO do resíduo do
 > piloto (0,36).
 
-Logo a predição pré-registrada é **de equivalência**:
+Logo a predição pré-registrada **decisória** é **de equivalência**:
 
 > **`a` invariante em β₂** (tolerância 0,1) **e** `|b(0,9) − b(0,999)| < 2`.
 
-Um efeito GRANDE de β₂ em `b` refutaria o mecanismo do piso de ε (mostraria que
-quem governa a profundidade é a memória de `v`, não o piso). Um efeito de β₂ em
-`a` refutaria mais fortemente ainda.
-
 **MATA (ii):** IC95 pareado de `Δb = b(0,9) − b(0,999)` sair de [−2, +2], ou
-`Δa` além de 0,1 com IC excluindo 0. Se o IC95 de Δb for mais largo que ±1, o
-teste é declarado **SEM POTÊNCIA** e não decide nada (registrado como tal).
+`Δa` além de 0,1 com IC excluindo 0. Se a meia-largura do IC95 de Δb for maior
+que 1, o teste é declarado **SEM POTÊNCIA** e não decide nada.
 
-### SECUNDÁRIA (iii) — o baseline GD como âncora `ε → ∞`
+**A predição mais apertada `|Δb| < 0,1` é PREDIÇÃO-SOB-TESTE, não critério
+(17º parecer, blocker 6).** O Apêndice A.3.3 deriva, de `κ = 1,00` medido, que
+β₂ quase não entra em `b`: `|Δb| < 0,1`. Mas **o smoke test já deu
+`Δb = −0,40`** (1 instância, ≈2σ pareado) — **contradiz a predição**. Registro
+honesto: `|Δb| < 0,1` fica como **predição-sob-teste com evidência contrária
+prévia declarada**; o critério **decisório é e continua sendo o teste de
+equivalência ±2 congelado**. Não se usa uma predição já contrariada como
+critério de morte, nem se apaga a contradição.
+
+### SECUNDÁRIA (iii) — SATURAÇÃO: ε = 1 e GD como âncoras
 
 Formulação: quando `ε ≫ √v̂`, o update de Adam vira `lr·m̂/ε`, **linear em g** —
 o piso deixa de existir como gate e o passo volta a ser (uma versão suavizada
@@ -99,21 +208,26 @@ por momento de) GD. Nesse sentido **GD é a célula ε → ∞**, e a lei
 `y = a·ln(1/ε) + b` deve **saturar** nele, não extrapolar através dele:
 `ln(1/ε) → −∞` daria `y → −∞`, o que é fisicamente impossível (a profundidade é
 limitada pelo balanço de GD). O piloto viu exatamente isso: ε=1 → y = 6,4;
-GD → y = 5,0.
+GD → y = 5,0. **É este o papel que ε = 1 tem agora: ponto de saturação, âncora
+da ponta direita — não ponto do ajuste primário.**
 
-> **Predição (direcional, não é o teste principal):** em **todo** ε da grade,
-> a mediana de `y_Adam(ε)` é MAIOR que a mediana de `y_GD` (Adam estaciona mais
-> fundo que GD em qualquer ε), e `y_GD` não depende de ε (controle de vazamento:
-> a corrida GD ignora ε por construção — se depender, há bug no harness).
+> **Predição (direcional, não é o teste principal):** em **todo** ε da grade
+> EXECUTADA (inclusive ε = 1), a mediana de `y_Adam(ε)` é MAIOR que a mediana de
+> `y_GD`: Adam estaciona mais fundo que GD em qualquer ε.
 
 **MATA (iii):** algum ε com mediana `y_Adam < y_GD`. Isso não mata H-BARREIRA;
 mata a leitura "o piso APROFUNDA o portão", que é a história física.
 
+O "controle de vazamento `y_GD` não depende de ε" foi **REMOVIDO** (17º parecer,
+cosmético 16): é vácuo — o harness de GD não recebe `ε` por construção, então a
+verificação não pode falhar. Um controle que não pode falhar não é controle.
+
 ### P-NULL de instrumento (obrigatório)
 
-Se menos de **60%** das células (instância × ε) da âncora entregarem `z_park`
-válido (§2, critério de platô), nada é decidido: veredito **INSTRUMENTO-NULL**,
-registrado como negativo de instrumento, sem reciclar hipótese.
+Se menos de **60%** das células (instância × ε) **da grade primária** da âncora
+entregarem `z_park` válido (§2, critério de platô), nada é decidido: veredito
+**INSTRUMENTO-NULL**, registrado como negativo de instrumento, sem reciclar
+hipótese.
 
 ---
 
@@ -126,47 +240,95 @@ registrado como negativo de instrumento, sem reciclar hipótese.
 - **Bloco de seeds NOVO: 20270000+**, disjunto do bloco do piloto
   (20260726–20261325). A **primeira** instância aprovada é a de **CALIBRAÇÃO de
   lr** e fica FORA da análise; as 100 seguintes são o confirmatório.
-- **Grade de ε: {1e−8, 1e−6, 1e−4, 1e−2, 1}** — 5 pontos (o piloto teve 4),
-  espaçamento uniforme de 2 décadas em `ln(1/ε)` ∈ {0; 4,6; 9,2; 13,8; 18,4}.
+- **Grade de ε EXECUTADA: {1e−8, 1e−6, 1e−4, 1e−2, 1}** — 5 pontos, espaçamento
+  uniforme de 2 décadas em `ln(1/ε)` ∈ {18,4; 13,8; 9,2; 4,6; 0}.
+  **Grade PRIMÁRIA (do ajuste): {1e−8, 1e−6, 1e−4, 1e−2}**, 4 pontos.
+  `EPS_GRID` e `EPS_PRIMARIO` são chaves separadas do config (entram no sha256).
 - **Células** (um-fator-por-vez a partir da âncora, ver §5):
   `ancora` (β=1e4, β₂=0,999) · `beta-baixo` (1e3, 0,999) ·
   `b2-099` (1e4, 0,99) · `b2-090` (1e4, 0,9). Mais o **baseline GD** nos dois β.
 - **lr recalibrado por (β, β₂, ε)** por bisseção em log(lr) para casar
   `t_hit^Adam = t_hit^GD` na instância de calibração — mesmo procedimento do
   piloto, e é o que impede que a transição em ε seja confundida com mudança de
-  timescale. Nenhum ajuste posterior.
+  timescale. Nenhum ajuste posterior. **É também a fonte do vazamento
+  `d ln(lr)/dL`**, medido e reportado no diagnóstico (§1).
 - **Horizonte H = 10,0** (piloto usou 8,0; fase morta mediana ~3,6 no ε pequeno).
   dt = 1e−5, β₁ = 0,9 fixo, FACE = 0 — todos herdados do piloto.
 - **`z_park` desacoplado do release** (correção de viés introduzida aqui, não
-  havia no piloto): `z_park` é válido se (a) houve release — então o mínimo é
-  interior por construção, `z` desceu e voltou a 0 — ou (b) o run truncou no
-  horizonte MAS o mínimo já se sustentou por 0,5 unidade de tempo dentro de
-  0,5/β. Sem isso, as instâncias truncadas dariam `z_park` censurado (viés para
-  fundo) e as células de ε grande, de fase morta curta, seriam excluídas em
-  bloco — perdendo justamente a ponta direita da regressão (visto no smoke, §8).
+  havia no piloto): `z_park` é válido (`plato = True`) se (a) houve release —
+  então o mínimo é interior por construção, `z` desceu e voltou a 0 — ou (b) o
+  run truncou no horizonte MAS o mínimo já se sustentou por 0,5 unidade de tempo
+  dentro de 0,5/β. Sem isso, as instâncias truncadas dariam `z_park` censurado
+  (viés para fundo) e as células de ε grande, de fase morta curta, seriam
+  excluídas em bloco.
+- **`estacionario`: verificação de platô calculada SEMPRE, inclusive nos runs COM
+  release** (17º parecer, forte 9). É **diagnóstico**, reportado por ε: mede se
+  o mínimo se sustentou por 0,5 dentro de 0,5/β, sem exigir isso de quem teve
+  release. **Fato já observado no smoke: ε = 1 FALHA a estacionariedade**
+  (`bz_retorno = 0,545` contra tolerância 0,50). Isso agora é **reportado**, e é
+  **coerente com o papel de ponto de saturação** que ε = 1 passou a ter — não
+  contamina o primário, porque ε = 1 não está no primário.
+- **Filtro de validade: apenas `plato`.** A guarda `n_mortes ≠ 1` foi
+  **REMOVIDA** (17º parecer, forte 7): com o motor como está, a flag `morto` só
+  vira `True` uma vez, logo `n_mortes` nunca passa de 1 e a guarda **nunca podia
+  disparar** — era decorativa e dava falsa sensação de filtro. `n_mortes`
+  continua sendo GRAVADO em cada registro.
 - **IC por bootstrap de CLUSTER sobre instâncias** (reamostra a instância
-  inteira com seus 5 ε), B = 10000, semente 20270001. Comparações entre células
+  inteira com seus ε), B = 10000, semente 20270001. Comparações entre células
   usam bootstrap **pareado** (as células compartilham as mesmas instâncias).
 
 ## 3. Análise (congelada em `analise_hbarreira.py`)
 
-OLS empilhado de `y` sobre `ln(1/ε)`; `a` e `b` como acima. **Guarda de
-curvatura pré-registrada:** ajusta-se também `y = q·L² + a·L + b`; se
-`|q|·L²max > 1,0` (a curvatura desloca o ajuste em mais de 1 unidade de β·z ao
-longo da grade) **e** o IC95 de `q` excluir 0, a lei linear é declarada
-inadequada e o resultado primário vira **INCONCLUSIVO-CURVATURA**. Motivo de
-existir: o piloto ajustou 4 pontos incluindo ε=1, onde o Adam já está
-degenerando em GD; se a lei tem joelho, o `a` do ajuste linear é um artefato e
-não se deve declarar vitória nem derrota.
+**Tudo que este README decide existe em código congelado**, e o sintético
+exercita cada regra nos dois sentidos (17º parecer, blocker 5).
 
-Exclusão de células: `plato = False` ou `n_mortes ≠ 1`. A fração excluída é
-reportada por ε (e alimenta o P-NULL de instrumento).
+- **Primário:** OLS empilhado de `y` sobre `ln(1/ε)`, **grade primária** (sem
+  ε=1); `a`, `b`; IC por bootstrap de cluster. Janela [0,90; 1,10].
+- **Guarda de curvatura pré-registrada:** ajusta-se também `y = q·L² + a·L + b`;
+  se `|q|·L²max > CURV_TOL` **e** o IC95 de `q` excluir 0, a lei linear é
+  declarada inadequada e o primário vira **INCONCLUSIVO-CURVATURA**.
+  `CURV_TOL = 1,0` **agora vive no `CFG`** (cosmético 13), logo entra no sha256
+  do config — antes era uma constante solta no arquivo de análise, fora do hash.
+- **Diagnóstico** (§1): `d ln(lr)/dL`, `d ln(K)/dL`, `resto`, IC95 do resto,
+  `n_usado`, `n_trunc`, e a checagem numérica de que a identidade fecha.
+  Veredito `ESTIMAÇÃO-COM-ALERTA` ou `RESTO DENTRO DA TOLERANCIA`.
+- **Secundárias (i) e (ii):** sobre `y*`, com guardas de potência.
+- **Secundária (iii):** medianas por ε na grade EXECUTADA contra a mediana de GD.
+- **Estacionariedade por ε** é reportada junto do resultado real.
+- **Subcomando obrigatório** (forte 11): `python analise_hbarreira.py` sem
+  argumento, ou com argumento desconhecido, **ERRA** com código 1. Antes o
+  default era `sintetico` e o `else` caía em `real` — um typo (`rael`) viraria um
+  **peek** não declarado no dado do confirmatório.
 
-## 4. Custo (medido, não estimado no chute)
+Exclusão de células: `plato = False`. A fração excluída é reportada por ε (e
+alimenta o P-NULL de instrumento).
 
-Constantes medidas nesta máquina em 2026-07-26, **1 núcleo, `nice -19`**, na
-instância de referência, H = 8: Adam ε=1e−8 → **28,4 s**; Adam ε=1 → **9,0 s**;
-GD → **5,0 s** (o run para assim que release e os dois preditores dispararam).
+**Tabela de vereditos — uma linha por pergunta, sem dupla chance:**
+
+| pergunta | base | veredito possível |
+|---|---|---|
+| PRIMÁRIO H-BARREIRA | `y` bruto, grade primária | SUSTENTA / MATA / INCONCLUSIVO / INCONCLUSIVO-CURVATURA / INSTRUMENTO-NULL |
+| diagnóstico do resto | `y*`, within-instância | RESTO DENTRO DA TOLERANCIA / ESTIMAÇÃO-COM-ALERTA (nunca MATA) |
+| secundária (i) β | `y*` | INVARIANTE / NAO-INVARIANTE / SEM POTENCIA |
+| secundária (ii) β₂ | `y*` | MECANISMO-V SUSTENTADO / REFUTADO / SEM POTENCIA |
+| secundária (iii) saturação | grade executada + GD | SATURACAO COERENTE / SATURACAO VIOLADA |
+
+## 4. Custo (medido onde diz medido)
+
+Constantes desta máquina em 2026-07-26, **1 núcleo, `nice -19`**, na instância de
+referência, H = 8:
+
+| ε | s/run | origem |
+|---|---|---|
+| 1e−8 | 28,4 | **MEDIDO** |
+| 1e−6 | 26,0 | **INTERPOLADO** (declarado — 17º parecer, cosmético 14) |
+| 1e−4 | 22,0 | **INTERPOLADO** |
+| 1e−2 | 16,0 | **INTERPOLADO** |
+| 1    |  9,0 | **MEDIDO** |
+| GD   |  5,0 | **MEDIDO** |
+
+As três entradas intermediárias são interpolação a olho entre os dois extremos
+medidos, **não** cronometragens. Se o custo real divergir, vai para §9.
 Padding ×1,6 para H = 10, instâncias mais lentas que a de referência e a fração
 que trunca (paga o horizonte inteiro).
 
@@ -180,6 +342,8 @@ que trunca (paga o horizonte inteiro).
 
 Parede: **9,8 h** com Pool(3) · **7,4 h** com Pool(4) · **4,9 h** com Pool(6).
 Reproduzir: `python preditor_hbarreira.py custo`.
+**O custo não mudou com a emenda**: ε = 1 continua sendo rodado (como ponto de
+saturação); o que mudou foi só o que entra no ajuste primário.
 
 ## 5. Por que NÃO o fatorial cheio (justificativa escrita)
 
@@ -209,9 +373,13 @@ done
 nice -19 python analise_hbarreira.py sintetico  # TEM de passar antes de olhar o real
 nice -19 python analise_hbarreira.py real
 ```
-Estágios resumíveis (o ambiente reinicia processos de fundo); `run` faz *append*
-em `results/hbarreira_runs.jsonl` — reexecutar uma célula duplica linhas, então
-truncar antes de repetir.
+Estágios resumíveis (o ambiente reinicia processos de fundo). `run` e `gd` fazem
+*append* em `results/hbarreira_runs.jsonl` — e agora há **TRAVA
+ANTI-DUPLICAÇÃO** (17º parecer, cosmético 17): se o arquivo já contém linhas da
+mesma chave (célula, ε) ou de GD, o estágio **ABORTA** com mensagem. Antes o
+README pedia "truncar antes de repetir", que é um pedido de disciplina onde cabe
+uma trava. Se uma rodada anterior foi parcial ou inválida, as linhas têm de ser
+removidas EXPLICITAMENTE e o fato registrado em §9.
 
 ## 7. DISCLOSURES
 
@@ -223,50 +391,91 @@ truncar antes de repetir.
    do piloto. H-SIGN foi *refutada como mecanismo* e H-EPS foi confirmada
    exploratoriamente; nenhuma das duas é reciclada. Hipótese nova = experimento
    novo, com pré-registro novo — este arquivo.
-3. `a = 1` é predição a priori do mecanismo, **não** o valor ajustado do piloto
-   (0,94). A regra de decisão foi escrita como equivalência em [0,9; 1,1]
-   **antes** de qualquer dado novo, e o piloto está dentro dessa janela: isto é
-   assimétrico a favor de sustentar, e está declarado como tal. O que protege o
-   teste é o IC estreito (meia-largura ~0,01 com N=100): um `a` de 0,94 com IC
-   [0,935; 0,948] SUSTENTA a lei mas **não** é `a = 1` — o texto do resultado
-   terá de dizer as duas coisas.
+3. `a = 1` é a predição do mecanismo; `a ≈ 0,97` é a predição **derivada sob
+   este desenho** (§1), e é ela que está declarada como resultado esperado. A
+   regra de decisão [0,90; 1,10] foi escrita como equivalência **antes** de
+   qualquer dado novo, e o piloto (0,973 na grade sem ε=1) está dentro dessa
+   janela: **isto é assimétrico a favor de sustentar, e está declarado como
+   tal.** O que protege o teste é o IC estreito (meia-largura 0,0066): um `a` de
+   0,97 com IC [0,963; 0,977] SUSTENTA a lei mas **exclui** `a = 1` — o texto do
+   resultado terá de dizer as duas coisas.
 4. A calibração de lr usa uma instância que fica fora da análise, mas é a MESMA
    para as 100 — o lr não é ótimo por instância. Herança do piloto, declarada.
+   É também a origem do vazamento `d ln(lr)/dL` medido no diagnóstico.
 5. **Peek declarado (smoke, §8):** o smoke test rodou 1 instância (a de
    referência, EXCLUÍDA da análise) em 3 configurações. Ele mostrou
-   `b(0,9) − b(0,999) = −0,40` em ε=1e−8 — sinal oposto ao do argumento de
-   defasagem de §1(ii), com magnitude compatível com o ruído. **A predição de
-   §1(ii) não foi ajustada a esse ponto**; foi escrita como teste de
-   equivalência com tolerância ±2 derivada a priori (0,07), e o ponto do smoke
-   cai dentro dela. Registrado aqui para que ninguém descubra depois.
+   `b(0,9) − b(0,999) = −0,40` em ε=1e−8 — **sinal oposto** ao do argumento de
+   defasagem de §1(ii) e **magnitude 4× a predição `|Δb| < 0,1` do Apêndice
+   A.3.3**. Esta contradição está agora registrada onde importa: `|Δb| < 0,1`
+   é **predição-sob-teste com evidência contrária prévia**, e **não** é critério
+   de morte. O critério decisório continua sendo a equivalência ±2, derivada a
+   priori (0,07) e congelada. Registrado para que ninguém descubra depois.
 6. A regra de platô (§2) foi ajustada **depois** do smoke e **antes** de
-   qualquer dado do confirmatório: a primeira versão exigia sustentação por 0,5
-   também nas corridas com release, e reprovava ε=1 (bz_retorno = 0,545 contra
-   tolerância 0,5). O ajuste é uma correção de instrumento com justificativa
-   física (mínimo interior é garantido pelo release), não uma escolha guiada por
-   resultado.
+   qualquer dado do confirmatório. **DIREÇÃO DA MUDANÇA: ela AFROUXOU**
+   (17º parecer, forte 8). A primeira versão exigia sustentação por 0,5 também
+   nas corridas com release, e **reprovava ε=1** (`bz_retorno = 0,545` contra
+   tolerância 0,50); a versão vigente aceita release como prova de mínimo
+   interior, e portanto **admite ε=1**. Mudança de instrumento na direção de
+   incluir mais dados tem de ser declarada como tal — está. A justificativa
+   física (mínimo interior é garantido pelo release) continua valendo, e o custo
+   epistêmico foi pago duas vezes: (a) ε = 1 saiu do primário por outro motivo
+   (§1.1); (b) a estacionariedade voltou como diagnóstico reportado, e ε = 1
+   aparece explicitamente como **não-estacionário**.
+7. **Este pré-registro foi emendado pelo 17º parecer** (`parecer-17.md`) em
+   2026-07-27, **antes de qualquer execução** do confirmatório. As mudanças
+   estão listadas item a item no parecer e refletidas aqui e no código. O
+   config foi regerado (SHA novo, no cabeçalho) e o sintético foi rodado
+   inteiro depois da emenda (§8).
+8. O estimador within-instância do diagnóstico do resto (§1) foi escolhido
+   **depois** de o sintético mostrar que o OLS empilhado não tinha resolução
+   para o teste — e **antes** de qualquer dado real. É uma escolha de estimador
+   feita contra um mundo simulado, não contra o dado. Declarada.
 
-## 8. Smoke tests já rodados (só isto foi executado)
+## 8. Smoke tests e validação sintética (só isto foi executado)
 
-`python preditor_hbarreira.py smoke` — 3 trajetórias, 1 processo, 2,4 min.
-Verifica que o motor roda, que o critério de platô dispara e que o config é
-determinístico. **Não** é o experimento. Resultado da 1ª passada (ver disclosure
-5 e 6) e da 2ª (com a regra de platô corrigida) está em `results/`.
+- `python preditor_hbarreira.py smoke` — 3 trajetórias, 1 processo, ~1–2 min.
+  Verifica que o motor roda, que o critério de platô dispara e que o config é
+  determinístico. **Não** é o experimento. Resultado da 1ª passada (ver
+  disclosures 5 e 6), da 2ª (regra de platô corrigida) e da 3ª (pós-emenda, com
+  o campo `estacionario`) estão em `results/`. A 3ª passada confirma
+  `estac=False` em ε=1 (`bz_ret = 0,545`) e `estac=True` nos dois ε=1e−8.
+- `python analise_hbarreira.py sintetico` — **TUDO PASSA** (pós-emenda), com os
+  mundos novos:
+  - mundo `a = 1` → SUSTENTA; mundo `a = 0,97` (a predição declarada) → SUSTENTA;
+  - `a = 0,7`, `a = 1,4`, SEM LEI → MATA; ruído grande com n = 6 → INCONCLUSIVO;
+  - **mundo com CURVATURA REAL `q = 0,005`** (efeito 1,71) →
+    INCONCLUSIVO-CURVATURA — a guarda **pode** disparar;
+  - **mundo do JOELHO** (curvatura só em ε=1, o mundo do desenho velho) →
+    SUSTENTA, `|q|L²max = 0,057`; **contraprova impressa pelo próprio teste:**
+    na grade VELHA o mesmo mundo daria `a = +1,133` e `|q|L²max = 6,96`
+    (**DISPARARIA**). É a demonstração de que a grade nova resolve o artefato;
+  - diagnóstico do resto nos dois sentidos: mundo sem resto → dentro da
+    tolerância; mundo com `resto = −0,018` (o do piloto) → **ESTIMAÇÃO-COM-
+    ALERTA** (`IC95 = [−0,026; −0,011]`); mundo com `+0,05` → ALERTA;
+  - guardas de potência das secundárias (i) e (ii) → SEM POTÊNCIA quando o IC é
+    largo (antes, a (i) diria INVARIANTE);
+  - **confound de `lr` removido pela grade descontada:** duas células com
+    vazamentos diferentes dão `Δa = −0,301` sobre `y` bruto (NÃO-INVARIANTE,
+    falso positivo) e `Δa = +0,007` sobre `y*` (INVARIANTE, correto);
+  - secundária (iii) nos dois sentidos e P-NULL de instrumento.
 
 ## 9. Desvios (preencher DEPOIS da execução)
 
-_(vazio — nada foi executado além dos smoke tests de §8)_
+_(vazio — nada foi executado além dos smoke tests e do sintético de §8)_
 
 ---
 
 # Apêndice A — Derivação de `a = 1`
 
-Escrito 2026-07-26, **antes** do parecer e **antes** de qualquer execução do
+Escrito 2026-07-26, **antes** do 17º parecer e **antes** de qualquer execução do
 confirmatório. Verificação reexecutável: `derivacao_a1.py`
 (`algebra` = SymPy · `crossover` = re-execução instrumentada da instância de
 referência do **piloto** · `ajuste` = reajuste do `results/e7_runs.jsonl` do
 **piloto**). Nada aqui usa dado do confirmatório — ele não existe. A instância
 usada é a de referência, que já está **excluída** da análise (§7.1).
+
+**§A.5 foi reescrita pela emenda** (era a proposta do primário′, negada). O
+resto do apêndice está como foi escrito.
 
 ## A.1 A conta
 
@@ -332,7 +541,8 @@ sequer nesse nível: um passo desloca `y_park` em ρ ≈ 7e−5.
 - Se o portão fosse **`v̂ ~ ε`** (ler o denominador como `v̂+ε`), então
   `g² ~ ε` ⟹ `y = ½·ln(1/ε)`: **`a = 1/2`**. As duas leituras diferem por um
   **fator 2** na inclinação e são trivialmente distinguíveis. O piloto dá 0,94 —
-  `a = 1/2` está **excluído** (não é uma disputa de casas decimais).
+  `a = 1/2` está **excluído** (não é uma disputa de casas decimais). Corolário
+  registrado: `a = 1/2` é morta por qualquer `a > 0,75`.
 - Se o limiar for `√v̂ = θ·ε` para **qualquer** constante `θ` (θ=1, θ=2 do
   `√v̂+ε = 2ε`, ou o `θ ≈ 2e−4` que de fato se mede), isso muda `b` por `ln θ`
   e **não muda `a`**. `a = 1` é **invariante à convenção de limiar** — é o que dá
@@ -358,9 +568,9 @@ com `y ≥ y_park − 1`):
    **certa como estrutura**: o que a lei `a=1` exige é apenas que
    `|g|_park ∝ ε`, e é isso que se mede (θ constante a ±9% entre ε=1e−8 e
    ε=1e−2, oito décadas). O `ln θ` mora em `b`. **Esta correção não altera
-   nenhum critério de morte pré-registrado** — `a=1` e a regra [0,9;1,1] são
+   nenhum critério de morte pré-registrado** — `a=1` e a regra [0,90; 1,10] são
    exatamente as mesmas —, mas o texto da história física precisa dizer
-   `|g| ∝ ε`, não `|g| ≈ ε`.
+   `|g| ∝ ε`, não `|g| ≈ ε`. (§1 já foi corrigida nesse sentido.)
 2. **θ é identificado.** A EDO prevê `θ = 1/(A·K_morto) = 1/(β·lr·c·K_morto)`.
    Medido/predito = **1,42 · 1,49 · 1,38 · 1,19** (ε = 1e−8 … 1). A razão é
    constante a ±12% **através do joelho de ε=1** — a *estrutura* está
@@ -368,9 +578,12 @@ com `y ≥ y_park − 1`):
 3. **κ = 1,00 em todo ε ⟹ β₂ NÃO entra em `b`.** A justificativa de §1(ii)
    (defasagem de τ₂ passos, Δb ≈ 0,07) chega ao mesmo veredito de equivalência
    por um caminho diferente; a derivação é mais forte: κ entra em (★) apenas
-   pelo termo `κ·y/(A·K)` ≈ 3e−3. **Predição derivada: `|Δb(β₂)| < 0,1`**, dez
-   vezes mais apertada que a tolerância ±2 pré-registrada. (Mantém-se a regra
-   frozen de ±2; esta é uma predição adicional, mais exigente, registrada aqui.)
+   pelo termo `κ·y/(A·K)` ≈ 3e−3. **Predição derivada: `|Δb(β₂)| < 0,1`.**
+   > **RESSALVA OBRIGATÓRIA (17º parecer, blocker 6):** o smoke test **já
+   > contradiz esta predição** — deu `Δb = −0,40`, quatro vezes a tolerância
+   > (≈2σ pareado, 1 instância). Portanto `|Δb| < 0,1` **NÃO é critério de
+   > morte**: é **predição-sob-teste com evidência contrária prévia declarada**.
+   > O critério decisório é e continua sendo a equivalência ±2 congelada.
 
 ## A.4 O que realmente produz o `0,94` do piloto — e o risco para o confirmatório
 
@@ -397,25 +610,29 @@ cai pela metade. Consequência, tudo derivado e depois verificado:
 
 | ajuste | `a` | `q` (curvatura) | `\|q\|·L²max` |
 |---|---|---|---|
-| y bruto, 4 ε | **0,941** | +0,0050 | **1,697 → a guarda de §3 DISPARA** |
-| y bruto, ε ≤ 1e−2 | 0,973 | −0,0002 | 0,075 (ok) |
-| **y* = y − ln(lr·K_morto), 4 ε** | **0,9985** | — | — |
+| y bruto, 4 ε **incluindo ε=1** | **0,941** | +0,0050 | **1,697 → a guarda DISPARARIA** |
+| **y bruto, ε ≤ 1e−2 (a GRADE PRIMÁRIA nova)** | **0,973** | −0,0002 | **0,075 (não dispara)** |
+| y* = y − ln(lr·K_morto), 4 ε | 0,9985 | — | — |
 | y*, ε ≤ 1e−2 | 0,982 | — | — |
 
 > **Descontado o vazamento de projeto, `a = 0,9985` sobre as quatro décadas
 > inteiras, joelho incluído.** O joelho de ε=1 **não é curvatura da lei
 > física**: é `lr(ε)` e `K_morto(ε)`.
 
-**AVISO OPERACIONAL (é o achado que mais importa para o parecer).** O
-confirmatório usa a mesma grade com ε=1 e a mesma recalibração de `lr`. A
-derivação prediz, portanto, que ele deve produzir `a ≈ 0,93–0,95` **e** disparar
-a própria guarda de curvatura de §3 (`|q|L²max ≈ 1,7 > 1,0`), caindo em
-**INCONCLUSIVO-CURVATURA** — não por a lei ser falsa, mas por um artefato de
-desenho que agora está derivado e é corrigível.
+**Este era o achado operacional decisivo** e foi o que motivou a emenda: o
+desenho original produziria `a ≈ 0,94` **e** dispararia a própria guarda de
+curvatura por artefato. **A emenda o resolve tirando ε=1 do ajuste primário**
+(§1.1), não tirando o vazamento por baixo do pano: na grade primária nova o
+vazamento residual é `d ln(lr·K)/dL = −0,009`, a predição vira `a ≈ 0,97`, e a
+guarda não dispara (0,075). O que sobra do `y*` é o **diagnóstico do resto**
+(§1) — que é onde a informação de fato mora.
 
-## A.5 A janela: [0,9; 1,1] é folgada, apertada ou certa?
+## A.5 Orçamento de erro, e a janela que foi ABANDONADA
 
-Orçamento de erro **derivado**, para a grade do confirmatório:
+**[Esta seção foi reescrita pela emenda do 17º parecer. A proposta original —
+um "PRIMÁRIO′" sobre `y*` com janela [0,95; 1,05] — foi NEGADA. Ver §1.1–1.2.]**
+
+Orçamento de erro derivado, para a **grade primária** (sem ε=1):
 
 | fonte | efeito em `a` | conta |
 |---|---|---|
@@ -423,39 +640,24 @@ Orçamento de erro **derivado**, para a grade do confirmatório:
 | discretização (dt) | −1e−4 | um passo = ρ ≈ 7e−5 em `y` |
 | camada de sticking / memória de v̂ (`ln κ`) | 0 | **κ = 1,00 medido** |
 | deriva de `C(ε)` (|R| na parada) | ±0,02 | resíduo A.4 (0,982 vs 1) |
-| **vazamento `d ln(lr·K)/dL`, grade sem ε=1** | −0,009 | medido |
-| **vazamento `d ln(lr·K)/dL`, grade COM ε=1** | **−0,06** | 0,9985 → 0,941 |
-| estatística (N=100, 5 ε, bootstrap de cluster) | ±0,01 | §1 |
+| **vazamento `d ln(lr·K)/dL`, grade primária** | −0,009 | medido |
+| _(vazamento na grade COM ε=1, para comparação)_ | _−0,06_ | _0,9985 → 0,941_ |
+| estatística (N=100, 4 ε, bootstrap de cluster) | ±0,0066 | sintético, §8 |
 
-**Veredito.**
+**Duas conclusões, e uma autocrítica.**
 
-- **Sobre `y` bruto na grade completa (o teste primário como está congelado):**
-  a janela [0,9; 1,1] está **CERTA em largura mas descentrada e certa pelo
-  motivo errado**. O centro derivado não é 1,00, é **0,94**; a janela só
-  funciona porque é larga o bastante para absorver o vazamento. E ela é
-  **assimétrica sem necessidade**: **todo** termo do orçamento é negativo — a
-  derivação não admite `a > 1,00 + 0,01`. Um `a = 1,08` "sustentaria" a lei pela
-  regra atual sendo, pela derivação, tão anômalo quanto `a = 0,7`.
-- **Sobre `y* = y − ln(lr·K_morto)` (o teste com poder):** o orçamento total é
-  ±0,03 e a janela **derivada** é **[0,95; 1,05]**.
-
-**Janela proposta (emenda a adjudicar ANTES de rodar — não aplicada
-unilateralmente):**
-
-```
-  PRIMÁRIO (mantido, frozen): a sobre y bruto, janela [0,90; 1,10].
-     Reinterpretação registrada: o valor derivado sob ESTE desenho é 0,94,
-     não 1,00. Sustentar aqui é fraco.
-  PRIMÁRIO', pré-registrado agora: a sobre y* = y − ln(lr·K_morto),
-     janela DERIVADA [0,95; 1,05], e a guarda de curvatura §3 aplicada a y*.
-     MATA: IC95(a*) disjunto de [0,95; 1,05].
-  Corolário: a leitura a = 1/2 é MORTA por qualquer a > 0,75 nas duas versões.
-```
-
-Justificativa de a emenda ser legítima: (i) é escrita antes de qualquer execução
-do confirmatório; (ii) `lr` e `K_morto` são **variáveis de desenho registradas e
-medidas**, não graus de liberdade de ajuste — `y*` não tem parâmetro livre novo;
-(iii) a regra antiga **não é removida**, é mantida e reportada em paralelo.
+1. O centro derivado sob **a grade primária** é **≈ 0,97**, e a janela congelada
+   [0,90; 1,10] o contém com folga dos dois lados. Ela é **larga** para o poder
+   que o experimento tem (IC de ±0,0066) — e isso está declarado como
+   assimetria a favor de sustentar (disclosure §7.3). A compensação é que o
+   texto do resultado é **obrigado** a reportar o IC e a dizer se `a = 1` foi
+   ou não excluído: "SUSTENTA" sozinho não é reporte aceitável.
+2. **A janela [0,95; 1,05] foi ABANDONADA e a lição registrada.** Ela foi
+   apresentada como "derivada", mas o orçamento que a produziu usava a mesma
+   linha `y*, 4 ε → 0,9985` que ela iria julgar: um orçamento **calibrado no
+   dado que ele deveria testar**. É auto-cumprimento, e o fato de a conta
+   "fechar" não é evidência — é circularidade. A janela vigente é a original,
+   escrita antes de qualquer orçamento.
 
 ## A.6 Etiquetas
 
@@ -467,6 +669,8 @@ medidas**, não graus de liberdade de ajuste — `y*` não tem parâmetro livre 
 - `[NÃO VERIFICADO]` — que `c = |x_face|+1` seja exatamente o coeficiente
   geométrico (a razão medida é 1,2–1,5, não 1,0); nada depende disso, pois `c`
   vive só em `b`.
+- `[ESPECULAÇÃO]` — a física do **resto inexplicado** (§1). Se ele aparecer
+  acima de 0,01 no confirmatório, é achado a investigar, não explicação pronta.
 - **Fora de escopo:** tudo isto é sobre a instância de referência (1 instância) e
   as 13 instâncias EXPLORATÓRIAS do piloto. A derivação é geral; a **verificação
   numérica não é** — ela mostra que a conta descreve o piloto, não que descreve

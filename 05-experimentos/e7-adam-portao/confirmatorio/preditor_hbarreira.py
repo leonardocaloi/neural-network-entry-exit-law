@@ -40,8 +40,16 @@ SWEEPDIR = os.path.join(RAIZ, "t2-sweep-instancias")
 CFG = dict(
     tag="e7-confirmatorio-hbarreira",
     data_pre_registro="2026-07-26",
-    # --- grade de eps: 5 pontos (>= 4 do piloto), 2 decadas de espacamento
+    # --- grade de eps EXECUTADA: 5 pontos, 2 decadas de espacamento
     EPS_GRID=[1e-8, 1e-6, 1e-4, 1e-2, 1.0],
+    # --- grade PRIMARIA (17o parecer, adjudicacao (c) restrita): eps=1 NAO
+    #     entra no ajuste primario. Em eps=1 o Adam ja degenera em GD (a fase
+    #     VIVA ja esta no regime linear), a recalibracao de lr salta x8.9 e o
+    #     "joelho" resultante e VAZAMENTO DE PROJETO, nao curvatura da lei.
+    #     eps=1 e o GD continuam RODADOS e reportados -- como PONTOS DE
+    #     SATURACAO da secundaria (iii), nunca no primario.
+    EPS_PRIMARIO=[1e-8, 1e-6, 1e-4, 1e-2],
+    EPS_SATURACAO=[1.0],
     # --- celulas: uma ANCORA + dois bracos de um-fator-por-vez (ver README §5)
     #     (o fatorial cheio 2 beta x 3 b2 nao alimenta nenhuma hipotese
     #      pre-registrada: a interacao beta x b2 nao foi predita por ninguem)
@@ -74,8 +82,17 @@ CFG = dict(
     # --- criterios de decisao (repetidos em analise_hbarreira.py; fonte unica aqui)
     A_LO=0.9, A_HI=1.1,     # H-BARREIRA: MATA se IC95(a) for disjunto de [0.9,1.1]
     BOOT=10000, BOOT_SEED=20270001,
-    DB2_TOL=2.0,            # secundaria (ii): |b(0.9)-b(0.999)| predito << 2 (ver README §4)
+    CURV_TOL=1.0,           # guarda de curvatura: |q|*Lmax^2 acima disto (com IC95(q)
+                            # excluindo 0) => INCONCLUSIVO-CURVATURA. (17o parecer,
+                            # cosmetico 13: dentro do CFG, logo dentro do sha256.)
+    RESTO_TOL=0.01,         # diagnostico: |resto inexplicado| acima disto com IC
+                            # excluindo 0 => ESTIMACAO-COM-ALERTA (NAO mata)
+    DA_TOL=0.1,             # secundaria (i): tolerancia de equivalencia em delta_a
+    DA_POT=0.1,             # se a meia-largura do IC95(delta_a) > isto => SEM POTENCIA
+    DB2_TOL=2.0,            # secundaria (ii): |b(0.9)-b(0.999)| predito << 2 (ver README §1)
     DB2_POT=1.0,            # se a meia-largura do IC95(delta_b) > 1, o teste nao tem potencia
+    DB2_PREV=0.1,           # predicao-sob-teste do Apendice A.3.3 (NAO decisoria; o
+                            # smoke ja deu 0.40, evidencia contraria previa)
     MIN_CELULAS_VALIDAS=0.60,   # < 60% de celulas com plato => P-NULL de instrumento
 )
 LRF = os.path.join(RES, "lr_calibrado.json")
@@ -179,15 +196,27 @@ def roda(X, Y, PA0, PB0, beta, opt="adam", lr=None, eps=None, b2=None,
         if guardar and k % CFG["REC"] == 0:
             ser.append((t, z0, R, aR, aS, rat))
     # ---- criterio de PLATO, em pos-processamento da serie subamostrada de z
-    plato, bz_ret = False, None
+    # Duas coisas DISTINTAS (17o parecer, forte 9):
+    #   `estacionario` : verificacao de platO, calculada SEMPRE (inclusive nos
+    #                    runs COM release), = o minimo se sustentou por PLATO_DT
+    #                    dentro de PLATO_TOL/beta. E DIAGNOSTICO, reportado por eps.
+    #   `plato`        : validade de z_park para a analise = houve release (minimo
+    #                    interior por construcao) OU estacionario (truncado que ja
+    #                    parou). NAO exige estacionaridade de quem teve release.
+    # Se eps=1 falhar `estacionario`, ele e REPORTADO como nao-estacionario --
+    # coerente com o papel de ponto de SATURACAO que ele tem (nao entra no primario).
+    plato, bz_ret, plato_dur = False, None, None
     if t_park is not None and serz:
         sz = np.array(serz)
         jan = sz[(sz[:, 0] >= t_park) & (sz[:, 0] <= t_park + CFG["PLATO_DT"])]
-        dur = (sz[-1, 0] - t_park)
-        if dur >= CFG["PLATO_DT"] and len(jan):
+        plato_dur = float(sz[-1, 0] - t_park)
+        if len(jan):
             bz_ret = float(b * (jan[:, 1].max() - zpark))
-        plato = bool(t_rel is not None or (bz_ret is not None
-                                           and bz_ret <= CFG["PLATO_TOL"]))
+        estac = bool(plato_dur >= CFG["PLATO_DT"] and bz_ret is not None
+                     and bz_ret <= CFG["PLATO_TOL"])
+        plato = bool(t_rel is not None or estac)
+    else:
+        estac = False
     out = dict(t_hit=t_hit, t_release=t_rel, n_mortes=n_mortes, t_zeroR=t_z0,
                t_pred_area=t_pa, t_pred_sign=t_ps,
                aR_rel=float(aR_rel), aS_rel=float(aS_rel),
@@ -196,6 +225,7 @@ def roda(X, Y, PA0, PB0, beta, opt="adam", lr=None, eps=None, b2=None,
                frac_S=float(abs(aS_rel / amS)) if amS < 0 else None,
                zA_park=float(zpark), bz_park=float(zpark * b),
                t_park=t_park, plato=plato, bz_retorno=bz_ret,
+               estacionario=estac, plato_dur=plato_dur,
                truncado=bool(t_rel is None),
                rat_med=float(np.median(rats)) if rats else None)
     if guardar:
@@ -291,8 +321,27 @@ def _uma_gd(arg):
                 b2=None, eps=None, lr=None, opt="gd", **r)
 
 
+def _ja_rodou(pred):
+    """TRAVA ANTI-DUPLICACAO (17o parecer, cosmetico 17). `run` faz append; a
+    versao anterior confiava em 'truncar antes de repetir'. Agora ABORTA."""
+    if not os.path.exists(RUNS):
+        return 0
+    n = 0
+    with open(RUNS) as fh:
+        for l in fh:
+            if l.strip() and pred(json.loads(l)):
+                n += 1
+    return n
+
+
 def estagio_run(nome_cel, eps, nproc=4):
     cel = [c for c in CFG["CELULAS"] if c["nome"] == nome_cel][0]
+    n = _ja_rodou(lambda r: r.get("celula") == nome_cel and r.get("eps") == eps)
+    if n:
+        raise SystemExit(
+            f"ABORTA: {RUNS} ja tem {n} linhas de celula={nome_cel} eps={eps:.0e}. "
+            f"Reexecutar duplicaria. Se a rodada anterior foi parcial/invalida, "
+            f"remova essas linhas EXPLICITAMENTE e registre em README §9 (desvios).")
     lr = json.load(open(LRF))["lr"][chave(cel["beta"], cel["b2"], eps)]
     ins = le_instancias()
     with Pool(nproc) as pool:
@@ -301,11 +350,19 @@ def estagio_run(nome_cel, eps, nproc=4):
         for r in regs:
             fh.write(json.dumps(r) + "\n")
     ok = [r for r in regs if r["plato"]]
+    est = [r for r in regs if r["estacionario"]]
+    tru = [r for r in regs if r["truncado"]]
     print(f"{nome_cel} eps={eps:.0e}: {len(ok)}/{len(regs)} com plato, "
-          f"mediana bz_park={np.median([r['bz_park'] for r in ok]):.2f}")
+          f"{len(est)}/{len(regs)} estacionarios, {len(tru)} truncados, "
+          f"mediana bz_park={np.median([r['bz_park'] for r in ok]):.2f}"
+          + ("   [PAPEL: saturacao da secundaria (iii), fora do primario]"
+             if eps in CFG["EPS_SATURACAO"] else ""))
 
 
 def estagio_gd(nproc=4):
+    n = _ja_rodou(lambda r: r.get("opt") == "gd")
+    if n:
+        raise SystemExit(f"ABORTA: {RUNS} ja tem {n} linhas de GD. Reexecutar duplicaria.")
     ins = le_instancias()
     betas = sorted({c["beta"] for c in CFG["CELULAS"]})
     with Pool(nproc) as pool:
@@ -322,6 +379,12 @@ def estagio_gd(nproc=4):
 # Constantes MEDIDAS em 2026-07-26 nesta maquina (1 nucleo, nice -19, H=8,
 # instancia de referencia): Adam eps=1e-8 -> 28.4 s; Adam eps=1 -> 9.0 s;
 # GD -> 5.0 s. O run para assim que release E os dois preditores dispararam.
+# 17o parecer, cosmetico 14: DECLARADO quais entradas sao medidas e quais nao.
+#   MEDIDAS      : eps=1e-8 (28.4) e eps=1 (9.0), mais o GD (5.0).
+#   INTERPOLADAS : eps=1e-6, 1e-4, 1e-2 -- as TRES sao interpolacao a olho
+#                  entre os dois extremos medidos, NAO cronometragens. Se o
+#                  custo real divergir, vai para README §9 (desvios).
+CUSTO_MEDIDO = {1e-8, 1.0}
 CUSTO_S = {1e-8: 28.4, 1e-6: 26.0, 1e-4: 22.0, 1e-2: 16.0, 1.0: 9.0}
 CUSTO_GD = 5.0
 PAD = 1.6   # padding: H 8->10, instancias mais lentas que a de referencia,
@@ -348,6 +411,10 @@ def estagio_custo():
     print(f"{'TOTAL (core-hora, com padding %.1fx)'%PAD:45s} {soma/3600:8.2f}")
     for np_ in (3, 4, 6):
         print(f"  Pool({np_}), nice -19  ->  {soma/3600/np_:5.1f} h de parede")
+    print("\n  entradas de custo por eps (s/run, 1 nucleo, H=8):")
+    for e in CFG["EPS_GRID"]:
+        print(f"    eps={e:.0e}: {CUSTO_S[e]:5.1f} s  "
+              f"{'MEDIDO' if e in CUSTO_MEDIDO else 'INTERPOLADO (declarado)'}")
     print(f"\nFatorial CHEIO (2 beta x 3 b2 x 5 eps x {n}) seria "
           f"{6*sum(CUSTO_S[e] for e in CFG['EPS_GRID'])*n*PAD/3600:.1f} core-h "
           f"na grade Adam; o desenho um-fator-por-vez usa "
@@ -367,7 +434,8 @@ def estagio_smoke():
                  opt="adam", lr=lr, eps=eps, b2=b2)
         print(f"beta={beta:.0e} b2={b2} eps={eps:.0e}: t_hit={r['t_hit']:.4f} "
               f"t_rel={r['t_release']} bz_park={r['bz_park']:.2f} "
-              f"plato={r['plato']} bz_ret={r['bz_retorno']} trunc={r['truncado']}")
+              f"plato={r['plato']} estac={r['estacionario']} "
+              f"bz_ret={r['bz_retorno']} dur={r['plato_dur']} trunc={r['truncado']}")
     print(f"[smoke] {(time.time()-t0)/60:.1f} min")
 
 

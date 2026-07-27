@@ -1,0 +1,30 @@
+OK  mundo a=1 (mecanismo verdadeiro)                     -> SUSTENTA                 a=+0.994 IC95=(0.987, 1.0) |q|Lmax^2=0.185 (esperado SUSTENTA)
+      meia-largura IC95(a) = 0.0066
+      diag: a=+0.9935 = 1 -0.0059(lr) -0.0020(K) +0.0015(resto)  identidade fecha em 2.2e-16
+      diag: RESTO DENTRO DA TOLERANCIA  IC95(resto)=(-0.0055, 0.0084)  n=366 truncados_excluidos=34
+      sec(i)  INVARIANTE  delta_a=+0.001
+      sec(ii) MECANISMO-V SUSTENTADO  b={0.9: 6.189562972682732, 0.99: 6.172197506008364, 0.999: 6.0927124124694965}
+      sec(iii)SATURACAO COERENTE  prof_gd=5.02
+OK  mundo a=0.97 (predicao derivada do desenho)          -> SUSTENTA                 a=+0.967 IC95=(0.959, 0.976) |q|Lmax^2=0.449 (esperado SUSTENTA)
+OK  mundo a=0.7 (mecanismo falso)                        -> MATA                     a=+0.690 IC95=(0.683, 0.697) |q|Lmax^2=0.319 (esperado MATA)
+OK  mundo a=1.4                                          -> MATA                     a=+1.392 IC95=(1.384, 1.399) |q|Lmax^2=0.078 (esperado MATA)
+OK  mundo SEM LEI (z_park nao depende de eps)            -> MATA                     a=-0.005 IC95=(-0.012, 0.002) |q|Lmax^2=0.420 (esperado MATA)
+OK  mundo a=0.85, ruido grande, n=6 (indeciso)           -> INCONCLUSIVO             a=+1.140 IC95=(-0.801, 3.256) |q|Lmax^2=38.873 (esperado INCONCLUSIVO)
+OK  mundo com CURVATURA REAL q=0.005 (efeito 1.7)        -> INCONCLUSIVO-CURVATURA   a=+1.107 IC95=(1.1, 1.114) |q|Lmax^2=1.712 (esperado INCONCLUSIVO-CURVATURA)
+OK  mundo do JOELHO (so eps=1 deslocado; grade nova exclui) -> SUSTENTA                 a=+0.997 IC95=(0.989, 1.005) |q|Lmax^2=0.057 (esperado SUSTENTA)
+      contraprova: na grade VELHA (com eps=1) o MESMO mundo daria a=+1.133 e |q|Lmax^2=6.959 (DISPARARIA)
+OK  diag: mundo SEM resto (a = 1 + vazamentos)           -> RESTO DENTRO DA TOLERANCIA resto=+0.0016 IC95=(-0.0072, 0.0104) (esperado RESTO DENTRO DA TOLERANCIA)
+OK  diag: mundo COM resto -0.018 (o do piloto)           -> ESTIMACAO-COM-ALERTA     resto=-0.0189 IC95=(-0.0264, -0.0114) (esperado ESTIMACAO-COM-ALERTA)
+OK  diag: mundo COM resto +0.05                          -> ESTIMACAO-COM-ALERTA     resto=+0.0517 IC95=(0.0441, 0.0594) (esperado ESTIMACAO-COM-ALERTA)
+OK  sec(ii) mundo com b2 IRRELEVANTE (mecanismo eps)     -> MECANISMO-V SUSTENTADO   IC95(db)=(-0.27, 0.59) (esperado MECANISMO-V SUSTENTADO)
+OK  sec(ii) mundo com b2 DOMINANTE (mecanismo v)         -> MECANISMO-V REFUTADO     IC95(db)=(7.66, 8.52) (esperado MECANISMO-V REFUTADO)
+OK  sec(ii) guarda de POTENCIA (ruido grande, n=6)       -> SEM POTENCIA
+OK  sec(i) beta INVARIANTE                               -> INVARIANTE               delta_a=+0.001 (esperado INVARIANTE)
+OK  sec(i) beta NAO-INVARIANTE                           -> NAO-INVARIANTE           delta_a=+0.351 (esperado NAO-INVARIANTE)
+OK  sec(i) guarda de POTENCIA (ruido grande, n=6)        -> SEM POTENCIA  meia-largura=1.209
+OK  sec(i) confound de lr removido pela grade descontada -> INVARIANTE               delta_a=+0.007 (y bruto daria -0.301)
+OK  sec(iii) Adam mais fundo que GD                      -> SATURACAO COERENTE       (esperado SATURACAO COERENTE)
+OK  sec(iii) GD mais fundo que Adam                      -> SATURACAO VIOLADA        (esperado SATURACAO VIOLADA)
+OK  controle P-NULL de instrumento                       -> INSTRUMENTO-NULL
+
+SINTETICO: TUDO PASSA
