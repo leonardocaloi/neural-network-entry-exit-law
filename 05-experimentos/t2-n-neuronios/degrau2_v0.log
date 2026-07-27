@@ -1,0 +1,35 @@
+[v0=0.5] peneira: 30 candidatas de 500 em 0.7 min
+[v0=0.5] pronto em 5.8 min
+[v0=2.0] peneira: 30 candidatas de 500 em 6.3 min
+[v0=2.0] pronto em 10.3 min
+
+=== TESTE DISCRIMINANTE v_0, m=4, beta=1e+04, 10.3 min ===
+
+--- v0(0) = 0.5: 22/30 passaram ---
+      7  beta-run sem release no horizonte
+      1  morte antes de t_min (fora da janela)
+  v0_hit: min 0.499999 | mediana 0.500000 | max 0.500000   (|v0_hit-v0(0)| max = 1.196e-06)
+  err_naive: mediana 104.89% | p90 116.72% | max 194.64%
+  err_corr: mediana 5.80% | p90 16.70% | max 47.32%
+  VEREDITO PAREADO: err_corr < err_naive em 22/22 instancias; razao mediana err_corr/err_naive = 0.0519
+  T_ep         min 0.03425 | mediana 0.06694 | max 0.3513
+  L_B          min 2.356 | mediana 3.968 | max 6.023
+  Lambda_ck    min 2.356 | mediana 3.968 | max 6.023
+  gronwall     min 1.118 | mediana 1.264 | max 2.288
+  R_exit       min 0.0631 | mediana 0.1086 | max 0.2001
+  v_min_live   min 0.01456 | mediana 0.1065 | max 0.2713
+
+--- v0(0) = 2.0: 26/30 passaram ---
+      4  beta-run sem release no horizonte
+  v0_hit: min 1.999996 | mediana 2.000000 | max 2.000000   (|v0_hit-v0(0)| max = 3.595e-06)
+  err_naive: mediana 50.43% | p90 51.31% | max 51.65%
+  err_corr: mediana 2.19% | p90 15.29% | max 37.72%
+  VEREDITO PAREADO: err_corr < err_naive em 25/26 instancias; razao mediana err_corr/err_naive = 0.0429
+  T_ep         min 0.01447 | mediana 0.05942 | max 0.2316
+  L_B          min 3.301 | mediana 4.665 | max 7.07
+  Lambda_ck    min 3.301 | mediana 4.665 | max 7.07
+  gronwall     min 1.076 | mediana 1.324 | max 2.873
+  R_exit       min 0.03081 | mediana 0.1122 | max 0.169
+  v_min_live   min 0.00498 | mediana 0.106 | max 0.2986
+
+jsonl: /home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios/degrau2_v0.jsonl
