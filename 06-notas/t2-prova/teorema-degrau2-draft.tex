@@ -1,5 +1,7 @@
 % teorema-degrau2-draft.tex -- PROVA do TEOREMA DEGRAU 2 (readout treinavel).
-% [DRAFT -- aguarda 17o parecer].  NAO e o paper.  Fonte da verdade numerica:
+% [TEOREMA -- promovido no 18o parecer (2 rodadas), 2026-07-27]. Status: (H6') sobre v_0
+% como hipotese, verificavel a posteriori; (P1)-(P10) abertos declarados; beta_0 herda
+% e^{X_max C_res H} para todas as clausulas.  NAO e o paper.  Fonte da verdade numerica:
 %   06-notas/2026-07-27-degrau2-scoping.md
 %   05-experimentos/t2-n-neuronios/degrau2_readout.{py,jsonl}   (v_0(0)=1)
 %   05-experimentos/t2-n-neuronios/degrau2_v0.{py,jsonl}        (v_0(0) in {0.5,2})
@@ -43,9 +45,9 @@
 \newcommand{\hyplabel}[1]{\textup{(#1)}}
 
 \title{The Degrau~2 theorem: the entry--exit law with a \emph{trainable} readout\\
-\large [DRAFT --- awaiting the 17th referee report]}
+\large [THEOREM --- promoted at the 18th referee report (two rounds), 2026-07-27]}
 \author{j-space internal note}
-\date{2026-07-28}
+\date{2026-07-27}
 
 \begin{document}
 \maketitle
@@ -198,7 +200,7 @@ $v'=cv_0R^{\hyb}(\texit)$, the constant $C_4$ and the coefficient
 So a live readout may vanish, or change sign, without any step of
 L1$''$--L6$''$ failing: the live block simply loses a direction of its own
 Gauss--Newton part, which is a PSD term we only ever discard. See
-\cref{sec:open}\,(C6).
+\cref{sec:open}\,(P10).
 \end{remark}
 
 \begin{remark}[\hyplabel{H6$'$} is what Algorithm~1 already enforces]
@@ -826,7 +828,7 @@ still $O(\sqrt m)$ for both readout scalings. \emph{Unchanged in order.}
 \lesssim\sqrt m\,\varphi_v^{-2}e^{\Xmax\Cres\Tep}$. Compare \cite{paper}:
 $M_2\lesssim\sqrt m$; and \cite[L2]{paper}, the two-neuron form:
 $\sqrt m\,e^{\Theta(mH)}$. \textbf{The trainable readout costs one exponential
-whose exponent does not grow with $m$; the $m\cdot H$ restriction does not come
+whose exponent admits a bound free of the width (the realized exponent is not yet measured, (P7)); the $m\cdot H$ restriction does not come
 back.} This is the whole content of \cref{lem:curv} at the level of constants.
 \item[(U5)] The live-unit term \eqref{eq:Brate}, third group, is unchanged:
 $C_5\sqrt m\,\Cres e^{-\beta\delta_B}$, affecting $\beta_1$ logarithmically and
@@ -891,7 +893,7 @@ the initialization of \cite{paper}, which has $B_0(0)<0$, so we \emph{measure}
 $\varphi_v$ rather than construct it.
 \item[(P4)] \textbf{Saturation of \cref{lem:curv} is unexplained.} See
 \cref{rem:sat}. The inequality is proved; the observed equality is not.
-\item[(C6)] \textbf{$v_0=0$ is a genuine singularity; $v_k=0$ is not.} The
+\item[(P10)] \textbf{$v_0=0$ is a genuine singularity; $v_k=0$ is not.} The
 coefficient \eqref{eq:release} blows up as $v_0(\thit)\to0$, and this is not an
 artefact of the estimate: at $v_0=0$ the dead unit is functionally absent, the
 margin equation \eqref{eq:margin} has $\dot z\equiv0$ to leading order, and
@@ -959,7 +961,7 @@ and read 2026-07-27.
 done, the rigorous proof needs the L4$''$ bootstrap.
 \Cref{thm:d2} as a whole: \emph{[SPECULATION]} --- proof sketch at lemma
 granularity, no step audited by a referee.
-Numbers of \cref{sec:num}: \emph{[RESULT 2026-07-28]}.
+Numbers of \cref{sec:num}: \emph{[RESULT 2026-07-27]}.
 Saturation of \cref{lem:curv} on trajectories: \emph{[SPECULATION]} for the
 mechanism, \emph{[RESULT]} for the measurement.
 
