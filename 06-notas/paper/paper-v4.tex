@@ -40,6 +40,9 @@
 \newaliascnt{proposition}{theorem}
 \newtheorem{proposition}[proposition]{Proposition}
 \aliascntresetthe{proposition}
+\newaliascnt{corollary}{theorem}
+\newtheorem{corollary}[corollary]{Corollary}
+\aliascntresetthe{corollary}
 \theoremstyle{definition}
 \newaliascnt{definition}{theorem}
 \newtheorem{definition}[definition]{Definition}
@@ -183,8 +186,8 @@ case: one dead unit, one live unit, one active datum at a time, a \emph{fixed}
 readout and a one-dimensional input. \Cref{thm:forcing} removes the second of
 those restrictions --- the live side may be any affine subsystem of any order
 $m$ --- and in doing so it changes the status of the transfer from the proved
-object to the measured one, which in the previous version of this paper was
-simply empirical. The honest statement is now a gradation in three levels, and
+object to the measured one, which a statement about two neurons alone would
+leave simply empirical. The honest statement is a gradation in three levels, and
 we keep the levels separate throughout.
 
 \begin{enumerate}
@@ -201,7 +204,11 @@ window of \eqref{H4p} is identified. Both checks are one hybrid integration
 (\cref{sec:forcing-numerics}); neither is guaranteed a priori by any
 initialization criterion we know: in our sweeps the acceptance rate is about
 $3\%$ of random draws in the NTK-readout family and about $20\%$ ($179/900$) in
-the unit-readout family.
+the unit-readout family.\footnote{Four acceptance rates appear in this paper
+and each is a property of its own prior and screen, not of the hypotheses:
+$9.5\%$ ($57/600$) for the two-neuron sweep of \cref{sec:sweep}, $26\%$
+conditional on a death inside the detector window, and the $3\%$/$20\%$
+per-family rates of the $m$-sweep. They are not comparable to one another.}
 \item[(P3)] \textbf{Empirical.} A trainable readout $v_k$, which is what the
 experiments of \cref{sec:experiments} use and what takes the live field outside
 the gradient-of-a-convex-function class; several data active at once; and the
@@ -900,7 +907,8 @@ and we say what each does and does not establish.
 \eqref{H1p}--\eqref{H4p} --- $23$ at $m=4$, $21$ at $m=8$, $22$ at $m=16$ --- against a
 $57$-instance two-neuron baseline, at $\beta=10^4$, explicit Euler with
 $dt_0=10^{-5}$ on the hybrid and $dt=2\cdot10^{-6}$ on the coupled flow,
-$H=1.8$. No free parameter is fitted: the predicted coefficients span
+$H=1.8$ (the campaign horizon, distinct from the $H=1.7$ of the reference
+instance). No free parameter is fitted: the predicted coefficients span
 $[-109,-14]$, a factor of $7.6$, the measured ones $[-132,-14]$, with
 $R^2=0.950$ against the unfitted law, and an OLS slope of $1.154$
 ($R^2=0.968$). Median relative errors are
@@ -930,8 +938,12 @@ $\approx20\%$ at $m=4$). Here
 $\lambda_{\max}(G_B)$ grows with $m$ and the published constant
 $e^{L_BH}C_fC_4/c$ would be exponential. The law survives, with the same
 qualitative degradation pattern; under the PSD constant \eqref{eq:M2F} this is
-expected, under $e^{L_BH}C_fC_4/c$ it would not be. This is the empirical case
-for \cref{lem:gronwallF} being the right estimate.
+expected, under $e^{L_BH}C_fC_4/c$ it would not be. Across the joint sample
+$\lambda_{\max}(G_B)$ spans $1.4$ to $56.1$, so $e^{L_BH}$ varies by $42$
+orders of magnitude while the measured error is flat in it ($t=-0.47$) and
+tracks only $1/R^{\hyb}(\texit)$ ($t=7.44$): no estimate carrying that factor
+can be the operative one. This is the empirical case for \cref{lem:gronwallF}
+being the right estimate.
 
 \emph{(4) The $\beta$ sweep on the worst instances.} The six worst $m=8$
 instances of item~(1), with errors $11.9$--$20.5\%$ at $\beta=10^4$, were rerun
@@ -1048,8 +1060,7 @@ stays at $\theta_A(\thit)$ on all of $[\thit,H]$. By \cref{def:hybrid} and
 $\dot z(\texit^+)=cR^{\hyb}(\texit)>0$, so $z>0$ immediately after $\texit$.
 \end{proof}
 
-\begin{proposition}[the bridge to an MLP of the affine class, as a
-corollary]\label{cor:mlp}
+\begin{corollary}[the bridge to an MLP of the affine class]\label{cor:mlp}
 Let a one-hidden-layer network with $m+1$ units, \emph{fixed} readout and a
 one-dimensional input be trained by gradient flow on $[0,H]$, and let $A$ be one
 of its units. Suppose that on a window $W\subseteq[0,H]$ containing the death
@@ -1061,7 +1072,7 @@ reference computed with $\theta_A$ frozen satisfies \eqref{H1p}--\eqref{H2p} and
 $\beta\ge\beta_0=O(m)$ the unit is released at
 $\texit-1/(c\beta R^{\hyb}(\texit))+o(\beta^{-1})$, where $\texit$ is the first
 zero of the area of the residual excluding $A$.
-\end{proposition}
+\end{corollary}
 
 \begin{proof}
 The hypotheses of the proposition are \eqref{H0p}--\eqref{H5p} with \eqref{H4p} read as the
@@ -1071,10 +1082,10 @@ of order $m$ in the sense of \cref{sec:forcing}, with $G_B$ the Gram
 \eqref{eq:gramF}. Apply \cref{thm:forcing}.
 \end{proof}
 
-The content of \cref{cor:mlp} is that it is not an analogy. In the previous
-version of this paper the passage from the theorem to the MLP measurements of
-\cref{sec:experiments} was declared empirical without qualification; with
-\cref{thm:forcing} it splits into the three levels (P1)--(P3) of
+The content of \cref{cor:mlp} is that it is not an analogy. Without
+\cref{thm:forcing} the passage from the theorem to the MLP measurements of
+\cref{sec:experiments} could only be declared empirical without qualification;
+with it, the passage splits into the three levels (P1)--(P3) of
 \cref{sec:intro}. For an MLP of the affine class --- readout held fixed --- the
 law is deduced, conditionally on hypotheses that are checked a posteriori by one
 hybrid integration and not assumed: \eqref{H1p}--\eqref{H2p} on the hybrid trajectory
@@ -1752,7 +1763,13 @@ monotone-sigmoid class.
 We derived an entry--exit law for the death and resurrection of a smoothed unit,
 verified each of its constants on a two-neuron instance, and tested the release
 law over a sweep of 600 drawn instances, where it holds on all 57 that satisfy
-the hypotheses, with a median relative error of $2.7\%$. We measured the law
+the hypotheses, with a median relative error of $2.7\%$. The law belongs to the
+forcing: \cref{thm:forcing} extends it to any live subsystem of the affine
+class with $m$ units, with constants uniform to $O(\sqrt m)$ and
+$\beta_0=O(m)$ (\cref{prop:beta0}), verified over $66+23+67$ further
+instances; this converts the bridge to an MLP of the class from analogy into
+a corollary under a-posteriori-verifiable hypotheses (\cref{cor:mlp}), with
+the trainable readout remaining the empirical level (P3). We measured the law
 in a small MLP under a pre-registered protocol: resurrection occurs, the residual
 area opens before the return in 13 of 16 cases, hard ReLU gives a structural
 zero, and the return probability is monotone in the activation stiffness. In a
