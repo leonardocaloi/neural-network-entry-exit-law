@@ -56,14 +56,16 @@ assumes the live subsystem $B$ is \emph{affine of order $m$}: frozen activation
 pattern \emph{and fixed readouts}. Open item (O6) of that paper asks what
 survives when the readouts $v_k$ are trained too. This note answers: everything
 survives, at the price of \textbf{one} new elementary lemma
-(\cref{lem:curv}) and \textbf{one} new hypothesis \hyplabel{H6$'$}, and with the
+(\cref{lem:curv}) and \textbf{one} new hypothesis \hyplabel{H6$'$} --- a guard
+on the \emph{dead} unit's readout alone, no live readout being constrained
+(\cref{rem:H6only0}) --- and with the
 first-order coefficient acquiring an explicit and \emph{measurable} factor,
 $-1/\bigl(c\,v_0(\thit)\,R^{\hyb}(\texit)\bigr)$. The new lemma says that the
 negative curvature of the loss over the live block is bounded by
 $\Lambda=\max_k\|c_k\|=\max_k\|\nabla_{(w_k,b_k)}L\|/|v_k|\le\Xmax\Cres$: a
 \emph{maximum over blocks}, hence independent of $m$. This corrects (O6), which
 predicts a Gr\"onwall factor $e^{L_B\Tep}$ with $L_B=\lambda_{\max}(G_B)\sim m$;
-the correct exponent does not grow with the width. We prove the lemma
+the correct exponent admits a bound free of the width. We prove the lemma
 (verified symbolically in SymPy and numerically on $2\cdot10^4$ random points),
 rewrite L2$'$ as L2$''$, and settle the coefficient by a \emph{discriminating}
 numerical experiment with $v_0(0)\in\{0.5,2.0\}$ that the scoping note left
@@ -71,7 +73,8 @@ undone --- the previous campaign had $v_0(0)=1$ and was a null of instrument.
 The experiment is decisive and it decides \emph{for} the corrected law. We are
 explicit about what the exponential factor costs and, in particular, correct the
 scoping note on where it enters: clause~(ivB) pays a \emph{horizon} factor, not
-an episode factor.
+an episode factor, and the threshold $\beta_0$ inherits that horizon factor for
+\emph{every} clause even though the statements of (i)--(iii) do not.
 \end{abstract}
 
 \tableofcontents
@@ -167,32 +170,66 @@ $\{\theta_B^{\hyb}+s\Delta:s\in[0,1]\}$, exactly as \cite{paper} already states
 them (``along both trajectories in the tube''). We add one hypothesis.
 
 \begin{itemize}
-\item[\hyplabel{H6$'$}] \textbf{Readout guard.} There is $\varphi_v>0$ with
+\item[\hyplabel{H6$'$}] \textbf{Guard on the dead unit's readout.} There is
+$\varphi_v>0$ with
 \[
-\min_{0\le k\le m}\ \min_{t\in[0,H]}\ |v_k(t)|\ \ge\ \varphi_v>0,
+\min_{t\in[0,H]}\ \bigl|v_0(t)\bigr|\ \ge\ \varphi_v>0,
 \]
-and no $v_k$ changes sign on $[0,H]$, along both trajectories and on the tube.
+and $v_0$ does not change sign on $[0,H]$, along both trajectories and on the
+tube. \textbf{Nothing is assumed about the live readouts $v_1,\dots,v_m$.}
 \end{itemize}
+
+\begin{remark}[why the guard is needed on $v_0$ only]\label{rem:H6only0}
+The natural first draft of \hyplabel{H6$'$} asks $\min_{0\le k\le
+m}\min_t|v_k|\ge\varphi_v$. That is stronger than anything the proof consumes,
+and we weaken it deliberately. Audit of every place a readout appears:
+\begin{itemize}
+\item $\Lambda$ of \cref{lem:curv} is $\max_k\|c_k\|$ with
+$c_k=\frac1n\sum_i\res_i\mathbf1_{k,i}(x_i,1)$: \emph{it does not mention $v_k$
+at all}, and the bound used, $\Lambda\le\Xmax\Cres$, is free of readouts. The
+identity $\Lambda=\max_k\|\nabla_{(w_k,b_k)}U\|/|v_k|$ is a \emph{reading}, not
+a step (\cref{rem:readings}).
+\item $C_f$, $\|G_{BA}\|$, $C_5$ are \emph{upper} bounds on readout norms
+(\cref{sec:unif}, U3, U-new). Upper bounds do not need a floor.
+\item the arrival speed $v=c|v_0||R^{\hyb}(\thit)|$, the exit speed
+$v'=cv_0R^{\hyb}(\texit)$, the constant $C_4$ and the coefficient
+\eqref{eq:release} involve $v_0$ and \emph{only} $v_0$.
+\end{itemize}
+So a live readout may vanish, or change sign, without any step of
+L1$''$--L6$''$ failing: the live block simply loses a direction of its own
+Gauss--Newton part, which is a PSD term we only ever discard. See
+\cref{sec:open}\,(C6).
+\end{remark}
 
 \begin{remark}[\hyplabel{H6$'$} is what Algorithm~1 already enforces]
 \hyplabel{H6$'$} is not a new demand on the experimenter: the acceptance filter
 of \texttt{degrau2\_readout.py} (the trainable-readout descendant of
 Algorithm~1 of \cite{paper}) rejects, instance by instance, any run in which
-some $v_k$ crosses zero inside the window, on \emph{either} the hybrid or the
-$\beta$-run; $\varphi_v$ is then read off as $\min_k\min_t|v_k|$ over the
-accepted trajectory. So \hyplabel{H6$'$} is checkable a posteriori by the same
+\emph{some} readout crosses zero inside the window, on \emph{either} the hybrid
+or the $\beta$-run; that filter is \emph{stricter} than \hyplabel{H6$'$} as now
+stated, so the accepted instances satisfy it a fortiori, and $\varphi_v$ is read
+off as $\min_t|v_0|$ over the accepted trajectory. So \hyplabel{H6$'$} is checkable a posteriori by the same
 single integration that checks \hyplabel{H1$'$}--\hyplabel{H2$'$}, which is the
 standard this paper holds all its hypotheses to.
 
-It is \emph{not}, in the initialization family used here, an automatic
-condition. Under ReLU gradient flow each unit conserves exactly
+Under ReLU gradient flow each unit conserves exactly
 $B_k=v_k^2-\|(w_k,b_k)\|^2$ (Du--Hu--Lee balancedness, \cite{duhulee}), so
-$B_k(0)>0$ would give $|v_k(t)|\ge\sqrt{B_k(0)}$ for all $t$ and make
-\hyplabel{H6$'$} a condition on the \emph{initialization}. The NTK-scaled
-initialization of \cite{paper} has $B_k(0)<0$ in $100\%$ of live units
-(measured range $[-134,-0.32]$), so the corollary is vacuous there and
-\hyplabel{H6$'$} is a genuine hypothesis. We record this as an open route, not
-as a result: see \cref{sec:open}\,(P3).
+$B_k(0)>0$ gives $|v_k(t)|\ge\sqrt{B_k(0)}$ for all $t$ and makes the guard a
+condition on the \emph{initialization}.
+
+\textbf{Corollary of the reduction to $k=0$.} Because \hyplabel{H6$'$} now
+concerns one unit, the balancedness route needs
+\[
+B_0(0)=v_0(0)^2-\|(w_0,b_0)(0)\|^2>0
+\]
+for the \emph{dead unit alone}, and then $\varphi_v=\sqrt{B_0(0)}$. That is a
+condition on \emph{one} triple, imposable by construction --- e.g.\ by the
+balanced rescaling $(v_0,w_0,b_0)\mapsto(sv_0,w_0/s,b_0/s)$, which does not
+change $f$ --- whereas the $m+1$-unit version competed with \hyplabel{H4$'$} on
+every live unit and failed (\cref{sec:open}\,(P3)). The campaigns here still use
+the initialization of \cite{paper}, which has $B_0(0)<0$, so we \emph{measure}
+$\varphi_v$ rather than construct it; but the route from hypothesis to
+construction is now a one-unit problem, and that is the substantive gain.
 \end{remark}
 
 %======================================================================
@@ -292,6 +329,17 @@ spectrum of $S$ is the \emph{union} of the block spectra and the extreme
 eigenvalue is a \emph{maximum over $m$ numbers}, each of which is bounded
 independently of $m$.
 
+\emph{A precision the referee insisted on.} What is $m$-free is the
+\textbf{bound} $\Lambda\le\Xmax\Cres$, which is what every estimate below uses.
+The \emph{realized} $\Lambda$ along a trajectory is an empirical quantity and
+could in principle drift with $m$ through the residuals. A pilot (accepted
+hybrid instances, coarse $dt=2\cdot10^{-4}$, script \path{parecer18_m2.py})
+finds median $\Lambda=5.03,\,5.70,\,5.18$ at $m=4,8,16$ against
+$\lambda_{\max}(G_B)=10.2,\,18.7,\,37.7$ --- the latter plainly linear in $m$,
+the former flat. $N$ is $4$, $4$ and $1$ at the three levels after filtering, so
+this is \emph{indicative and nothing more}; the proper sweep is
+\cref{sec:open}\,(P7).
+
 \smallskip
 \emph{Step 4 (Weyl).} By Weyl's inequality applied to \eqref{eq:GNsplit},
 \[
@@ -331,6 +379,13 @@ different objects: $\lambda_{\max}(G_B)$ grows like $m$ (it is a sum of $n$ rank
 terms whose norms add over units), whereas $\Lambda$ is a maximum over blocks and
 does not. As stated, (O6) is more pessimistic than the mathematics requires,
 and \cref{lem:curv} is the correction.
+
+\emph{Notation, to keep the two apart.} We reserve $L_B$ for
+$\lambda_{\max}(G_B)$, the paper's object, and write
+$\Lambda_{\rm meas}:=\max\bigl(0,-\lambda_{\min}(\nabla^2U)\bigr)$ for the
+quantity the experiments measure and that \cref{lem:curv} bounds by $\Lambda$.
+Using one symbol for both --- as an earlier draft of this note did --- makes the
+present remark unreadable, since its entire content is that they differ.
 \end{remark}
 
 \begin{remark}[executable verification]\label{rem:verif}
@@ -353,12 +408,18 @@ $10^{-10}$ --- i.e.\ \emph{saturated} --- in $22.9\%$ of points (step~4).
 \begin{remark}[saturation is observed, not proved]\label{rem:sat}
 On the actual trajectories of \cref{sec:num}, \eqref{eq:curv} holds with
 \emph{equality to machine precision}: over the $43$ instances of the
-$v_0(0)=1$ campaign, $\max|L_B-\Lambda|=4.4\cdot10^{-15}$ (relative
-$9\cdot10^{-16}$), where $L_B=\max(0,-\lambda_{\min}(\nabla^2U))$ is measured by
-exact eigenvalues of the $12\times12$ Hessian. A plausible mechanism is that
-$\mathrm{rank}(J^\top J)\le n<3m$ and the negative eigenvector of the binding
-block falls in the kernel of the Gauss--Newton part, closing Weyl. That is
-\emph{not} automatic from the rank deficit: the random-point test of
+$v_0(0)=1$ campaign, $\max|\Lambda_{\rm meas}-\Lambda|=4.4\cdot10^{-15}$
+(relative $9\cdot10^{-16}$), where
+$\Lambda_{\rm meas}:=\max(0,-\lambda_{\min}(\nabla^2U))$ is measured by
+exact eigenvalues of the $12\times12$ Hessian. The sharp form of the mechanism,
+as the referee put it: Weyl closes with equality exactly when the
+\emph{minimizing eigenvector of $S$ is also a null vector of the Gauss--Newton
+part}. By step~3 of \cref{lem:curv} that eigenvector is explicit --- inside the
+binding block $k^\ast=\arg\max_k\|c_k\|$ it is $(e_{c_{k^\ast}}-e_3)/\sqrt2$,
+and it is zero on every other block. Since
+$\mathrm{rank}(\tfrac1nJ^\top J)\le n<3m$ (here $4<12$), the Gauss--Newton
+kernel has dimension $\ge3m-n=8$; the claim is that this \emph{particular}
+vector lands in it. That is \emph{not} automatic from the rank deficit: the random-point test of
 \cref{rem:verif}\,(C) has the same deficit and saturates only $23\%$ of the
 time. \textbf{What is a theorem is the inequality \eqref{eq:curv}; the equality
 is an empirical fact about this family.} [SPECULATION for the mechanism.]
@@ -372,18 +433,26 @@ Assume \hyplabel{H4$'$}, \hyplabel{H5$'$}, \hyplabel{H6$'$} and, on $[\thit,s]$,
 the layer bound $\int_{\thit}^{s}c\,v_0\log(1+w)\,dt\le2C_4\log\beta/\beta$
 supplied by the bootstrap L4$''$. Put
 \begin{equation}\label{eq:Lamsup}
-\Lambda_{\rm ep}:=\sup_{t\in[\thit,\trel]}\ \sup_{s\in[0,1]}
-\Lambda\bigl(\theta_B^{\hyb}(t)+s\Delta(t)\bigr)\ \le\ \Xmax\Cres .
+\Lambda_{\rm ep}:=\sup_{t\in[\thit,\,s]}\ \sup_{\sigma\in[0,1]}
+\Lambda\bigl(\theta_B^{\hyb}(t)+\sigma\Delta(t)\bigr)\ \le\ \Xmax\Cres ,
 \end{equation}
-Then
+the supremum being taken over the \emph{same} interval $[\thit,s]$ on which the
+bootstrap hypothesis is assumed, not over a fixed $[\thit,\trel]$; the induction
+of L4$''$ closes on $s$ and the two must match. Then
 \begin{multline}\label{eq:Brate}
-\sup_{[0,s]}\rho
-\ \le\ e^{\Lambda_{\rm ep}\Tep}\bigl(1+O(\beta^{-1})\bigr)
-\Bigl[\underbrace{\frac{C_fC_4}{c\,|v_0|}\cdot\frac{2\log\beta}{\beta^2}}_{\text{episode}}
-+\underbrace{O(\beta^{-2})\,e^{\Lambda_{\rm pre}\thit}}_{\text{pre-hit}}\\
+\sup_{[\thit,s]}\rho
+\ \le\ e^{\Lambda_{\rm ep}(s-\thit)}
+\Bigl[\underbrace{\rho(\thit)}_{\text{initial datum}}
++\underbrace{\frac{C_fC_4}{c\,|v_0|}\cdot\frac{2\log\beta}{\beta^2}}_{\text{episode}}\\
 {}+\underbrace{H\bigl(C_3e^{-\beta\delta_1}+C_5\sqrt m\,\Cres e^{-\beta\delta_B}\bigr)}_{\text{beyond all orders}}\Bigr],
+\qquad
+\rho(\thit)\le O(\beta^{-2})\,e^{\Lambda_{\rm pre}\thit},
 \end{multline}
-so $\sup\rho=O(\log\beta/\beta^2)$ with
+so that on $[\thit,\trel]$, where $s-\thit=\Tep+O(\beta^{-1})$, the prefactor is
+$e^{\Lambda_{\rm ep}\Tep}(1+O(\beta^{-1}))$ and the pre-hit factor
+$e^{\Lambda_{\rm pre}\thit}$ sits \emph{inside} the bracket --- the two
+\textbf{compose}; they are not two independent readings of one factor ---
+and $\sup\rho=O(\log\beta/\beta^2)$ with
 $M_2^{\,\prime\prime}=e^{\Lambda_{\rm ep}\Tep}\,C_fC_4/(c\,|v_0|)$, and
 consequently $R^\beta=R^{\hyb}+\delta$ with
 $\|\delta\|_\infty\le\LipR\sup\rho+m\beta^{-1}e^{-\beta\delta_B}$.
@@ -504,9 +573,18 @@ $[\trel,H]$, length $H-\trel$ & $M_3$, clause (ivB) & $e^{\Lambda_{\rm post}(H-\
 \bottomrule
 \end{tabular}
 \end{center}
-Only the first is an episode factor. Clause~(ivB) \emph{does} need the factor,
-and it needs a \emph{horizon} one; a worst-case reading of all three is
-$e^{\Xmax\Cres H}$. Two honest mitigations, neither of which we claim as a
+Only the first is an episode factor, and the first two \emph{compose}: the
+pre-hit factor multiplies the initial datum \emph{inside} the bracket that the
+episode factor then scales (\eqref{eq:Brate}); they are not two alternative
+readings of one factor. Clause~(ivB) \emph{does} need the factor, and it needs a
+\emph{horizon} one; a worst-case reading of all three is $e^{\Xmax\Cres H}$.
+\textbf{And the threshold inherits the worst of them for every clause.} It is
+tempting to say ``clauses (i)--(iii) only pay $e^{\Lambda\Tep}$'', and that is
+true of the constants \emph{displayed in their statements}; but $\beta_0$ is one
+number, the maximum over the five rows of \cite[Tab.~5]{paper}, and one of those
+rows is fed by clause~(ivB). So the \emph{statements} of (i)--(iii) are
+episode-clean while the \emph{threshold above which they hold} is not. We
+separate the two rather than round in our favour. Two honest mitigations, neither of which we claim as a
 theorem. First, the sharp form of \eqref{eq:gronwall} carries
 $\exp\bigl(\int\Lambda(u)\,du\bigr)$, and by the fine reading of
 \cref{rem:readings} $\Lambda\le\|\nabla U\|/\varphi_v$ decays along a converging
@@ -594,23 +672,35 @@ is itself unchanged (\cref{rem:L5}). Clause~(i) reads
 $u=c\,v_0(\thit)\beta|\Ar^{\hyb}(t)|(1+o(1))$.
 
 \smallskip\noindent
-\textbf{(b) Three constants gain one exponential each, on three different
-intervals.}
+\textbf{(b) The constants gain exponentials, on three intervals of three
+different lengths, and a power of the guard.}
 \[
-M_2\ \mapsto\ e^{\Lambda_{\rm ep}\Tep}\,\frac{M_2}{|v_0(\thit)|},
-\qquad
-\rho(\thit)\ \mapsto\ e^{\Lambda_{\rm pre}\thit}\,\rho(\thit),
+M_2\ \mapsto\ M_2^{\,\prime\prime}=e^{\Lambda_{\rm ep}\Tep}\,\frac{C_fC_4}{c\,|v_0(\thit)|},
 \qquad
 M_3\ \mapsto\ e^{\Lambda_{\rm post}(H-\trel)}\,M_3 ,
 \]
-and $\beta_0$ inherits the largest of them together with a factor
-$\varphi_v^{-1}$ from the speeds $v,v'$ (\cref{sec:unif}).
+the pre-hit datum $\rho(\thit)$ acquiring $e^{\Lambda_{\rm pre}\thit}$
+\emph{inside} the bracket that $e^{\Lambda_{\rm ep}\Tep}$ then multiplies
+(\cref{eq:Brate}: the two pre-hit factors \emph{compose}, they are not
+alternatives). The dependence on the guard is
+\[
+M_2^{\,\prime\prime}\ \lesssim\ \varphi_v^{-2}\,e^{\Lambda_{\rm ep}\Tep}\,M_2 ,
+\]
+\textbf{a second power, not a first}: one factor $|v_0|^{-1}$ is displayed, and
+a second is hidden inside $C_4$, whose first term is
+$2/\bigl(c|v_0|\min(|R^{\hyb}(\thit)|,R^{\hyb}(\texit))\bigr)$ (\cref{sec:unif},
+U2 and U4). Finally $\beta_0$ \textbf{inherits the largest of the three
+exponentials}, namely the horizon one $e^{\Xmax\Cres H}$, together with a power
+$\varphi_v^{-p}$, $p\le3$ --- and it does so \emph{for every clause}, including
+(i)--(iii), because $\beta_0$ is a single threshold defined as the max over the
+five rows of \cite[Tab.~5]{paper} and one of those rows is fed by
+clause~(ivB).
 
 \smallskip
-In particular \textbf{$\Lambda$ does not depend on $m$}, so
-$\beta_0\lesssim O(m)\cdot e^{\Xmax\Cres H}$ at fixed forcing and
+In particular \textbf{the exponent $\Lambda$ admits a bound free of $m$}, so
+$\beta_0\lesssim O(m)\cdot\varphi_v^{-p}\,e^{\Xmax\Cres H}$ at fixed forcing and
 \cite[Prop.~7]{paper} (polynomial threshold in $m$) survives at fixed
-$\Lambda$, $\Tep$, $H$, $\varphi_v$.
+$\Xmax$, $\Cres$, $\Tep$, $H$, $\varphi_v$.
 \end{theorem}
 
 \begin{proof}
@@ -749,9 +839,13 @@ L3$''$, the exit speed $v'$ of L6$''$ and $C_A$, and $C_4$ via (U2). It does
 $\beta_0\lesssim O(m)\,\varphi_v^{-p}e^{\Xmax\Cres H}$ for a small integer $p$
 ($p\le3$ by inspection of the five rows of \cite[Tab.~5]{paper}); we do not
 multiply the rows out, for the reason given in (O1) of \cite{paper}.
-\item[(U7)] \textbf{The horizon.} Per \cref{rem:honest}, the worst of the three
-exponentials is $e^{\Lambda_{\rm post}(H-\trel)}$ in $M_3$, i.e.\ clause~(ivB)
-only. Clauses (i)--(iii) and (ivA) carry only $e^{\Lambda_{\rm ep}\Tep}$.
+\item[(U7)] \textbf{The horizon, and what $\beta_0$ inherits.} The worst of the
+three exponentials is $e^{\Lambda_{\rm post}(H-\trel)}$ in $M_3$: it is
+clause~(ivB) that carries a horizon factor, and the constants displayed in
+clauses (i)--(iii) and (ivA) carry only $e^{\Lambda_{\rm ep}\Tep}$, with the
+pre-hit factor composed inside. \textbf{But $\beta_0$ is a single threshold and
+inherits $e^{\Xmax\Cres H}$ for all clauses alike} (\cref{rem:honest}): the
+statements are episode-clean, the threshold is not.
 \end{itemize}
 
 %======================================================================
@@ -775,25 +869,78 @@ $\beta_0(\text{forcing})$ of Degrau~1 rather than a failure of the law rests on
 the sign of a correlation, not on a collapse under a $\beta$-sweep. The
 $\beta$-sweep on the worst instances is the cheapest next test and it is not
 done.
-\item[(P3)] \textbf{The balancedness route to \hyplabel{H6$'$} is open.} Under
-ReLU gradient flow $B_k=v_k^2-\|(w_k,b_k)\|^2$ is exactly conserved
-\cite{duhulee}; under softplus the defect is beyond all orders inside
-\hyplabel{H4$'$} (measured $2.8\cdot10^{-5}$, $1.7\cdot10^{-7}$, $\sim10^{-13}$
-at $\beta=10,10^2,10^3$). If $B_k(0)>0$ then \hyplabel{H6$'$} is automatic with
-$\varphi_v=\min_k\sqrt{B_k(0)}$. The initialization of \cite{paper} has
-$B_k(0)<0$ everywhere, so this is not available here; the balanced rescaling
-$(v,w,b)\mapsto(sv,w/s,b/s)$, which does not change $f$, removes $100\%$ of the
-observed sign crossings ($0/150$ against $19/300$) but breaks \hyplabel{H4$'$}
-by shrinking the margins. Writing a joint initialization that satisfies both is
-open, and would upgrade \hyplabel{H6$'$} from hypothesis to construction.
+\item[(P3)] \textbf{The balancedness route to \hyplabel{H6$'$} is open, but it
+is now a \emph{one-unit} problem.} Under ReLU gradient flow
+$B_k=v_k^2-\|(w_k,b_k)\|^2$ is exactly conserved \cite{duhulee}; under softplus
+the defect is beyond all orders inside \hyplabel{H4$'$} (measured
+$2.8\cdot10^{-5}$, $1.7\cdot10^{-7}$, $\sim10^{-13}$ at
+$\beta=10,10^2,10^3$). With \hyplabel{H6$'$} reduced to the dead unit
+(\cref{rem:H6only0}) the sufficient condition is $B_0(0)>0$, on \emph{one}
+triple, giving $\varphi_v=\sqrt{B_0(0)}$.
+
+This is a genuine simplification of the obstruction. In the $m+1$-unit version
+the balanced rescaling $(v,w,b)\mapsto(sv,w/s,b/s)$ --- which does not change
+$f$ --- removes $100\%$ of observed sign crossings ($0/150$ against $19/300$)
+but breaks \hyplabel{H4$'$} by shrinking the live margins, and there is a
+genuine competition. Applied to unit $0$ \emph{alone}, the rescaling touches no
+live margin at all; the only constraint it must respect is that $A$'s own
+margins still satisfy the $\delta_1$ clause of \hyplabel{H4$'$} and that $A$
+still dies in the window. Whether a rescaling factor $s$ exists that meets both
+has \textbf{not} been checked, numerically or otherwise. The campaigns here use
+the initialization of \cite{paper}, which has $B_0(0)<0$, so we \emph{measure}
+$\varphi_v$ rather than construct it.
 \item[(P4)] \textbf{Saturation of \cref{lem:curv} is unexplained.} See
 \cref{rem:sat}. The inequality is proved; the observed equality is not.
+\item[(C6)] \textbf{$v_0=0$ is a genuine singularity; $v_k=0$ is not.} The
+coefficient \eqref{eq:release} blows up as $v_0(\thit)\to0$, and this is not an
+artefact of the estimate: at $v_0=0$ the dead unit is functionally absent, the
+margin equation \eqref{eq:margin} has $\dot z\equiv0$ to leading order, and
+there is no release to predict. The degradation is graceful and of exactly the
+same species as (O1) of \cite{paper} --- a forcing-side quantity in a
+denominator, with no lower bound available from any initialization criterion.
+A \emph{live} readout crossing zero, by contrast, is innocuous
+(\cref{rem:H6only0}): no step consumes a lower bound on $v_k$, $k\ge1$. The
+acceptance filter of the campaigns rejects both, which is stricter than
+necessary and costs sample size, not validity.
 \item[(P5)] \textbf{The averaged-Hessian bound is taken on the tube.} $\Lambda_{\rm ep}$
 in \eqref{eq:Lamsup} is a supremum over the segment between the two
 trajectories, and is therefore bounded through \hyplabel{H5$'$}-on-the-tube.
 Since $\|\Delta\|=O(\log\beta/\beta^2)$, the tube is thin and the distinction is
 immaterial in practice; but the bootstrap that makes it rigorous is the same
 continuity argument as in \cite[L4$'$]{paper} and we have not rewritten it.
+\item[(P7)] \textbf{The $m$-sweep of $\Lambda$ is a pilot, not a measurement.}
+The claim that survives proof is that the \emph{bound} $\Xmax\Cres$ is $m$-free;
+the claim that the \emph{realized} $\Lambda$ is flat in $m$ rests on $N=4,4,1$
+instances at $m=4,8,16$ (\cref{sec:lema}). The design that would settle it, and
+which we have not run: $N\approx20$ accepted instances per level,
+$m\in\{4,8,16,32\}$, same drawing family and the fine $dt$, reporting the median
+and the interquartile range of $\Lambda$ and of $\lambda_{\max}(G_B)$ per level,
+with the pre-registered prediction that the first is flat and the second linear.
+Note that $m=32$ needs a $96\times96$ Hessian per sample and a coarser
+\texttt{HESS\_EVERY}; cost is a few CPU-hours at two workers.
+\item[(P8)] \textbf{We measure $\Lambda$, not the quantity the estimate
+actually needs.} Step~3 of \cref{lem:L2} uses the Rayleigh quotient of the
+averaged Hessian \emph{along the realized $\Delta$},
+\[
+q(t)\ :=\ -\frac{\Delta^\top\bar H(t)\Delta}{\|\Delta\|^2}\ \le\ \Lambda_{\rm ep},
+\]
+and the Gr\"onwall factor that the argument truly pays is
+$\exp\bigl(\int q\,dt\bigr)$, not $e^{\Lambda\Tep}$. The two coincide only if
+$\Delta$ aligns with the minimizing eigenvector. \emph{Measuring $q(t)$ is the
+experiment that separates the two live explanations of \cref{sec:num}}: if
+$q\approx\Lambda$, the exponent is right and the estimate is tight, and the
+negative correlation of the residual error with $e^{\Lambda\Tep}$ is telling us
+the error lives elsewhere; if $q\ll\Lambda$, the Gr\"onwall step is simply loose
+and $\Lambda$ is an artefact of the worst-case direction. The instrumentation is
+cheap --- $\Delta$ and $\bar H$ are both already computed in
+\path{degrau2_readout.py} --- and it has not been done.
+\item[(P9)] \textbf{Selection is conditional on the treatment.} See
+\cref{sec:num}: the acceptance filter rejected $8/30$ at $v_0(0)=0.5$ against
+$4/30$ at $v_0(0)=2.0$, so the two arms are not samples of the same population
+and the between-arm comparison of error levels is confounded with selection.
+The within-instance paired comparison, which is what decides item~(a), is
+untouched by this. Quantifying the selection --- e.g.\ by re-running with the
+horizon $H$ enlarged until the rejection rates match --- is not done.
 \item[(P6)] \textbf{Inherited unchanged from \cite{paper}}: (O2) frozen live
 pattern, (O3) the unquantified $o(1)$ of the entry corner, (O1) the forcing
 dependence of $\beta_0$ (every row degenerates as $a_0\to0$ or

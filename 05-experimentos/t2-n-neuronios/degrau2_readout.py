@@ -13,8 +13,14 @@ O que este script mede, por instancia:
      fator; c -> c*v_0.
   2. Lambda := sup_t max_k ||c_k(t)||, com c_k = (1/n) sum_i r_i 1_{k,i} (x_i,1):
      a cota analitica para a curvatura NEGATIVA do bloco vivo (ver nota).
-  3. LmaxJ := sup_t max(0, -lambda_min(Hess_B U)) medido por autovalores exatos
-     do Hessiano 3m x 3m do campo vivo na trajetoria hibrida — o L_B do (O6).
+  3. Lambda_meas := sup_t max(0, -lambda_min(Hess_B U)) medido por autovalores
+     exatos do Hessiano 3m x 3m do campo vivo na trajetoria hibrida.
+     ATENCAO (parecer 18, B3): NAO chamar isto de L_B.  No paper-v4,
+     L_B := lambda_max(G_B) (a parte Gauss-Newton), que cresce ~m; Lambda_meas e
+     o -lambda_min do Hessiano INTEIRO, que NAO cresce com m.  Distinguir os dois
+     e o conteudo inteiro da correcao ao (O6).  A chave 'L_B' segue sendo escrita
+     no jsonl apenas como ALIAS DEPRECIADO para compatibilidade com os jsonl e
+     scripts ja gravados.
   4. T_ep = t_exit - t_hit, e o fator de Gronwall exp(LmaxJ * T_ep).
   5. conservacao de B_k = v_k^2 - (w_k^2 + b_k^2) (balancedness), no hibrido
      (relu, deve ser EXATA) e no beta-run (softplus, deve driftar O(e^-beta d)).
@@ -98,7 +104,7 @@ def hibrido(X, Y, P0, dt0=DT0, medir=False):
     troca_pat = False
     k_troca = -1
     lam_c = np.zeros(nt // HESS_EVERY + 2)      # max_k ||c_k||
-    lam_h = np.zeros(nt // HESS_EVERY + 2)      # max(0, -lambda_min(Hess))
+    lam_h = np.zeros(nt // HESS_EVERY + 2)      # max(0, -lambda_min(Hess)) = Lambda_meas
     t_lam = np.zeros(nt // HESS_EVERY + 2, dtype=int)
     nlam = 0
     v_min = np.inf
@@ -171,9 +177,11 @@ def hibrido(X, Y, P0, dt0=DT0, medir=False):
     if medir:
         sel = t_lam[:nlam] <= k_exit
         out["Lambda_ck"] = float(lam_c[:nlam][sel].max()) if sel.any() else 0.0
-        out["L_B"] = float(lam_h[:nlam][sel].max()) if sel.any() else 0.0
+        out["Lambda_meas"] = float(lam_h[:nlam][sel].max()) if sel.any() else 0.0
+        out["L_B"] = out["Lambda_meas"]          # ALIAS DEPRECIADO (parecer 18, B3)
         out["Lambda_ck_H"] = float(lam_c[:nlam].max())
-        out["L_B_H"] = float(lam_h[:nlam].max())
+        out["Lambda_meas_H"] = float(lam_h[:nlam].max())
+        out["L_B_H"] = out["Lambda_meas_H"]      # ALIAS DEPRECIADO
     return out
 
 
@@ -225,7 +233,7 @@ def uma(arg):
     reg.update({k: v for k, v in h.items() if k != "ok"})
     reg["pred_naive"] = -1.0 / (c * h["R_exit"])
     reg["pred_corr"] = -1.0 / (c * h["v0_hit"] * h["R_exit"])
-    reg["gronwall"] = float(np.exp(h["L_B"] * h["T_ep"]))
+    reg["gronwall"] = float(np.exp(h["Lambda_meas"] * h["T_ep"]))
     tr, n_mortes, troca_v, drift, v0_fim = roda_acoplado(X, Y, P0, BETA)
     reg.update({"n_mortes": n_mortes, "bal_beta_drift": drift, "v0_fim": v0_fim})
     if tr is None:
@@ -286,12 +294,12 @@ def main():
         print(f"  {nome}: mediana {np.median(e)*100:.2f}% | p90 "
               f"{np.percentile(e,90)*100:.2f}% | max {e.max()*100:.2f}%")
     print("  baseline readout FIXO (verifica_forcing m=4): mediana 0.80%")
-    for nome in ("v0_hit", "T_ep", "L_B", "Lambda_ck", "gronwall",
+    for nome in ("v0_hit", "T_ep", "Lambda_meas", "Lambda_ck", "gronwall",
                  "bal_hyb_drift", "bal_beta_drift", "R_exit", "v_min_live"):
         a = np.array([r[nome] for r in ok], dtype=float)
         print(f"  {nome:15s} min {a.min():.4g} | mediana {np.median(a):.4g} | max {a.max():.4g}")
     e = np.array([r["err_corr"] for r in ok])
-    for nome in ("gronwall", "L_B", "T_ep", "R_exit"):
+    for nome in ("gronwall", "Lambda_meas", "T_ep", "R_exit"):
         a = np.array([r[nome] for r in ok], dtype=float)
         cc = np.corrcoef(np.log(np.abs(a) + 1e-300), np.log(e + 1e-300))[0, 1]
         print(f"  corr(log err_corr, log {nome}) = {cc:+.3f}")

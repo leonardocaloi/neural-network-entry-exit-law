@@ -2,22 +2,40 @@
 % (05-experimentos/t2-n-neuronios), run de 2026-07-28, 10.3 min, 2 workers nice -19.
 % [RESULT 2026-07-28]
 
-\paragraph{The readout does freeze, at both levels.}
+\paragraph{The readout freezes from the initialization --- a separate fact from
+\eqref{eq:v0const}.}
 Over the accepted instances,
 \[
 \max\bigl|v_0(\thit)-v_0(0)\bigr|
 =1.2\cdot10^{-6}\ \ (v_0(0)=0.5),
 \qquad
-3.6\cdot10^{-6}\ \ (v_0(0)=2.0),
+3.6\cdot10^{-6}\ \ (v_0(0)=2.0).
 \]
-so \eqref{eq:v0const} holds far more tightly than the $O(\beta^{-2}\Tep)$ it
-promises, and the two predictors now differ by a clean factor $2$ and
-$\tfrac12$ respectively. The instrument is no longer null.
+\textbf{This is not a test of \eqref{eq:v0const}}, and we will not present it as
+one. \Cref{eq:v0const} is a statement about the \emph{episode}
+$[\thit,\trel]$, where the unit is dead; the measurement above is over
+$[0,\thit]$, where the unit is \emph{alive}. It says that in this drawing family
+$v_0$ barely moves even before the death, because $A$ is initialized with a
+small margin on the face ($z_A(0)\le0.05$) and its output --- to which
+$\partial L/\partial v_0$ is proportional --- is small throughout. It is a
+welcome empirical fact, because it is what makes the discriminating design work
+at all: it lets us set $v_0(\thit)$ by setting $v_0(0)$. Testing
+\eqref{eq:v0const} properly would require logging $v_0$ \emph{inside} the
+episode against a $\beta$-sweep, which is not done (\cref{sec:open}\,(P2)).
+Practically, the consequence here is that the two predictors now differ by a
+clean factor $2$ and $\tfrac12$. The instrument is no longer null.
 
 \paragraph{The corrected law wins, and by the predicted factor.}
 Acceptance: $22/30$ at $v_0(0)=0.5$ and $26/30$ at $v_0(0)=2.0$ (rejections: $11$
 $\beta$-runs with no release inside the horizon, $1$ death before $t_{\min}$; no
-instance was rejected by the sign guard of \hyplabel{H6$'$}). Writing
+instance was rejected by any readout sign guard, so \hyplabel{H6$'$} was never
+binding). \textbf{The rejection rate depends on the treatment} --- $8/30$ against
+$4/30$ --- so the two arms are not draws from a common population and any
+\emph{between-arm} comparison of error levels is confounded with selection. We
+therefore do not make one. The comparison that decides item~(a) is
+\emph{within} each instance, where the two predictors are computed from the same
+trajectory, and selection cannot touch it. Registered as
+\cref{sec:open}\,(P9). Writing
 $\mu=\beta(t^\beta_{\rm release}-\texit)$ for the measured coefficient:
 
 \begin{center}
@@ -44,21 +62,47 @@ predicts, with no free parameter and no fit. Relative errors:
 \toprule
  & median & p90 & max \\
 \midrule
-$|\mu-\text{naive}|/|\text{naive}|$, pooled $N=48$ & $51.4\%$ & --- & --- \\
 $|\mu-\text{corrected}|/|\text{corrected}|$, pooled $N=48$ & $\mathbf{2.76\%}$ & $17.3\%$ & $47.3\%$ \\
 \ \ at $v_0(0)=0.5$ & $5.80\%$ & $16.7\%$ & $47.3\%$ \\
 \ \ at $v_0(0)=2.0$ & $2.19\%$ & $15.3\%$ & $37.7\%$ \\
+\midrule
+$|\mu-\text{naive}|/|\text{naive}|$ (\emph{arithmetic floor}) & $51.4\%$ & --- & --- \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \noindent
+\textbf{The last row is not an empirical error and must not be read as one.} If
+\eqref{eq:release} is exactly right then, identically,
+\[
+\frac{|\mu-\text{naive}|}{|\text{naive}|}
+\ \approx\ \Bigl|1-\frac1{v_0}\Bigr|
+=\begin{cases}100\% & v_0=0.5\\ 50\% & v_0=2.0,\end{cases}
+\]
+which is what is observed ($104.9\%$ and $50.4\%$). It is an
+\emph{arithmetic floor} built into the contrast by the choice of $v_0(0)$: it
+measures how far apart we placed the two hypotheses, not how badly the naive one
+fits. Reporting it as ``the naive law errs by $51\%$'' would be inflating a
+design parameter into a result. \textbf{The informative statistics are the
+paired count and the ratios $\mu/\text{predictor}$}, both of which are free of
+this artefact.
+
+\smallskip\noindent
 \textbf{Paired verdict: the corrected predictor beats the naive one in $47$ of
-$48$ instances}, with median ratio $\texttt{err\_corr}/\texttt{err\_naive}=0.043$
---- a factor $23$. The single exception is at $v_0(0)=2.0$ and is an instance
-whose corrected error is already the sample maximum ($37.7\%$), i.e.\ an
-instance where the residual $\beta_0$ effect dominates the $v_0$ effect, not one
-where the naive law is right.
+$48$ instances} (one-sided sign test, $p=1.7\cdot10^{-13}$), with pooled median
+ratio $\texttt{err\_corr}/\texttt{err\_naive}=\mathbf{0.046}$ --- a factor $22$.
+(The value $0.043$ is the $v_0(0)=2.0$ subgroup, not the pool.) The single
+exception is at $v_0(0)=2.0$ and is an instance whose corrected error is already
+the sample maximum ($37.7\%$), i.e.\ an instance where the residual $\beta_0$
+effect dominates the $v_0$ effect, not one where the naive law is right.
+
+\smallskip\noindent
+\emph{Independent replication.} Fresh seeds (\path{parecer18_rep.py},
+\texttt{SEED0}$=77770101$, disjoint from the run above), $8$ instances per level,
+$16/16$ accepted: $\mu/\text{naive}$ medians $1.950$ and $0.4995$,
+$\mu/\text{corrected}$ medians $0.975$ and $0.999$, paired wins $15/16$, and
+$\max|\Lambda_{\rm meas}-\Lambda|=7.1\cdot10^{-15}$ again. Nothing in the
+verdict depends on the particular seed block.
 
 \smallskip\noindent
 \emph{The falsification condition fixed before the run was not met.} Item~(a) of
@@ -66,10 +110,15 @@ where the naive law is right.
 readout.
 
 \paragraph{The lemma is again saturated, and Gr\"onwall is again not the driver.}
-Measuring $L_B=\max(0,-\lambda_{\min}(\nabla^2U))$ by exact eigenvalues of the
-$12\times12$ Hessian along the hybrid trajectory, against
-$\Lambda=\max_k\|c_k\|$: $\max_{48}|L_B-\Lambda|=7.1\cdot10^{-15}$ (relative
-$3.0\cdot10^{-15}$). Ranges: $\Lambda\in[2.36,7.07]$ (median $4.34$),
+Measuring $\Lambda_{\rm meas}:=\max(0,-\lambda_{\min}(\nabla^2U))$ by exact
+eigenvalues of the $12\times12$ Hessian along the hybrid trajectory, against
+$\Lambda=\max_k\|c_k\|$: $\max_{48}|\Lambda_{\rm meas}-\Lambda|=7.1\cdot10^{-15}$,
+pointwise relative $\max_{48}\bigl(|\Lambda_{\rm meas}-\Lambda|/\Lambda\bigr)
+=1.59\cdot10^{-15}$. (The figure $3.0\cdot10^{-15}$ quoted elsewhere is the
+different normalization $\max|\cdot|/\min\Lambda$, which is an upper bound on
+the pointwise one; we report both and label them.) \emph{$\Lambda_{\rm meas}$ is
+not the $L_B$ of \cite{paper}}, which is $\lambda_{\max}(G_B)$ --- see
+\cref{rem:O6}; the whole point is that the two differ. Ranges: $\Lambda\in[2.36,7.07]$ (median $4.34$),
 $\Tep\in[0.0145,0.351]$ (median $0.0626$), and the episode Gr\"onwall factor
 \[
 e^{\Lambda\Tep}\in[1.08,\ 2.87],\qquad\text{median }1.28 .
@@ -86,9 +135,13 @@ single $\beta$ excludes Gr\"onwall as the dominant channel by the sign, and
 nothing more.
 
 \paragraph{Guard and balancedness.}
-The empirical guard is $\varphi_v=\min_k\min_t|v_k|=5.0\cdot10^{-3}$ over the
-whole sample (median over instances $0.106$); no sign crossing occurred inside a
-window in any accepted instance. Balancedness drift
+Hypothesis \hyplabel{H6$'$} as stated concerns $v_0$ only, and it is satisfied
+\emph{trivially} here: $|v_0|$ stays within $4\cdot10^{-6}$ of $v_0(0)\in
+\{0.5,2.0\}$, so $\varphi_v\in\{0.5,2.0\}$ effectively. The quantity
+$\min_k\min_t|v_k|$ over the \emph{live} units, which the acceptance filter also
+guards but which \hyplabel{H6$'$} no longer requires, has minimum
+$5.0\cdot10^{-3}$ over the sample (median over instances $0.106$); no sign
+crossing occurred inside a window in any accepted instance. Balancedness drift
 $\max_k|B_k(t)-B_k(0)|$ over the episode: $\le6.0\cdot10^{-5}$ on the hybrid
 ($dt=10^{-5}$) and $\le9.5\cdot10^{-6}$ on the $\beta$-run
 ($dt=2\cdot10^{-6}$), a ratio $\approx6.3$ against a step ratio of $5$ --- the

@@ -53,7 +53,7 @@ def uma(arg):
     reg.update({k: v for k, v in h.items() if k != "ok"})
     reg["pred_naive"] = -1.0 / (c * h["R_exit"])
     reg["pred_corr"] = -1.0 / (c * h["v0_hit"] * h["R_exit"])
-    reg["gronwall"] = float(np.exp(h["L_B"] * h["T_ep"]))
+    reg["gronwall"] = float(np.exp(h["Lambda_meas"] * h["T_ep"]))
     tr, n_mortes, troca_v, drift, v0_fim = roda_acoplado(X, Y, P0, BETA)
     reg.update({"n_mortes": n_mortes, "bal_beta_drift": drift, "v0_fim": v0_fim})
     if tr is None:
@@ -129,7 +129,10 @@ def main():
         print(f"  VEREDITO PAREADO: err_corr < err_naive em {gan}/{len(ok)} "
               f"instancias; razao mediana err_corr/err_naive = "
               f"{np.median(ec/np.maximum(en,1e-300)):.4f}")
-        for nome in ("T_ep", "L_B", "Lambda_ck", "gronwall", "R_exit", "v_min_live"):
+        # 'Lambda_meas' = max(0,-lambda_min(Hess)); NAO e o L_B=lambda_max(G_B)
+        # do paper-v4 (parecer 18, B3).
+        for nome in ("T_ep", "Lambda_meas", "Lambda_ck", "gronwall", "R_exit",
+                     "v_min_live"):
             a = np.array([r[nome] for r in ok], dtype=float)
             print(f"  {nome:12s} min {a.min():.4g} | mediana {np.median(a):.4g} "
                   f"| max {a.max():.4g}")
