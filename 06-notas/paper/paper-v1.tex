@@ -15,8 +15,9 @@
 \newcommand{\trel}{t_{\mathrm{release}}}
 
 \title{An entry--exit law for dead-neuron resurrection:\\
-the smoothed-ReLU limit of training dynamics at an\\
-activation boundary, and its confirmation in a small MLP}
+the smoothed-ReLU limit of training dynamics at an activation\\
+boundary, and its confirmation in a small MLP and a\\
+one-layer transformer}
 \author{L.~Caloi Santos}
 \date{2026-07-25 \quad DRAFT v1 --- not for circulation}
 
@@ -40,7 +41,15 @@ stochastic-schedule model is falsified; two instrument designs are recorded as
 negatives (a calibrated null fires); and a confirmatory MLP run ($400$ runs,
 $T=0$) reproduces resurrection at $p=0.50$ with the residual area opening before
 $13/16$ returns, hard ReLU giving zero, and a monotone channel staircase in
-$\beta$. A transformer confirmatory run is in progress.
+$\beta$. A pre-registered one-layer-transformer confirmatory ($800$ runs, $T=0$)
+then closes the ladder: the theorem's class transfers to the FFN's own channel
+(softplus-$\beta3$ with attention frozen, $p_{\mathrm{sust}}=0.440\,[0.300,0.587]$,
+drive area opening before the return in $21/22$); a \emph{universal upstream
+channel} adds $\approx+0.20$ in all four activation arms --- including hard ReLU,
+whose own channel is exactly zero; and the GELU sign-flip barrier is
+\emph{consistent with}, not established by, the counts, which are confounded with
+injection depth, while its sign signature separates deep from shallow in $92\%$
+against $4\%$.
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -86,13 +95,15 @@ a calibrated null fired (\S\ref{sec:negativos}); the mechanism first observed in
 an MLP pressure pilot (\S\ref{sec:mecanismo}); and a \emph{confirmatory} MLP run
 --- $400$ runs, area law reproduced with confidence intervals, hard ReLU as the
 zero-gradient control, monotone staircase in $\beta$ (\S\ref{sec:confirm},
-Fig.~\ref{fig:escada}). A transformer confirmatory run is in progress
-(\S\ref{sec:transformer}); its scoping already exposed two new mechanisms (a
-GELU sign-flip barrier and an upstream channel).
+Fig.~\ref{fig:escada}); and a \emph{confirmatory} one-layer transformer ---
+$800$ runs, the theorem's class transferring in the FFN's own channel, a
+universal upstream channel of $\approx+0.20$, and the GELU barrier reported as
+consistent-with-barrier under an explicit depth confound
+(\S\ref{sec:transformer}), whose scoping had already exposed both new mechanisms.
 \end{itemize}
 
 The paper is deliberately honest about scope: the theorem is one two-neuron
-instance; the confirmatory is one small architecture at temperature zero; the
+instance; the confirmatories are two small architectures at temperature zero; the
 stochastic gate is open and, where we probed it, it \emph{breaks} the
 deterministic schedule (\S\ref{sec:falsif}).
 
@@ -257,7 +268,8 @@ designs are shown rather than hidden. Every confirmatory analysis was frozen by
 a pre-registration commit before the run; hypotheses that fell were archived, not
 rewritten. Commits: piloto-pressure \texttt{b48b527}; rate pilot \texttt{995a87c};
 4a.3 pre-registration \texttt{a8f8f8c}; 4a.3 confirmatory \texttt{5a961cb};
-transformer pre-registration \texttt{1b45498}.
+transformer (etapa-5) pre-registration \texttt{1b45498}, confirmatory result
+\texttt{4051e7f}.
 
 \subsection{The deterministic schedule is falsified under SGLD}\label{sec:falsif}
 
@@ -413,7 +425,7 @@ this $N$ (a consequence of the frozen $\tfrac12\times$ pilot-lower-bound rule),
 so in practice C2 is the deciding test; this was signalled in the
 pre-registration, not discovered after.
 
-\subsection{Transformer: two new mechanisms, confirmatory in progress}\label{sec:transformer}
+\subsection{Confirmatory: two new mechanisms in a one-layer transformer}\label{sec:transformer}
 
 The same question in a one-layer transformer (FFN over an attended token) does
 \emph{not} reduce to the MLP, and the scoping (exploratory, commit
@@ -448,33 +460,73 @@ $=+6/+6/+6/+8$ returns; ReLU $0\to8$ with $\mathrm{own\_move}=0$).
 The transformer confirmatory (etapa-5, pre-registered commit \texttt{1b45498};
 $800$ runs, $\{$sp-$\beta3$, sp-$\beta10$, GELU, ReLU$\}\times\{$attn-train,
 attn-frozen$\}\times$ injection $\{-0.3,-2.0\}\times50$ seeds $2000$--$2049$;
-$H=2\cdot10^5$, $T=0$) \textbf{is running at the time of writing}; the following
-five estimands and their results are pending.
+$H=2\cdot10^5$, $T=0$, hysteresis $\delta_h=0.0476$) ran to completion under the
+frozen analysis (result commit \texttt{4051e7f}). Its five pre-registered
+estimands returned as follows; all counts are of \emph{sustained} returns under
+the hysteresis ruler.
 
 \begin{itemize}
-\item \textbf{[E5-PENDING: E-A validity]} --- any sustained return in
-relu-frozen invalidates the run (theorem: own-gradient $\equiv0$ and fixed input
-$\Rightarrow$ terminal). Pilot: $0/40$.
-\item \textbf{[E5-PENDING: E-B upstream channel]} ---
-$\Delta=p_{\mathrm{sust}}(\text{train})-p_{\mathrm{sust}}(\text{frozen})$ per arm;
-reproduces if the bootstrap lower bound $>0$. Stricter under hysteresis than the
-pilot; a genuine test, not a stamp.
-\item \textbf{[E5-PENDING: E-C transfer of the theorem class]} --- sp-$\beta3$
-frozen, shallow injection: $p(\text{sustained return}\mid\text{inj})$; transfers
-if $\ge n^\ast=6$ sustained returns. This is the direct analogue of the MLP C2.
-\item \textbf{[E5-PENDING: E-D GELU barrier]} --- gelu-frozen, deep ($-2.0$) vs.\
-shallow ($-0.3$); the barrier predicts shallow $\gg$ deep in the own channel,
-with a depth-matched control against sp-$\beta3$. The pilot at $-1.0$ was a tie
-(did not decide).
-\item \textbf{[E5-PENDING: E-E $\beta$ staircase]} --- $p(\text{sustained
-return})$ across $\beta\in\{3,10\}$, frozen and train (estimation, no kill).
+\item \textbf{E-A (validity): valid.} Zero sustained returns in relu-frozen
+across $100$ injections --- $0/50$ shallow and $0/50$ deep. Own-gradient
+$\equiv0$ with a fixed input is terminal, exactly as the theorem requires; any
+sustained return here would have invalidated the run.
+
+\item \textbf{E-B (upstream channel): reproduces in all four arms.} With
+$\Delta=p_{\mathrm{sust}}(\text{train})-p_{\mathrm{sust}}(\text{frozen})$ and the
+bootstrap clustered by seed:
+\[
+\begin{array}{llr@{\;}c@{\;}l}
+\text{sp-}\beta3  & \Delta=0.210\,[0.120,0.300] & (43/100 &\text{vs.}& 22/100),\\
+\text{sp-}\beta10 & \Delta=0.200\,[0.110,0.280] & (29/100 &\text{vs.}&  9/100),\\
+\text{GELU}       & \Delta=0.220\,[0.120,0.320] & (51/100 &\text{vs.}& 29/100),\\
+\text{ReLU}       & \Delta=0.200\,[0.120,0.280] & (20/100 &\text{vs.}&  0/100).
+\end{array}
+\]
+Every lower bound is above zero, and the effect is
+\emph{additive and essentially the same}, $\approx+0.20$, across activations
+whose own channels differ by orders of magnitude. The ReLU arm is the clean
+case: its own channel is exactly zero, so the whole $0\to20/100$ is upstream.
+This is a mechanistic answer to why real networks recover dead units even under
+hard activations.
+
+\item \textbf{E-C (transfer of the theorem class): transfers.} sp-$\beta3$
+frozen with shallow injection --- the FFN's own channel, isolated --- gives
+$22/50$ sustained returns, $p_{\mathrm{sust}}=0.440\,[0.300,0.587]$
+(Clopper--Pearson), against the pre-registered gate $n^\ast=6$ and kill
+threshold $0.0062$. The leader-drive area opens before the return in $21/22$ of
+them. This is the direct analogue of the MLP's C2, and it holds.
+
+\item \textbf{E-D (GELU barrier): consistent-with-barrier (confounded with
+depth)} --- the pre-registered three-way label, reported verbatim. The counts
+are gelu-frozen shallow $29/50$, $0.580\,[0.432,0.718]$, against deep $0/50$,
+$0.000\,[0.000,0.071]$; but the depth-matched control sp-$\beta3$-frozen at
+$-2.0$ is \emph{also} $0/50$, so the counts alone do not separate the barrier
+from injection depth. What does separate them is the S1 signature itself: the
+sign inversion $A_{\mathrm{drive}}\neq A_{\mathrm{mlp}}$ occurs in
+$46/50=92\%$ of the deep injections against $2/50=4\%$ of the shallow ones. We
+therefore report the barrier as \emph{consistent with} the data and visible in
+the sign channel --- not as established by the count.
+
+\item \textbf{E-E ($\beta$ staircase, estimation, no kill): monotone.}
+$p_{\mathrm{sust}}$ with attention frozen falls from $0.220\,[0.143,0.314]$ at
+$\beta=3$ to $0.090\,[0.042,0.164]$ at $\beta=10$; with attention training, from
+$0.430\,[0.331,0.533]$ to $0.290\,[0.204,0.389]$. The MLP staircase of
+\S\ref{sec:confirm} reappears in the transformer, in both the own and the
+upstream regimes: stiffening the activation closes the return channel.
 \end{itemize}
 
-The scoping verdict is itself a result: the MLP mechanism does not transfer
-directly to the GELU FFN; the sign-flip barrier obstructs self-resurrection and
-the upstream channel is a new route. The confirmatory tests the theorem class
-(softplus-$\beta$) on the FFN and treats the GELU barrier and the upstream
-channel as estimands of their own.
+Across the grid the temporal ordering predicted by the area law holds in the
+large majority of sustained returns --- $21/22$ (sp-$\beta3$ frozen), $34/39$
+(sp-$\beta3$ train), $26/27$ (sp-$\beta10$ train), $24/29$ (GELU frozen) --- so
+the drive area opens \emph{before} the return, as in the MLP.
+
+The scoping verdict survives the confirmatory and is itself a result: the MLP
+mechanism does not transfer directly to the GELU FFN --- the sign-flip barrier
+obstructs self-resurrection --- while the theorem's own class (softplus-$\beta$)
+does transfer, and the upstream channel is a genuinely new route that the MLP
+does not have. The confirmatory is injection-conditional by design (natural FFN
+death is $\approx0$ at $d=16$), so it measures the fate of units placed dead,
+not the rate at which they die.
 
 \section{Limitations}\label{sec:limits}
 
@@ -488,8 +540,14 @@ model under-predicts, leaving the reactivating unit's back-reaction as the
 leading candidate driver. \textbf{(iii)} Scale: the confirmatories are small
 networks ($m\le6$ MLP units, $m_{\mathrm{ffn}}=4$ FFN units) with rich $1$D
 targets, chosen so that a single unit can be tracked with a ground-truth clock.
-\textbf{(iv)} GELU is outside the monotone class; the transformer confirmatory is
-in progress and its five estimands are pending. \textbf{(v)} The cone apex
+\textbf{(iv)} The transformer confirmatory is \emph{injection-conditional}:
+natural FFN death is $\approx0$ at $d=16$, so it measures the fate of units
+placed dead, not the rate at which they die; the design declares this and does
+not claim a death rate. \textbf{(v)} GELU is outside the monotone class, and our
+transformer verdict on its barrier is \emph{consistent with}, not established:
+the deep-vs-shallow count is confounded with injection depth (the depth-matched
+softplus control is also $0/50$), and only the sign signature separates the two
+(\S\ref{sec:transformer}). \textbf{(vi)} The cone apex
 (corank $\ge2$), where weight decay produces genuine sliding toward the most
 singular stratum, is untouched.
 
@@ -511,10 +569,14 @@ verifications \texttt{passo0--6.py}, \texttt{prova\_L1--L6.py}; figures via
 \texttt{python run\_4a3.py --workers 4} then \texttt{python analise\_4a3.py}
 (reads \texttt{results-4a3/} + \texttt{config\_4a3.json}). Rate pilot
 \texttt{995a87c}. Staircase figure: \texttt{06-notas/paper/figuras\_paper.py}.
-\item \textbf{Transformer (etapa-5).} \texttt{05-experimentos/etapa5-transformer/}:
-scoping \texttt{d4e4c35}, rate pilot \texttt{2dba27d}, confirmatory
-pre-registration \texttt{1b45498}. \\
-\texttt{python run\_e5.py --workers 4} then \texttt{python analise\_e5.py}.
+\item \textbf{Transformer confirmatory (etapa-5).}
+\texttt{05-experimentos/etapa5-transformer/}: scoping \texttt{d4e4c35}, rate
+pilot \texttt{2dba27d}, confirmatory pre-registration \texttt{1b45498} (which
+freezes \texttt{config\_e5.json}: $\delta_h=0.0476$, $800$ runs, seeds
+$2000$--$2049$, $H=2\cdot10^5$), result commit \texttt{4051e7f}. \\
+\texttt{python run\_e5.py --workers 4} then \texttt{python analise\_e5.py}
+(reads \texttt{results-e5/}, $800$ episode files $+$ manifest, and writes
+\texttt{resultado-e5.md}).
 \item \textbf{Negatives.} \texttt{05-experimentos/NEGATIVOS.md} and the etapa-4a
 note record the invalidated instrument (commit \texttt{6411ac8}) and the rejected
 redesign (\texttt{a413b19}); the falsified schedule is
