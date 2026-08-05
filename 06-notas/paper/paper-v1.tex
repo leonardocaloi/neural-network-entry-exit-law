@@ -34,17 +34,17 @@ by a hybrid system \emph{with memory}: the dead unit's parameters freeze and
 reactivation occurs exactly when the signed time integral of the excluded
 residual returns to zero --- the classical entry--exit function --- with a
 universal first-order release coefficient; all constants are verified on one
-two-neuron instance. The two limit orders do not commute: the field-first (pointwise generalized-gradient) limit
+two-neuron instance. The two limit orders do not commute: the discrete ReLU flow
 freezes dead units forever, the smoothed flow revives them by the area law. We
 then track the law upward through a pre-registered experimental ladder: a reduced
-deterministic-schedule model is falsified under noise; two instrument designs are recorded as
+stochastic-schedule model is falsified; two instrument designs are recorded as
 negatives (a calibrated null fires); and a confirmatory MLP run ($400$ runs,
 $T=0$) reproduces resurrection at $p=0.50$ with the residual area opening before
 $13/16$ returns, hard ReLU giving zero, and a monotone channel staircase in
 $\beta$. A pre-registered one-layer-transformer confirmatory ($800$ runs, $T=0$)
 then closes the ladder: the theorem's class transfers to the FFN's own channel
 (softplus-$\beta3$ with attention frozen, $p_{\mathrm{sust}}=0.440\,[0.300,0.587]$,
-drive area opening before the return in $21/22$); an upstream
+drive area opening before the return in $21/22$); a \emph{universal upstream
 channel} adds $\approx+0.20$ in all four activation arms --- including hard ReLU,
 whose own channel is exactly zero; and the GELU sign-flip barrier is
 \emph{consistent with}, not established by, the counts, which are confounded with
@@ -76,7 +76,7 @@ residual excluding that unit. The uniform rate is $O(\log\beta/\beta)$, the
 release time carries a \emph{universal} first-order coefficient
 $-1/(cR(\texit))$, and the law is independent of the smoothing within the
 monotone-sigmoid class (softplus, erf); GELU is excluded because its derivative
-is non-monotone. Six lemmas, each with an executable verification (the exit-corner half of the corner lemma is verified indirectly, through the release times), are
+is non-monotone. Six lemmas, each with an executable verification, are
 summarized in \S\ref{sec:theorem} and stated in Appendix~\ref{app:lemmas};
 Figs.~\ref{fig:mecanismo}--\ref{fig:constantes} show the mechanism and the
 predicted constants.
@@ -97,7 +97,7 @@ an MLP pressure pilot (\S\ref{sec:mecanismo}); and a \emph{confirmatory} MLP run
 zero-gradient control, monotone staircase in $\beta$ (\S\ref{sec:confirm},
 Fig.~\ref{fig:escada}); and a \emph{confirmatory} one-layer transformer ---
 $800$ runs, the theorem's class transferring in the FFN's own channel, a
-upstream channel adding the same $\approx+0.20$ in all four arms, and the GELU barrier reported as
+universal upstream channel of $\approx+0.20$, and the GELU barrier reported as
 consistent-with-barrier under an explicit depth confound
 (\S\ref{sec:transformer}), whose scoping had already exposed both new mechanisms.
 \end{itemize}
@@ -163,11 +163,9 @@ tangential components of $\theta_A$ are exponentially frozen. The first-order
 release coefficient is \emph{universal}: in the product (entry delay $\times$
 area cut) the arrival speed cancels, leaving the reciprocal exit speed --- each
 corner contributes the reciprocal of its transversal speed. The remainder is
-$o(\beta^{-1})$ as proved. The limit is that of the regularized flow taken
-first; the field-first (pointwise generalized-gradient) flow freezes the dead
-neuron forever --- the two limit orders do not commute (\S\ref{sec:noncomm}).
-Discrete hard-ReLU gradient descent freezes it as well, a separate observation
-confirmed empirically in \S\ref{sec:confirm}.
+$o(\beta^{-1})$ as proved. The limit is that of the regularized flow; discrete
+ReLU gradient descent freezes the dead neuron forever (the limits do not
+commute, \S\ref{sec:noncomm}).
 \end{theorem}
 
 \begin{figure}[t]
@@ -257,11 +255,11 @@ In machine-learning terms this non-commutation is the statement behind an
 empirical trend: discrete ReLU units that die stay dead --- the dormant-neuron
 and loss-of-plasticity phenomena documented across deep and reinforcement
 learning~\cite{Sokar23,Lyle23,Dohare24}, mitigated in practice by recycling dead
-units; the field's concurrent migration to smooth activations is consistent with the mechanism described here --- whereas the smoothed flow
+units or by migrating to smooth activations --- whereas the smoothed flow
 resurrects them by the area law. The channel that reopens a smoothed unit is
 $e^{\beta z}$, which closes as $\beta\to\infty$; \S\ref{sec:confirm} measures the
 resulting staircase directly, and the most alive arm ($\beta=3$) is the
-effective stiffness of the GELU family (GELU $\approx z\,\sigma(1.702z)$, i.e.\ $O(1)$).
+smoothness of the GELU family.
 
 \section{Experiments}\label{sec:experiments}
 
@@ -281,7 +279,7 @@ schedule survives noise. A reduced ``race'' model (pre-registered, commit
 (resurrection) probability of a dead unit from the mean residual schedule; the
 falsifying run (2700 runs) rejected it. The predicted-zero window was violated
 decisively: $139$ late captures occurred where the model gives exactly zero, and
-the bin $[0,0.1)$ saw $150$ captures against $1.4$ predicted (Poisson $z\approx+126$). Crucially
+the bin $[0,0.1)$ saw $150$ captures against $1.4$ predicted ($z=+131$). Crucially
 the model is well calibrated where it says capture is \emph{likely} (the
 $(0.5,0.9)$ bin, $z=-0.26$); the entire error is on the ``impossible'' side. The
 theorem-part of the model held: the observed censoring ($2$--$7\%$) matched the
@@ -329,13 +327,10 @@ $99.6\%$ censored). Script
 \end{figure}
 
 A redesign (etapa-4a.2) was itself rejected at the design stage by the same
-process (commit \texttt{a413b19}): at $T=10^{-3}$ the ReLU/softplus ratio stayed
-$\approx0.95$ after debounce, and an independent replication at the deploy
-temperature $T=10^{-5}$ still found ReLU $\approx$ softplus ($7,5$ vs.\ $9,6$
-clean episodes) --- gradient starvation at $\beta=300$ masked the effect.
-Separately, the pooled null broke $\alpha$ by $30$--$92\times$ in
-heterogeneous/autocorrelated worlds, which motivated the per-neuron stratified
-null (the stratified version held $\approx\alpha$). The inheritance was explicit: a
+process (commit \texttt{a413b19}): at $T=10^{-5}$ the ReLU/softplus ratio stayed
+$\approx0.95$ after debounce (gradient starvation at $\beta=300$ masked the
+effect), and the pooled null broke $\alpha$ by $30$--$92\times$ in
+heterogeneous/autocorrelated worlds. The inheritance was explicit: a
 hysteresis/dwell ruler, a per-neuron stratified null, and a move to the
 deterministic regime $T=0$ with a much longer horizon. These negatives falsify
 neither the area law nor the toy calibration; they falsify two rulers, and they
@@ -347,7 +342,7 @@ Moving to $T=0$ and a sub-parametrized regime (pressure: a plateau
 $\sim0.15$ on the rich target $y=\sin(2\pi x)+0.3\sin(5\pi x)$, $n=16$,
 $\eta=10^{-3}$, $H=2\cdot10^5$; $64$ runs, commit \texttt{b48b527}, exploratory)
 made the mechanism visible. Hard ReLU gave a \emph{structural zero}: $0$
-resurrections out of $25$ deaths in $16$ runs, the frozen ($\mathrm{grad}\equiv0$)
+resurrections out of $25$ deaths in $16$ seeds, the frozen ($\mathrm{grad}\equiv0$)
 branch exact in a real network at $T=0$. Softplus resurrected by mechanism: at
 $\beta=10$ a unit died at step $781$ and returned at $139{,}179$; at $\beta=300$
 one died at $3315$ and returned at $152{,}977$ (it had parked shallow enough that
@@ -404,7 +399,7 @@ leader datum --- an object of study, not hidden).
 \item \textbf{C4 (channel staircase, estimation, no kill): monotone in $\beta$.}
 $p(\mathrm{ret}\mid\mathrm{death})$ falls $0.457>0.370>0.211>0.000$ from
 $\beta=3$ to hard ReLU, with intervals --- the activation smoothness controls the
-return channel, and $\beta=3$ is the most
+return channel, and $\beta=3$ (the smoothness of the GELU family) is the most
 alive. This is the direct bridge to the plasticity practice of
 \S\ref{sec:noncomm}.
 \item \textbf{Validity: clean.} ReLU $0/17$ dynamical returns --- the
@@ -441,7 +436,7 @@ The same question in a one-layer transformer (FFN over an attended token) does
 at $z^\ast=-0.7518$ (verified analytically): for $z<z^\ast$ it is negative, so a
 deep-dead unit is pushed \emph{away} from the return by its own gradient.
 Self-resurrection is possible only in the shallow band $(-0.752,0)$. The
-MLP's slope-blind area instrument, ported as is (omitting $g'$), gets the \emph{sign} wrong on $12/12$
+MLP's blind area port (which omits $g'$) gets the \emph{sign} wrong on $12/12$
 GELU episodes; the correct instrument uses the slope-weighted area $A_{\mathrm{drive}}$.
 GELU is therefore genuinely outside the monotone-sigmoid class of
 Thm.~\ref{thm:main}, not a technicality.
@@ -506,12 +501,7 @@ depth)} --- the pre-registered three-way label, reported verbatim. The counts
 are gelu-frozen shallow $29/50$, $0.580\,[0.432,0.718]$, against deep $0/50$,
 $0.000\,[0.000,0.071]$; but the depth-matched control sp-$\beta3$-frozen at
 $-2.0$ is \emph{also} $0/50$, so the counts alone do not separate the barrier
-from injection depth. Indeed the control is uninformative essentially by
-construction: at $z=-2$ the softplus own-channel is $\sigma(3z)\approx0.0025$
-($0.85\%$ of its shallow value) while $\mathrm{GELU}'(-2)\approx-0.085$ is
-adverse --- the depth kills both mechanisms at once. (The rate pilot had
-already found a tie at $z=-1.0$, gelu-frozen deep $4/20$ vs.\ shallow $4/20$,
-which is why the confirmatory injects at $-2.0$.) The barrier is nonetheless visible in the drive field itself: the
+from injection depth. What does separate them is the S1 signature itself: the
 sign inversion $A_{\mathrm{drive}}\neq A_{\mathrm{mlp}}$ occurs in
 $46/50=92\%$ of the deep injections against $2/50=4\%$ of the shallow ones. We
 therefore report the barrier as \emph{consistent with} the data and visible in
@@ -525,10 +515,10 @@ $0.430\,[0.331,0.533]$ to $0.290\,[0.204,0.389]$. The MLP staircase of
 upstream regimes: stiffening the activation closes the return channel.
 \end{itemize}
 
-Across the grid the drive area opens before the return in the
+Across the grid the temporal ordering predicted by the area law holds in the
 large majority of sustained returns --- $21/22$ (sp-$\beta3$ frozen), $34/39$
-(sp-$\beta3$ train), $26/27$ (sp-$\beta10$ train), $24/29$ (GELU frozen) ---
-as in the MLP.
+(sp-$\beta3$ train), $26/27$ (sp-$\beta10$ train), $24/29$ (GELU frozen) --- so
+the drive area opens \emph{before} the return, as in the MLP.
 
 The scoping verdict survives the confirmatory and is itself a result: the MLP
 mechanism does not transfer directly to the GELU FFN --- the sign-flip barrier
@@ -556,7 +546,7 @@ placed dead, not the rate at which they die; the design declares this and does
 not claim a death rate. \textbf{(v)} GELU is outside the monotone class, and our
 transformer verdict on its barrier is \emph{consistent with}, not established:
 the deep-vs-shallow count is confounded with injection depth (the depth-matched
-softplus control is also $0/50$), and the sign signature shows the barrier acting in the drive field without separating it from depth
+softplus control is also $0/50$), and only the sign signature separates the two
 (\S\ref{sec:transformer}). \textbf{(vi)} The cone apex
 (corank $\ge2$), where weight decay produces genuine sliding toward the most
 singular stratum, is untouched.
@@ -646,7 +636,7 @@ layer after an $O(\beta^{-1})$ entry collar'' is nonempty
 (the assumption returns the better constant $M_2$ via Lem.~\ref{lem:gronwall},
 and Lem.~\ref{lem:release} with $\delta=O(\log\beta/\beta^2)$ keeps the layer up
 to $\texit-C_\varepsilon\log\beta/\beta$), with $M_2=e^{L_BT}C_fC_4/c$ independent
-of the hypothesis for $\beta\ge\beta_0$ (a finite threshold traceable through the constant chain, not exhibited; the strict layer check is vacuous for $\beta\le3\cdot10^3$ under the conservative $C_\varepsilon$ and confirmed at $\beta=10^4$); with the empirical $C_4=10.6$,
+of the hypothesis for $\beta\ge\beta_0$; with the empirical $C_4=10.6$,
 $M_2=440.8$; the leading term of the theoretical $C_4$ is
 $2/(cR^{\mathrm{hyb}}(\texit))=29.6$. The entry corner cuts initial area
 $\approx R^{\mathrm{hyb}}(\thit)K/\beta$, advancing the exit by
