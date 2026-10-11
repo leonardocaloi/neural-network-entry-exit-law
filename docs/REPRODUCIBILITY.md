@@ -22,8 +22,9 @@ python -m venv .venv
 pip install -r requirements.txt          # numpy 2.4.2, scipy 1.16.3, sympy 1.14.0, matplotlib 3.10.8
 ```
 
-The training engines (`motor_4a3.py`, `motor_taxa.py`, `motor_e5_conf.py`,
-`harness_mlp.py`, `e7_adam.py`) additionally need PyTorch. The release checks
+The MLP and transformer engines (`motor_4a3.py`, `motor_taxa.py`,
+`motor_e5_conf.py`, `harness_mlp.py`) additionally need PyTorch. The exploratory
+Adam toy script `e7_adam.py` uses NumPy. The release checks
 used torch 2.13.0. A CPU-only wheel is sufficient and much smaller than the
 default PyPI wheel, which bundles CUDA libraries on Linux:
 
@@ -67,7 +68,9 @@ cases, determinism of the transformer engine on a 200-step run, and the
 frozen-ReLU null (zero own-parameter movement). About 10 s and 0.9 GB of RAM.
 
 ```sh
-python verification/check_entry_exit.py [--output report.json]
+python verification/check_entry_exit.py
+# Optional: save a new report outside the archived evidence.
+python verification/check_entry_exit.py --output build/entry-exit-checks.json
 ```
 
 Independent of the historical Euler integrator. Verifies the scalar
@@ -83,11 +86,8 @@ The frozen analyses read the archived records and print the report that the
 manuscript tables were transcribed from. They write nothing.
 
 ```sh
-cd 05-experimentos/etapa4-mlp-populacao/pilotos-4a2/pressao/taxa
-python analise_4a3.py            # MLP confirmatory 4a.3: 400 runs, config_4a3.json
-
-cd 05-experimentos/etapa5-transformer
-python analise_e5.py             # transformer confirmatory e5: 800 runs, config_e5.json
+python 05-experimentos/etapa4-mlp-populacao/pilotos-4a2/pressao/taxa/analise_4a3.py
+python 05-experimentos/etapa5-transformer/analise_e5.py
 ```
 
 Both accept `--resultados <dir>` to point at a regenerated directory. They
@@ -129,28 +129,39 @@ The historical run took 11.8 min (`sweep_run.log`). The script overwrites
 
 ### 4.3 Training campaigns (hours)
 
-Both runners are resumable and skip files that already exist in their output
-directory. Because the archived records are in those directories, **move or
-copy the repository before regenerating**, or the runner will report
-everything as done.
+Both runners skip existing result files. Merely cloning the repository does
+not rerun the campaigns, because their archived outputs are included. Use a
+separate reproduction copy and move its result directories aside first; retain
+them for comparison. The commands below take hours and are **not** quick checks.
+
+With dependencies installed and the environment activated, from the original
+checkout's root:
 
 ```sh
-# MLP confirmatory 4a.3: 400 runs, H = 5e5 steps, ~175 s CPU per run
-cd 05-experimentos/etapa4-mlp-populacao/pilotos-4a2/pressao/taxa
-python run_4a3.py --smoke            # 2 short runs into results-4a3-smoke/ (mechanics only)
-python run_4a3.py --workers 4        # historical: 4.9 h wall-clock, 19.5 CPU-hours
-python analise_4a3.py
+git clone --branch v0.1.1 https://github.com/leonardocaloi/neural-network-entry-exit-law.git ../entry-exit-reproduction
+cd ../entry-exit-reproduction
+export OMP_NUM_THREADS=1
 
-# Transformer confirmatory e5: 800 runs, H = 2e5 steps
-cd 05-experimentos/etapa5-transformer
-python run_e5.py --smoke             # 2 runs into results-e5-smoke/
-python run_e5.py --estimativa        # times 2 runs and extrapolates the campaign
-python run_e5.py --workers 4         # historical: 13.9 h wall-clock
-python analise_e5.py
+# Preserve the archived MLP records in this reproduction copy.
+mv 05-experimentos/etapa4-mlp-populacao/pilotos-4a2/pressao/taxa/results-4a3 05-experimentos/etapa4-mlp-populacao/pilotos-4a2/pressao/taxa/results-4a3-archived
+python 05-experimentos/etapa4-mlp-populacao/pilotos-4a2/pressao/taxa/run_4a3.py --workers 4
+python 05-experimentos/etapa4-mlp-populacao/pilotos-4a2/pressao/taxa/analise_4a3.py
+
+# Preserve the archived transformer records in this reproduction copy.
+mv 05-experimentos/etapa5-transformer/results-e5 05-experimentos/etapa5-transformer/results-e5-archived
+python 05-experimentos/etapa5-transformer/run_e5.py --workers 4
+python 05-experimentos/etapa5-transformer/analise_e5.py
 ```
 
-Each worker is single-threaded; set `OMP_NUM_THREADS=1`. Memory per worker is
-below 1 GB. The `--smoke` outputs are not confirmatory and are ignored by Git.
+Historical times with four single-threaded CPU workers were 4.9 hours for
+400 MLP runs and 13.9 hours for 800 transformer runs. The release review did
+not rerun these campaigns or independently profile peak memory for every run.
+
+The runners also provide `--smoke`, writing separate ignored smoke directories.
+The MLP runner uses two shorter 20,000-step runs; the transformer runner still
+uses two full 200,000-step runs. For a much smaller engine check, use
+`python verification/smoke.py --engines` instead. Transformer `--estimativa`
+times two full runs and is not a lightweight metadata query.
 
 ### 4.4 Comparing a regenerated run with its archive
 
@@ -195,4 +206,4 @@ needed. The release build produced 66 pages with no errors.
   sweep; `05-experimentos/t2-n-neuronios/*.jsonl`: forcing-theorem numerics.
 
 The archived run files are run and episode summaries (per-unit events, areas,
-counters, periodic loss history), not full per-step trajectories.
+counters and loss summaries), not full per-step trajectories.

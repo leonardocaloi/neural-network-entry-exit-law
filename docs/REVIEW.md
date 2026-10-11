@@ -209,3 +209,19 @@ independently time-stamped registration.
   of the private research repository were not published.
 - The text of the historical notes under `06-notas/` and the experiment READMEs
   (in Portuguese) was not edited or translated.
+
+## 8. Delivery follow-up
+
+A subsequent documentation review consulted the Claude session that completed
+the public release, reused its recorded checks, and did not rerun the training
+campaigns. It shortened the README, corrected the theorem references to
+Theorems 2 and 6, and made the reproduction commands executable from the
+repository root. The full-regeneration instructions now explicitly preserve
+and move the archived results aside in a separate clone, because both runners
+otherwise skip all existing records. The manuscript, experiment code,
+configurations, results and version 0.1.0 PDF were unchanged by this follow-up.
+
+The documentation follow-up is released as version 0.1.1. It also fixes an
+unquoted colon in the citation title so that `CITATION.cff` parses as YAML,
+and updates the software citation version. The manuscript PDF has the same
+SHA256 as the version 0.1.0 release asset.
