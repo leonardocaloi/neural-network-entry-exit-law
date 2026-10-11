@@ -8,11 +8,9 @@ proofs and experiments were developed with substantial LLM assistance.
 
 [Read the manuscript (PDF, 66 pages)](paper/paper-v4.pdf) ·
 [LaTeX source](paper/paper-v4.tex) ·
-[Research map](docs/RESEARCH-MAP.md) ·
-[Roadmap](docs/ROADMAP.md) ·
 [Reproduction guide](docs/REPRODUCIBILITY.md) ·
 [Review and corrections](docs/REVIEW.md) ·
-[Release](https://github.com/leonardocaloi/neural-network-entry-exit-law/releases/tag/v0.2.0)
+[Release](https://github.com/leonardocaloi/neural-network-entry-exit-law/releases/tag/v0.2.1)
 
 ## Research question
 
@@ -26,21 +24,6 @@ central result describes a limiting trajectory that becomes inactive,
 retains a memory of the residual, and returns when a signed residual integral
 reaches zero. The experiments investigate related behavior in small MLPs and
 a one-layer transformer. They concern artificial units, not biological neurons.
-
-## Broader research context
-
-This study connects **training dynamics, local geometry, optimization, and
-measurement**. Singular perturbation supplies the entry-exit question;
-live-system geometry controls the forcing; experiments examine the behavior
-of inactive units; negative controls test whether the measurements support
-that interpretation.
-
-The [research map](docs/RESEARCH-MAP.md) explains connections to contact mechanics,
-kernel and information geometry, singular learning theory, mean-field dynamics,
-tropical geometry, neural-network plasticity, and evaluation methodology. It
-distinguishes manuscript results from background and exploratory connections.
-The [roadmap](docs/ROADMAP.md) identifies the next proof obligations and bounded
-research questions, including trainable readouts, competing margins, and Adam.
 
 ## Contributions and scope
 
@@ -131,25 +114,6 @@ a falsified stochastic schedule and a 600-run instrument invalidated by its
 own null control. They are retained in
 [`experiments/NEGATIVE-RESULTS.md`](experiments/NEGATIVE-RESULTS.md).
 
-## Repository guide
-
-The current directories, script entry-point filenames, and Markdown guides use
-English. Original records remain in the published history, with a complete
-[path migration map](docs/MIGRATION.md). Frozen data keys and internal research
-identifiers retain their original spelling to preserve reproducibility.
-
-| Path | Contents |
-|---|---|
-| [`paper/`](paper/) | Current manuscript, historical versions, figures, and figure scripts |
-| [`theory/`](theory/) | Proof notes, standalone drafts, symbolic and numerical verification scripts |
-| [`experiments/instance-sweep/`](experiments/instance-sweep/) | 600-instance sweep and its saved output |
-| [`experiments/affine-forcing/`](experiments/affine-forcing/) | Affine-extension numerics, controls, and exploratory extensions |
-| [`experiments/mlp/`](experiments/mlp/) | MLP pilots, invalidated instrument, and confirmatory `pilots/pressure/rates/` |
-| [`experiments/transformer/`](experiments/transformer/) | Transformer protocols, engines, analyses, and saved results |
-| [`verification/`](verification/) | Lightweight artifact checks and numerical comparison tools |
-| [`visualizations/`](visualizations/) | English interactive toy explainer, with its stochastic scope stated |
-| [`docs/`](docs/) | Research map, roadmap, reproduction, review, history, and provenance |
-
 ## Quick start
 
 From the repository root, with Python 3.14:
@@ -187,6 +151,40 @@ per-step trajectories. Regenerated gzip bytes can differ because of timing
 metadata, library versions, and floating-point behavior; comparison tools and
 explicit tolerances are documented.
 
+## Broader research context
+
+This study connects **training dynamics, local geometry, optimization, and
+measurement**. Singular perturbation supplies the entry-exit question;
+live-system geometry controls the forcing; experiments examine the behavior
+of inactive units; negative controls test whether the measurements support
+that interpretation.
+
+The [research map](docs/RESEARCH-MAP.md) explains connections to contact mechanics,
+kernel and information geometry, singular learning theory, mean-field dynamics,
+tropical geometry, neural-network plasticity, and evaluation methodology. It
+distinguishes manuscript results from background and exploratory connections.
+The [roadmap](docs/ROADMAP.md) identifies the next proof obligations and bounded
+research questions, including trainable readouts, competing margins, and Adam.
+
+## Repository guide
+
+The current directories, script entry-point filenames, and Markdown guides use
+English. Original records remain in the published history, with a complete
+[path migration map](docs/MIGRATION.md). Frozen data keys and internal research
+identifiers retain their original spelling to preserve reproducibility.
+
+| Path | Contents |
+|---|---|
+| [`paper/`](paper/) | Current manuscript, historical versions, figures, and figure scripts |
+| [`theory/`](theory/) | Proof notes, standalone drafts, symbolic and numerical verification scripts |
+| [`experiments/instance-sweep/`](experiments/instance-sweep/) | 600-instance sweep and its saved output |
+| [`experiments/affine-forcing/`](experiments/affine-forcing/) | Affine-extension numerics, controls, and exploratory extensions |
+| [`experiments/mlp/`](experiments/mlp/) | MLP pilots, invalidated instrument, and confirmatory `pilots/pressure/rates/` |
+| [`experiments/transformer/`](experiments/transformer/) | Transformer protocols, engines, analyses, and saved results |
+| [`verification/`](verification/) | Lightweight artifact checks and numerical comparison tools |
+| [`visualizations/`](visualizations/) | English interactive toy explainer, with its stochastic scope stated |
+| [`docs/`](docs/) | Research map, roadmap, reproduction, review, history, and provenance |
+
 ## Limitations and research status
 
 The mathematical results require their stated hypotheses, including fixed
@@ -195,8 +193,7 @@ experiments are small and go beyond those hypotheses. They do not establish
 behavior in production-scale networks. The stochastic setting, broader
 architectures, and a sharper asymptotic remainder remain unresolved.
 
-The manuscript is independent research and has not been peer-reviewed.
-Its original date is July 26, 2026; the public-release revision is dated
+The manuscript’s original date is July 26, 2026; the public-release revision is dated
 October 11, 2026. Pre-registration means commits made before the recorded
 campaigns in the local research history, not registration with an external
 service. Relevant history is preserved, with original hashes mapped in

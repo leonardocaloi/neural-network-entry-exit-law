@@ -12,7 +12,18 @@ claim in those drafts has passed review. See
 [multiple-margin scoping](../../docs/research-notes/2026-07-27-multiple-margin-scoping.md),
 and [review 18](review-18.md).
 
-Some historical review scripts reference scratchpad files not included in the
-release. The supported small check is `verification/check_entry_exit.py` from
+## Historical auxiliary campaigns
+
+`review14.py`, `review15_o5.py`, `review15_o5b.py`, and
+`generate_artifacts.py` are full-campaign research scripts, not quick tests.
+Version 0.2.1 removes an obsolete output directory and an unused import path;
+their required modules and `forcing_m.jsonl` are included here. Regenerated
+reports from `review14.py` and the wrapper go to `build/affine-forcing/` at the
+repository root, leaving the original records untouched. Their full numerical
+campaigns were not rerun for this maintenance release.
+
+The supported small check is `python verification/check_entry_exit.py` from
 the repository root; it uses an adaptive integrator on selected saved cases.
-The [roadmap](../../docs/ROADMAP.md) identifies the remaining proof obligations.
+See the [reproduction guide](../../docs/REPRODUCIBILITY.md) for the distinction
+between quick checks and full campaigns. The [roadmap](../../docs/ROADMAP.md)
+identifies the remaining proof obligations.

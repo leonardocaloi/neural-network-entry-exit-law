@@ -1,6 +1,9 @@
+"""Historical pre-hit scaling campaign; not part of the quick checks.
+
+Uses the adjacent review15_o5.py, verify_forcing.py, and forcing_m.jsonl.
+"""
 from pathlib import Path
 import sys, json, numpy as np
-sys.path.insert(0,"/tmp/claude-1000/-home-caloi-Projects-j-space/552bb7fa-f3f0-42f8-8086-cb79faf68c7a/scratchpad")
 sys.path.insert(0,str(Path(__file__).resolve().parent / '.'))
 from review15_o5 import run
 from verify_forcing import sorteia, FACE

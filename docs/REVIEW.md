@@ -262,3 +262,35 @@ inline equation was displayed on its own line without changing its content.
 JavaScript syntax checks passed for the English toy. An interactive browser
 was unavailable in the preparation environment, so a browser rendering check
 of that HTML file was not performed.
+
+## 10. Maintenance and automated checks (version 0.2.1)
+
+The manuscript, README, and citation retain Leonardo Caloi Santos as author.
+The project-scoped Claude Code setting `attribution.commit` is now empty to
+disable the automatic coauthor trailer in future commits, following the
+[Claude Code settings reference](https://code.claude.com/docs/en/settings-reference#attribution-commit).
+The existing AI-assistance disclosure and all previous commit messages remain
+intact. The local Git author uses the account-associated GitHub noreply address;
+the public remote and default branch remain unchanged.
+
+The README now presents the research question, contributions and hypotheses,
+mechanism, results, and quick reproduction before the broader research map.
+The new GitHub Actions workflow runs the two documented quick checks in a clean
+environment on pushes to `main` and pull requests. It does not run training or
+the historical full-campaign wrappers. Actions are pinned to commit hashes,
+and the workflow has read-only repository permissions.
+
+Inspection corrected the earlier description of auxiliary dependencies:
+`review14.py` used its old scratchpad path as an output directory, and
+`review15_o5b.py` contained an unused import search path. The required modules
+and input records are already in the repository. The obsolete paths have been
+removed; `review14.py` and `generate_artifacts.py` write regenerated reports to
+`build/affine-forcing/` instead of the scratchpad or archived evidence. Their
+numerical routines, configurations, and saved results are unchanged. These
+historical campaigns remain outside the quick verification path and were not
+rerun for this release.
+
+The manuscript PDF and LaTeX source are unchanged from version 0.2.0. No proof,
+scientific conclusion, archived result, preregistration commit, or provenance
+map was revised. Version 0.2.1 is a separate release; previous releases and
+tags are preserved. Its release notes link the actual automated check result.

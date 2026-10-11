@@ -1,10 +1,14 @@
-"""Parecer 14 - testes adversariais sobre verify_forcing.py (NAO edita nada do projeto)."""
+"""Historical adversarial checks of verify_forcing.py.
+
+Explicit campaigns write regenerated reports to build/affine-forcing/.
+They are outside the quick verification path and do not replace saved evidence.
+"""
 from pathlib import Path
 import json, os, sys, numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent / '.'))
 import verify_forcing as V
 
-AQUI = "/tmp/claude-1000/-home-caloi-Projects-j-space/552bb7fa-f3f0-42f8-8086-cb79faf68c7a/scratchpad"
+AQUI = str(Path(__file__).resolve().parents[2] / "build" / "affine-forcing")
 
 # ---------------------------------------------------------------- L_B por instancia
 def lam_max_GB(X, P0, a):
@@ -80,6 +84,7 @@ def teste_A():
               f"m=16: {(row.get('e16') or float('nan'))*100:.2f}%  "
               f"lam_max(G_B) {row['lam4']:.3f}/{row.get('lam8',float('nan')):.3f}/"
               f"{row.get('lam16',float('nan')):.3f}", flush=True)
+    Path(AQUI).mkdir(parents=True, exist_ok=True)
     json.dump(linhas, open(os.path.join(AQUI, "testeA.json"), "w"), indent=1)
     return linhas
 
@@ -149,6 +154,7 @@ def teste_B_full(n_seeds=900, n_full=25, H=1.8, m=4):
             print(f"    seed {r['seed']}: R_exit={r['R_exit']:.4f} "
                   f"Tep*beta={(r['t_exit']-r['t_hit'])*V.BETA:.0f} "
                   f"lam_max(G_B)={lam:.3f} erro={r['erro_rel']*100:.2f}%")
+    Path(AQUI).mkdir(parents=True, exist_ok=True)
     json.dump(regs, open(os.path.join(AQUI, f"testeB_full_m{m}_H{H}.json"), "w"))
     return regs
 

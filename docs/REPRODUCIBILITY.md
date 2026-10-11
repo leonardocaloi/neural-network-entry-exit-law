@@ -82,6 +82,16 @@ with SciPy's DOP853 at rtol 2e-12 and event interpolation, for β from 1e4 to
 3e5. About 3 s. `docs/verification/entry-exit-checks.json` is the report
 produced during the release review.
 
+### Automated verification
+
+[Quick verification](https://github.com/leonardocaloi/neural-network-entry-exit-law/actions/workflows/verification.yml)
+runs on pushes to `main`, pull requests, and manual dispatch. Each run installs
+`requirements.txt` in a fresh GitHub-hosted Ubuntu 24.04 / Python 3.14
+environment and executes only `verification/smoke.py` and
+`verification/check_entry_exit.py`, followed by a tracked-file integrity check.
+It does not install PyTorch or launch training campaigns. Successful checks
+validate the listed finite computations and saved records, not the full proofs.
+
 ## 3. Analysis only (seconds)
 
 The frozen analyses read the archived records and print the report that the
@@ -118,11 +128,20 @@ in `experiments/affine-forcing/` (`verify_forcing.py`, `beta.py`,
 `generate_artifacts.py`); the manuscript reports about 1 hour wall-clock for the
 whole set, single-threaded.
 
-Some historical review scripts (`review14.py`, `review15_o5b.py`) still reference
-scratchpad material absent from the release. Their saved outputs are included,
-but the wrapper is not a self-contained reproduction path for those auxiliary
-checks. Use `verification/check_entry_exit.py` for the supported independent
-selected-instance check; do not treat a historical timing as a successful rerun.
+Version 0.2.1 removes the obsolete local scratchpad paths from `review14.py`
+and `review15_o5b.py`. The former used the missing directory only for output;
+the latter had an unused search-path entry. Their required Python modules and
+`forcing_m.jsonl` are already included. No missing scientific source needed
+to be reconstructed.
+
+These are historical full-campaign scripts, outside the supported quick checks.
+`review14.py` and `generate_artifacts.py` now write new reports under
+`build/affine-forcing/`, keeping the archived records intact. The wrapper's
+`unit`, `beta`, and `prehit` modes retain their original numerical routines.
+Their imports and output routing were checked, but the full campaigns were
+not rerun for this maintenance release. Use `verification/check_entry_exit.py`
+for the supported independent selected-instance check; historical runtimes
+are not evidence of a new execution.
 
 ### 4.2 Two-neuron sweep (about 12 minutes)
 
@@ -145,7 +164,7 @@ With dependencies installed and the environment activated, from the original
 checkout's root:
 
 ```sh
-git clone --branch v0.2.0 https://github.com/leonardocaloi/neural-network-entry-exit-law.git ../entry-exit-reproduction
+git clone --branch v0.2.1 https://github.com/leonardocaloi/neural-network-entry-exit-law.git ../entry-exit-reproduction
 cd ../entry-exit-reproduction
 export OMP_NUM_THREADS=1
 

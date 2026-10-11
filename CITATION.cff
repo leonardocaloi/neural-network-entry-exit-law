@@ -4,7 +4,7 @@ message: >-
   This is an independent research manuscript, not peer-reviewed.
 type: software
 title: "Neural-network entry-exit law: research software and artifacts"
-version: 0.2.0
+version: 0.2.1
 date-released: '2026-10-11'
 authors:
   - family-names: Caloi Santos

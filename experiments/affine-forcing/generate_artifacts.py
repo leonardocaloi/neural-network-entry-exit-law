@@ -1,23 +1,26 @@
-"""Wrapper de ARTEFATOS: reexecuta as tres campanhas de sec:forcing-numerics que
-so tinham saida em stdout e grava jsonl versionavel. NAO altera a logica de
-review14.py / beta.py / review15_o5.py -- apenas as invoca e serializa.
+"""Historical full-campaign wrapper; not part of the quick checks.
 
-  python generate_artifacts.py unit    -> unit_readout_m.jsonl
-  python generate_artifacts.py beta    -> beta_sweep.jsonl
-  python generate_artifacts.py prehit  -> o5_prehit.jsonl
+Invokes the original numerical routines and serializes their outputs under
+build/affine-forcing/, without overwriting the archived evidence.
+
+  python generate_artifacts.py unit    -> build/affine-forcing/unit_readout_m.jsonl
+  python generate_artifacts.py beta    -> build/affine-forcing/beta_sweep.jsonl
+  python generate_artifacts.py prehit  -> build/affine-forcing/o5_prehit.jsonl
 """
 from pathlib import Path
 import json, os, sys
 import numpy as np
 
 AQUI = str(Path(__file__).resolve().parent / '.')
+OUTPUT_DIR = Path(__file__).resolve().parents[2] / "build" / "affine-forcing"
 sys.path.insert(0, AQUI)
 import verify_forcing as V
 import review14 as P14
 
 
 def _dump(nome, linhas):
-    p = os.path.join(AQUI, nome)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    p = OUTPUT_DIR / nome
     with open(p, "w") as f:
         for r in linhas:
             f.write(json.dumps(r) + "\n")
