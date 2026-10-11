@@ -6,10 +6,11 @@ parecer14.py / beta.py / parecer15_o5.py -- apenas as invoca e serializa.
   python gera_artefatos.py beta    -> beta_sweep.jsonl
   python gera_artefatos.py prehit  -> o5_prehit.jsonl
 """
+from pathlib import Path
 import json, os, sys
 import numpy as np
 
-AQUI = "/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios"
+AQUI = str(Path(__file__).resolve().parent / '.')
 sys.path.insert(0, AQUI)
 import verifica_forcing as V
 import parecer14 as P14

@@ -2,9 +2,10 @@
 Predicao do draft (L2' passo 4): rho_B = O(beta^-2), rho_A = O(beta^-1).
 RK4 para que o erro de integracao fique <<  beta^-2.
 """
+from pathlib import Path
 import sys, os, json
 import numpy as np
-sys.path.insert(0, "/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios")
+sys.path.insert(0, str(Path(__file__).resolve().parent / '.'))
 from verifica_forcing import sorteia, readout, FACE, softplus, sig, hibrido, DT0
 
 def field_relu(P, X, Y, a):
@@ -42,7 +43,7 @@ def run(seed, m, betas, dt=2e-6):
 
 if __name__ == "__main__":
     betas = [1e3, 2e3, 4e3, 8e3]
-    recs = [json.loads(l) for l in open("/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios/forcing_m.jsonl")]
+    recs = [json.loads(l) for l in open(str(Path(__file__).resolve().parent / 'forcing_m.jsonl'))]
     ok = [r for r in recs if r["passou"]]
     sel = []
     for m in (4,8,16):

@@ -20,7 +20,7 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage[text={6in,8in},centering]{geometry}   % F22: limite SIADS
 \usepackage{graphicx}
-\usepackage{url}
+\PassOptionsToPackage{hyphens}{url}\usepackage{url}
 \usepackage{array}
 \usepackage{booktabs}
 \usepackage{microtype}
@@ -121,14 +121,16 @@ under smoothed ReLU activation}
 % e cidade a declarar. O que esta abaixo satisfaz a norma (nome + afiliacao +
 \author{Leonardo Caloi Santos\thanks{Independent researcher, Maring\'a,
 Paran\'a, Brazil. \texttt{leonardo@ventros.com.br}.}}
-\date{July 26, 2026}
+\date{July 26, 2026\\Public-release revision: October 11, 2026}
 
 \begin{document}
 \maketitle
+\begin{center}\small Independent research manuscript; not peer-reviewed.\end{center}
 
 \begin{abstract}
 A neuron dies when its pre-activation margin is negative on every datum, and
-under hard ReLU its gradient is exactly zero, so it never returns. In the
+under hard ReLU its own gradient is exactly zero; with fixed inputs, it
+cannot return through that channel. In the
 sharp-activation limit of a shallow softplus network under gradient flow the
 dynamics is instead hybrid with memory: we prove that the dead unit is
 released exactly when the signed time integral of the residual excluding it
@@ -139,10 +141,11 @@ median relative error $2.7\%$, coefficients spanning a factor of 20.
 The law is a statement about the forcing: a second theorem extends it to any
 affine live subsystem with $m$ units, with constants uniform to $O(\sqrt m)$. A
 pre-registered ladder follows, ending in two confirmatories. A 400-run MLP
-reproduces resurrection, the area in fact turning positive in 13 of 16 returns,
+records returns, with the area turning positive in 13 of 16 returns
+in the primary softplus-$\beta3$ arm,
 hard ReLU structurally zero. A transformer confirmatory of 800 pre-registered
-runs transfers the class to the feed-forward block through the unit's own
-channel ($\hat p=0.440$) and reproduces a second, upstream channel in all four
+runs observes own-channel returns in its shallow-injection softplus arm
+($22/50$, $\hat p=0.440$) and reproduces a second, upstream channel in all four
 arms: hard-ReLU units return 20 of 100, against 0 with attention frozen.
 \end{abstract}
 
@@ -154,21 +157,24 @@ perturbation; dead neurons; smoothed ReLU; gradient flow; loss of plasticity.
 
 \section{Introduction}\label{sec:intro}
 
-Write $\Phi:\mathcal{W}\to\mathcal{F}$ for the parametrization of a network and
-$J=D\Phi$ for its Jacobian. A neuron whose pre-activation margin is negative on
-every datum contributes an identically zero column to $J$: it sits on a stratum
-of the singular locus where $J$ drops rank. This is exact for ReLU and
-exponentially thin for softplus-$\beta$; it does not hold for GELU at all, whose
-output is nonzero for every finite negative margin (\cref{sec:transformer-gelu}).
-Under a hard ReLU the gradient of the
-loss in the directions of that unit is exactly zero, so the stratum is absorbing.
-A dead unit stays dead. This is the mechanism behind the empirically documented
-dormant-neuron and loss-of-plasticity
-phenomena~\cite{Sokar23,Lyle23,Dohare24}. The question of this paper is what
-replaces the absorbing stratum when the activation is smoothed, as it is in every
-softplus or GELU~\cite{HG16} network actually trained.
+Write $\Phi:\mathcal{W}\to\mathcal{F}$ for the parametrization of a network
+on the training data and $J=D\Phi$ for its Jacobian. Under hard ReLU, a neuron
+whose pre-activation margin is negative on every datum has a zero Jacobian
+block with respect to its own incoming parameters. This does not, by itself,
+imply a drop in the rank of the full $J$: other units may already span its
+output space. The present law concerns this inactive block, not a global
+rank-loss theorem. For softplus-$\beta$ the block is exponentially small at
+fixed negative margins; GELU instead has a sign-changing derivative
+(\cref{sec:transformer-gelu}).
 
-Our answer is an exact gating law and its numerical arc.
+With fixed inputs and the zero-derivative convention for ReLU, a dead unit
+receives no own-parameter gradient. This is one mechanism relevant to dormant
+units, but it does not by itself explain all observed loss of
+plasticity~\cite{Sokar23,Lyle23,Dohare24}. The question here is what replaces
+this inactive regime when ReLU is regularized by softplus. GELU~\cite{HG16}
+provides an experimental comparison outside the theorem's class.
+
+The manuscript develops an entry--exit law under the hypotheses below.
 
 \begin{theorem*}[informal]
 In the sharp-activation limit of the smoothed flow, a dead unit does not sit on
@@ -230,17 +236,17 @@ $O(\log\beta/\beta)$ and the release time carries the first-order coefficient
 $-1/(cR(\texit))$, from which the arrival speed has cancelled. The proof is
 organized as six lemmas (\cref{app:lemmas}), each with an independent executable
 symbolic or numerical verification. A consequence of the same construction is
-that the two limit orders, smooth-then-sharp against the pointwise
-generalized-gradient flow, do not commute (\cref{sec:noncomm}): the field-first
-order is the frozen branch of Eberle, Jentzen, Riekert and Weiss~\cite{EJRW23},
-our flow-first limit resurrects, and the autodiff convention that fixes the
-branch is discussed in \cref{sec:related}. For the erf smoothing we verify
+that the smooth-flow limit differs from a specified absorbing hard-ReLU
+branch (\cref{sec:noncomm}). The zero-derivative convention selects that
+frozen construction; it is not the literal softplus derivative limit at the
+kink. Related branch-selection results are discussed, with their scope, in
+\cref{sec:related}. For the erf smoothing we verify
 numerically that the release criterion is unchanged; the proof is written for
 softplus, and GELU is outside the class because its derivative is non-monotone.
 
 \item \textbf{A second theorem: the law belongs to the forcing
-(\cref{sec:forcing,thm:forcing}).} The residual $R$ is treated as a
-\emph{prescribed forcing} and the live side is allowed to be any affine
+(\cref{sec:forcing,thm:forcing}).} The residual $R$ is analyzed through its
+\emph{scalar forcing} and the live side is allowed to be any affine
 subsystem of order $m$ --- any number of live units with a constant activation
 pattern and a fixed readout --- instead of the single live neuron of
 \cref{thm:main}. The same law holds, with the same first-order coefficient
@@ -270,15 +276,17 @@ as the zero-gradient control, and the return probability is monotone in $\beta$
 (\cref{sec:confirmatory,fig:escada}). The scoping of the transformer
 (\cref{sec:transformer-gelu}) exposed two new mechanisms, a GELU sign-flip barrier and
 an upstream channel, and its own pre-registered confirmatory of 800 runs was
-executed: the theorem class transfers to the feed-forward block through the own
-channel, the upstream channel reproduces in all four arms including hard ReLU,
-and the barrier remains confounded with injection depth.
+executed: own-channel returns are observed in the feed-forward block in the
+shallow-injection softplus arm (the pre-registered estimand E-C), the upstream
+channel reproduces in all four arms including hard ReLU, and the barrier
+remains confounded with injection depth.
 
 \item \textbf{A confirmatory in a transformer block
 (\cref{sec:transformer,sec:transformer-gelu} and \cref{app:estimands}).} The
-800 pre-registered runs close their five estimands: the theorem class transfers
-to the feed-forward block through the unit's own channel ($22/50$ sustained
-returns, the area opening before $21/22$ of them); the upstream channel
+800 pre-registered runs close their five estimands: the own-channel estimand
+E-C, labelled ``transfer of the theorem class'' in the pre-registration, passes
+its gate in the shallow-injection softplus arm ($22/50$ sustained returns, the
+area opening before $21/22$ of them); the upstream channel
 reproduces in all four arms, hard ReLU included ($20/100$ against $0/100$ with
 attention frozen); and the GELU barrier is left confounded with injection depth
 under the pre-registered three-way label. \Cref{tab:e5} carries the five rows.
@@ -299,7 +307,7 @@ form (\cref{sec:forcing}), the six lemmas
 that compose it and the numerical verification of its constants; the complete
 proofs of the lemmas are deferred to \cref{app:lemmas} and the proof of the
 forcing theorem to \cref{app:forcing}. \Cref{sec:noncomm} makes
-the non-commutation of the two limit orders precise and connects it to the
+the comparison with the absorbing hard-ReLU branch precise and connects it to the
 plasticity literature, which \cref{sec:related} surveys. \Cref{sec:experiments}
 is the experimental ladder, from the falsified reduced model to the two executed
 confirmatories, the MLP and the transformer;
@@ -336,8 +344,13 @@ $\theta_B$ alone; set $R^{\hyb}$ accordingly and
 \begin{equation}\label{eq:area}
 \Ar^{\hyb}(t)=\int_{\thit}^{t}R^{\hyb}(s)\,ds
 \end{equation}
-for its signed area. The death of $A$ is exactly the rank drop of $J$ on the
-stratum $\{z\le0\}$; the question is the fate of the trajectory on that stratum.
+for its signed area. Under \eqref{H3}, crossing to $z\le0$ makes the hard-ReLU Jacobian block
+associated with $A$ vanish. The question concerns the regularized dynamics
+near this inactive region, without assuming a rank drop of the full $J$.
+Both flows start from the same fixed initial state with the relevant margin
+positive. The first-order release correction below includes the smoothed
+entry delay. A prescribed-forcing trajectory initialized directly at $z=0$
+has no such delay and is the distinct setting of \cref{lem:release}.
 
 \paragraph{Hypotheses.} On the episode we assume
 \begin{align}
@@ -422,9 +435,11 @@ forcing}\label{sec:forcing}
 \Cref{thm:main} is stated for two neurons, and read literally it is a statement
 about a particular small network. It is not: nothing in the argument uses the
 live side except through the scalar $R$ it generates. This subsection makes that
-reading a theorem. The residual becomes a \emph{prescribed forcing}, the live
-side becomes an arbitrary affine subsystem of order $m$, and the law, the rate
-and the first-order coefficient are unchanged. The complete proof is
+reading a theorem. The hybrid residual is the reference forcing, the live
+side becomes an arbitrary affine subsystem of order $m$, and the coupled-flow
+law, rate and first-order coefficient are unchanged. The entry condition is
+inherited from \cref{sec:setup}; initializing directly on the face defines a
+different comparison problem. The complete proof is
 \cref{app:forcing}; the mathematical source is the standalone note
 \path{06-notas/t2-prova/teorema-forcing-draft.tex}.
 
@@ -641,7 +656,7 @@ outcome is reported at the end of each proof.
 Let $w=e^{\beta z}$ and $u=1/w$, and set $\Psi(u)=\log u+u$. In fast time
 $\tau=\beta t$ the margin obeys
 \begin{equation}\label{eq:normalform}
-\frac{dw}{d\tau}=c\,R(t)\,\frac{w^{2}}{1+w}\,(1+E_\beta),
+\frac{dw}{d\tau}=c\,R(t)\,\frac{w^{2}}{1+w}\,(1+E_\beta)+w\eta_\beta,
 \qquad
 |E_\beta|\le\frac{\log(1+w)}{\beta|R|},
 \end{equation}
@@ -652,8 +667,10 @@ identity
 \begin{equation}\label{eq:quadrature}
 \frac{d\Psi(u)}{dt}=-c\,\beta\,R(t)+c\log(1+w)+\mathcal{E}_{\eqref{H3}}(t),
 \qquad
-\bigl|\mathcal{E}_{\eqref{H3}}\bigr|\le C_3\,\beta\,e^{-\beta\delta_1}.
+\bigl|\mathcal{E}_{\eqref{H3}}\bigr|\le C_3\,\beta(1+u)\,e^{-\beta\delta_1}.
 \end{equation}
+Here $|\eta_\beta|\le C_3e^{-\beta\delta_1}$ is the other-margin
+forcing, and the multiplicative form is used only where $R\ne0$.
 Under \eqref{H1}--\eqref{H2} the additive correction satisfies
 $\int_{\thit}^{\trel}c\log(1+w)\,ds=O(\log\beta/\beta)$.
 \end{lemma}
@@ -1026,40 +1043,38 @@ proved. GELU itself, $z\,\mathcal N(z)$, has a non-monotone derivative and is no
 a member of the family for any $\beta$; \cref{sec:transformer-gelu} shows that
 this is a distinct mechanism rather than a technicality.
 
-\section{Non-commutation and the plasticity bridge}\label{sec:noncomm}
+\section{Branch selection and the plasticity bridge}\label{sec:noncomm}
 
-\Cref{thm:main} is the flow-first limit: one takes $\beta\to\infty$ of
-trajectories. The field-first order instead flows the pointwise-limit generalized
-gradient, and it freezes degenerate neurons forever. That branch is the rigorous
-one of Eberle, Jentzen, Riekert and Weiss~\cite[Theorem 3.3]{EJRW23}, whose
-selected solution is unique and has a degenerate set that is non-decreasing in
-time; their degenerate stratum is the fully-zero one rather than our functionally
-dead neuron, but the convention $\mathrm{ReLU}'(0)=0$ and the no-revival
-mechanism are the same.
+\Cref{thm:main} describes a limit of smooth trajectories. For comparison,
+consider the hard-ReLU generalized gradient with the explicit convention
+$\mathrm{ReLU}'(0)=0$ and choose its absorbing continuation after death.
+This convention is not the literal pointwise limit of the softplus derivative
+at zero: $\sigma(\beta\,0)=1/2$ for every $\beta$. Nor does a discontinuous
+field automatically have unique trajectories starting on the switching face.
+The comparison below is between specified branches.
 
-\begin{proposition}[the two limit orders do not commute]\label{prop:noncomm}
-Let $L_\infty$ be the loss of the hard-ReLU network and let $\nabla^0L_\infty$ be
-its pointwise-limit gradient, with the convention $\mathrm{ReLU}'(0)=0$; let
-$\theta^{\mathrm{FF}}$ solve $\dot\theta=-\nabla^0L_\infty(\theta)$ from
-$\theta^{\hyb}(\thit)$, which exists and is unique
-by~\cite[Theorem 3.3]{EJRW23}. Assume \eqref{H1}--\eqref{H4}. Then
-$\theta_A^{\mathrm{FF}}\equiv\theta_A(\thit)$ on $[\thit,H]$, whereas
-$\theta^\infty$ of \cref{def:hybrid} releases $A$ at $\texit<H$. The two limits
-therefore disagree on $(\texit,H]$.
+\begin{proposition}[absorbing branch versus the smooth-flow limit]\label{prop:noncomm}
+Assume \eqref{H1}--\eqref{H4}. Let $\theta^{\mathrm{FF}}$ be the hard-ReLU
+continuation from $\theta^{\hyb}(\thit)$ constructed by holding
+$\theta_A=\theta_A(\thit)$ and evolving the affine live subsystem with the
+zero-derivative convention at the inactive face. Then this continuation solves
+the selected hard-ReLU gradient equation and keeps $A$ inactive on $[\thit,H]$.
+In contrast, $\theta^\infty$ of \cref{def:hybrid} releases $A$ at
+$\texit<H$. The two selected continuations therefore differ after exit.
+No uniqueness among all nonsmooth continuations is asserted.
 \end{proposition}
 
 \begin{proof}
-The $A$-block of $\nabla^0L_\infty$ at $\theta$ is
-$-\tfrac1n\sum_i\mathrm{res}_i\,\mathbf 1_{\{z_{A,i}>0\}}(x_i,1)$, which vanishes
-identically whenever every margin of $A$ satisfies $z_{A,i}\le0$. At $\thit$ the
-margin on datum $j$ is zero and, by \eqref{H3}, the remaining margins are
-$\le-\delta_1<0$, so the $A$-block vanishes and $\dot\theta_A^{\mathrm{FF}}=0$.
-The margins of $A$ are functions of $\theta_A$ alone, so the condition
-$z_{A,i}\le0$ for all $i$ is preserved as long as $\theta_A$ is constant, and the
-set of such $\theta$ is therefore forward invariant: $\theta_A^{\mathrm{FF}}$
-stays at $\theta_A(\thit)$ on all of $[\thit,H]$. By \cref{def:hybrid} and
-\eqref{H2}, $\theta^\infty$ restarts the active flow at $\texit<H$ with
-$\dot z(\texit^+)=cR^{\hyb}(\texit)>0$, so $z>0$ immediately after $\texit$.
+With this convention, the $A$-block of the generalized gradient is
+$\tfrac1n\sum_i\mathrm{res}_i\mathbf 1_{\{z_{A,i}>0\}}(x_i,1)$.
+It vanishes whenever every margin of $A$ is nonpositive. At $\thit$ the
+face margin is zero and the remaining margins are negative by \eqref{H3}.
+Holding $\theta_A$ fixed therefore satisfies its gradient equation, while
+\eqref{H4} makes the live subsystem an affine ODE. This constructs the claimed
+absorbing solution on the stated window. By \cref{def:hybrid} and \eqref{H2},
+the smooth-flow limit instead restarts the active branch at $\texit$ with
+$\dot z(\texit^+)=cR^{\hyb}(\texit)>0$, hence has positive margin immediately
+after exit.
 \end{proof}
 
 \begin{corollary}[the bridge to an MLP of the affine class]\label{cor:mlp}
@@ -1102,7 +1117,7 @@ the transformer of \cref{sec:transformer} is a different architecture
 altogether. We do not claim the corollary covers any number reported in
 \cref{sec:experiments}. It covers the object those numbers are evidence about.
 
-Returning to the non-commutation itself: in machine-learning terms it is the
+Returning to this branch comparison: in machine-learning terms it is the
 statement behind an empirical trend. Discrete ReLU units that die stay dead --- an exact statement
 about a unit's \emph{own} channel under a fixed input, which is the setting of
 \cref{prop:noncomm} --- and this is the setting in which the dormant-neuron and
@@ -1134,12 +1149,14 @@ Szmolyan~\cite{KS01}, but there the forcing is autonomous, whereas here the
 residual is generated by the very trajectory it gates. We are not aware of an
 analogue of that coupling in the entry--exit literature.
 
-\paragraph{Gradient flows of ReLU networks.} Existence, uniqueness and
-convergence rates for gradient flows of ReLU networks are established
-in~\cite{EJRW23}, whose selected solution is the field-first branch of
-\cref{prop:noncomm}: once a neuron is degenerate it stays degenerate. Our
-result is the complementary, flow-first, selection, and the two disagree. The
-branch is fixed in practice by a convention of the differentiator, and that
+\paragraph{Gradient flows of ReLU networks.} Eberle, Jentzen, Riekert and
+Weiss~\cite{EJRW23} establish existence and uniqueness within a selected class
+for input distributions with a bounded density; their degenerate neurons have
+zero incoming weights and bias. That result is relevant to branch selection,
+but does not directly supply uniqueness for our finite atomic dataset or for
+all functionally inactive neurons. \Cref{prop:noncomm} instead constructs its
+absorbing branch explicitly. The derivative used in practice is fixed by a
+convention of the differentiator, and that
 convention has a name: in the framework of Bolte and Pauwels~\cite{BP21} the
 derivative returned by automatic differentiation is a definable selection of a
 conservative field for the loss, and $\mathrm{ReLU}'(0)=0$ is one such
@@ -1155,9 +1172,10 @@ distribution shift~\cite{Lyle23}, and its persistence in deep continual
 learning~\cite{Dohare24}. Death at initialization is a separate and better
 understood matter: Lu, Shin, Su and Karniadakis~\cite{Lu20} prove born-dead
 results for ReLU networks at initialization and study the initializations that
-avoid them. We invoke them only for that regime; every confirmatory count in
-this paper conditions on \emph{dynamical} deaths, units that die during
-training, and born-dead units are excluded by the instrument. The practical
+avoid them. We invoke them only for that regime. The primary MLP
+confirmatory estimands condition on \emph{dynamical} deaths during training
+and exclude born-dead units. The transformer confirmatory instead conditions
+on deliberately injected born-dead units; its denominators are distinct. The practical
 mitigations are recycling dead units and smoothing the activation.
 \Cref{thm:main} and \cref{prop:noncomm} say what the second mitigation buys: a
 channel of width $e^{\beta z}$ and a return time set by an area.
@@ -1491,7 +1509,7 @@ near-unreachable at this $N$, a consequence of the frozen rule that halves the
 pilot lower bound, so in practice C2 is the deciding test; this was signalled in
 the pre-registration rather than discovered afterwards.
 
-\subsection{The theorem class transfers to a transformer feed-forward
+\subsection{Empirical return channels in a transformer feed-forward
 block}\label{sec:transformer}
 
 The same question in a one-layer transformer, for the feed-forward block over an
@@ -1526,8 +1544,9 @@ record ahead of the data.
 
 \paragraph{The verdicts.}
 \Cref{tab:e5} carries the frozen analysis, one row per estimand: the validity
-control is clean, the theorem class transfers through the unit's own channel,
-the upstream channel reproduces in all four arms, the $\beta$ ordering of the
+control is clean, the own-channel estimand E-C passes its pre-registered gate
+in the shallow-injection softplus arm, the upstream channel reproduces in all
+four arms, the $\beta$ ordering of the
 MLP staircase repeats inside the block, and the GELU barrier is left
 consistent-with but confounded with depth. \Cref{app:estimands} keeps each
 estimand as it was frozen, with its result attached; \cref{fig:grade-e5} shows
@@ -1617,9 +1636,10 @@ E-D and E-B:
 
 \begin{itemize}
 \item \textbf{S1, a GELU sign-flip barrier.} $\mathrm{GELU}'(z)$ changes sign at
-$z^\ast=-0.7518$, verified analytically: for $z<z^\ast$ it is negative, so a
-deep-dead unit is pushed away from the return by its own gradient.
-Self-resurrection is possible only in the shallow band $(-0.752,0)$;
+$z^\ast=-0.7518$, verified analytically: for $z<z^\ast$ it is negative, reversing the local contribution relative to a positive
+activation derivative at the same residual and readout. The direction of the
+full margin dynamics also depends on those quantities and on other data; the
+sign change alone is not a general terminality theorem.
 \cref{fig:barreira} draws the barrier and both injection depths. The MLP's
 blind area port, which omits $g'$, gets the sign wrong on $12/12$ GELU episodes;
 the correct instrument uses the slope-weighted area $\Ar_{\mathrm{drive}}$. GELU
@@ -1636,17 +1656,18 @@ statistically separable, two-sided Fisher exact test, $p=0.23$.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{fig7-barreira-gelu.pdf}
-\caption{The analytic barrier and the non-stratum, both exact. Left: the GELU
+\caption{The analytic derivative sign change and the absence of a zero-output stratum. Left: the GELU
 derivative $g'(z)=\Phi(z)+z\varphi(z)$ changes sign at $z^\ast=-0.7518$; below
-$z^\ast$ (shaded) the unit's own gradient is adverse and the region is
-self-trapping, while on the shallow band $(z^\ast,0)$ the own gradient still
-points back toward activity. The two injection depths of the confirmatory,
+$z^\ast$ (shaded) the activation derivative is negative, while it is positive
+on $(z^\ast,0)$. The sign of the full margin velocity also depends on the
+residual, readout, other data, and any moving upstream input. The two injection depths of the confirmatory,
 $z=-0.3$ and $z=-2.0$, sit on opposite sides of the barrier. Right: the
 activations themselves. ReLU vanishes identically for $z<0$, an exact dead
 stratum; softplus-$\beta$ is exponentially small but strictly positive; GELU
 is strictly negative, with $\mathrm{GELU}(-0.3)=-0.115$, so for GELU there is
-no dead stratum at all and the deep-injection suppression of
-\cref{fig:grade-e5} must come from the sign of $g'$, not from a loss of rank.
+no zero-output dead stratum of the ReLU type. The deep-injection suppression
+in \cref{fig:grade-e5} does not by itself distinguish derivative-sign effects
+from injection depth.
 Script \protect\path{figura_barreira_gelu.py}.}
 \label{fig:barreira}
 \end{figure}
@@ -1662,27 +1683,23 @@ have.
 \end{itemize}
 
 Neither mechanism is a technicality of the instrument. The barrier says that the
-MLP mechanism does not port unchanged to a GELU block, since the sign-flip
-obstructs self-resurrection below $z^\ast$; the upstream channel says that
+MLP mechanism does not port unchanged to a GELU block, because its local gradient includes a sign-changing activation derivative; the upstream channel says that
 terminality of a discretely dead unit is a statement about that unit's own
 channel under a stationary input, and nothing more. In the confirmatory the
 barrier's terminality could not be separated from injection depth, and it is
 reported that way (E-D of \cref{tab:e5}); the upstream channel is established in
 all four arms (E-B).
 
-\paragraph{The deep zero is what the channel law predicts.} The own channel of
+\paragraph{A channel-based heuristic for the deep zero.} The own channel of
 sp-$\beta3$ is $\sigma(3z)$, which is $0.289$ at the shallow injection
 $z=-0.3$ and $0.00247$ at the deep one $z=-2.0$: a ratio of about $117$. The
 return time measured in the shallow cells is $\tau\approx60\,000$--$66\,000$
 steps, so scaling it by that ratio projects a deep return at roughly
-$7\cdot10^{6}$ steps, about $35$ times the horizon $H=2\cdot10^{5}$. The
-$0/50$ of sp-$\beta3$ frozen at $z=-2.0$ is therefore predicted by the channel
-law itself, at this horizon, and is not a failure of the transfer. It also
-disarms part of the E-D confound: the deep suppression of softplus is
-starvation of a quantitatively predicted size, so the depth-matched control
-gives $0/50$ for a reason that has nothing to do with the GELU barrier, and
-the two mechanisms remain separable only by the depth sweep around
-$z^\ast=-0.752$ that \cref{app:estimands} specifies.
+$7\cdot10^{6}$ steps, about $35$ times the horizon $H=2\cdot10^{5}$. This is a heuristic extrapolation that holds the other factors in the
+margin dynamics fixed; it is not a derived return-time prediction for the
+transformer. It is compatible with the $0/50$ observed for sp-$\beta3$ frozen
+at $z=-2.0$, but does not resolve the E-D confound. A depth sweep around
+$z^\ast=-0.752$ is specified in \cref{app:estimands}.
 
 \subsection{Deviations from the pre-registered protocol}\label{sec:deviations}
 
@@ -1744,20 +1761,20 @@ leading candidate driver.
 \textbf{(iii)} Scale: the confirmatories are small networks ($m\le6$ MLP units,
 $m_{\mathrm{ffn}}=4$ block units) with rich one-dimensional targets, chosen so
 that a single unit can be tracked with a ground-truth clock.
-\textbf{(iv)} GELU is outside the monotone class; its own-channel revival is
-blocked below $z^\ast=-0.752$, and in the confirmatory the barrier could not be
+\textbf{(iv)} GELU is outside the monotone class; its derivative changes sign at
+$z^\ast=-0.752$, and in the confirmatory a terminal barrier could not be
 separated from depth (the pre-registered three-way label), because at the deep
 injection $z=-2.0$ the softplus own channel is starved to $0.9\%$ of its shallow
 value --- a factor of about $117$, which projects the deep return past $35$
-horizons (\cref{sec:transformer-gelu}) --- while $\mathrm{GELU}'$ is adverse, so
-both mechanisms predict the same zero at this horizon; the separating design,
+horizons (\cref{sec:transformer-gelu}) --- while $\mathrm{GELU}'$ changes sign. These observations are compatible
+with deep suppression at this horizon but do not establish its cause; the separating design,
 a sweep of injection depths around
 $z^\ast=-0.752$, is stated in \cref{app:estimands} and left as future work. The
 upstream channel is established; the barrier's terminality remains open.
 \textbf{(v)} The cone apex, of corank $\ge2$, where weight decay produces genuine
 sliding toward the most singular stratum, is untouched.
-\textbf{(vi)} The independence of the law from the smoothing is proved for
-softplus and verified numerically for erf; it is not proved for the whole
+\textbf{(vi)} The law is proved for softplus, and its persistence under a change
+to erf smoothing is checked numerically; it is not proved for the whole
 monotone-sigmoid class.
 
 \section{Conclusion}\label{sec:conclusion}
@@ -1775,8 +1792,8 @@ the trainable readout remaining the empirical level (P3). We measured the law
 in a small MLP under a pre-registered protocol: resurrection occurs, the residual
 area opens before the return in 13 of 16 cases, hard ReLU gives a structural
 zero, and the return probability is monotone in the activation stiffness. In a
-pre-registered transformer confirmatory the theorem class transferred to
-the feed-forward block through the own channel ($22/50$, area before the return
+pre-registered transformer confirmatory, own-channel returns were observed
+in the shallow-injection softplus arm ($22/50$, area before the return
 in $21/22$), a second upstream channel reproduced in all four arms, and GELU's
 sign-changing derivative left its signature in $92\%$ of deep episodes while its
 terminality remained confounded with depth --- the pre-registered three-way
@@ -1809,27 +1826,41 @@ training.
 
 \section{Reproducibility}\label{sec:repro}
 
-All code, configs, per-run manifests and aggregate JSON needed to reproduce
-every number and figure in this note are in a single Git repository. One
-policy governs the raw data, in both confirmatories: the per-episode trace
-files (\path{results-4a3/*.jsonl.gz}, \path{results-e5/*.jsonl.gz}) are kept
-out of version control, while the manifests that checksum them
-(\path{results-4a3/manifest-4a3.json}, \path{results-e5/manifest-e5.json}) are
-versioned. The traces are byte-reproducible from the pinned configs
-(deterministic single-threaded CPU runs), so the versioned SHA256 list is what
-makes a regenerated file verifiable. That repository is private at the time of
-writing, so the commit hashes below, while they resolve in it and fix the
-state of every experiment, are not independently checkable today; public
-release under the MIT licence is a precondition for submission. All runs are
-deterministic on CPU with per-run manifests (SHA256, git hash, config), and
-pre-registration commits precede every confirmatory run in the repository
-history. No external data were used; every dataset in this note is generated
-by the scripts listed below.
+The public research repository is
+\url{https://github.com/leonardocaloi/neural-network-entry-exit-law}.
+It contains the manuscript sources, verification and analysis scripts,
+configurations, figures, and the original per-run JSON records for both
+confirmatories: 400 in \path{results-4a3/*.jsonl.gz} and 800 in
+\path{results-e5/*.jsonl.gz}. All 1,200 files and both configuration hashes
+were checked against the original manifests during release preparation.
+These are saved run and episode summaries, not complete per-step trajectories.
+The discarded instrument's 600 records and available pilot records are also
+included as historical evidence, not as confirmatory evidence.
+
+The original work was developed in a private repository. The public history
+retains the relevant research commits, including pre-registration and negative
+results, after removing unrelated material, third-party paper copies, and
+personal Git email addresses. \path{docs/provenance/commit-map.tsv} maps the
+original hashes cited below to their public counterparts. Original commit
+dates are preserved; they establish order within the recorded local history,
+not an independently time-stamped public registration.
+
+The scripts use seeded, single-threaded CPU execution. Regenerated gzip bytes
+need not match the historical manifests: the runner stores elapsed time and
+the gzip container has metadata. Library and platform changes can also alter
+numerical trajectories. Historical SHA256 values verify the supplied original
+files; \path{verification/compare_runs.py} compares regenerated numerical
+records separately from timing metadata. The exact historical dependency
+lockfile was not recorded. Tested release dependencies and separate quick,
+analysis-only and full-training commands are in \path{docs/REPRODUCIBILITY.md}.
+No external datasets were used for the experiments reported here.
 
 {\sloppy
 \begin{itemize}
 \item \textbf{Theorem constants and figures.} \path{06-notas/t2-prova/}: lemma
-verifications \texttt{passo0--6.py} and \texttt{prova\_L1--L6.py}; figures via
+verifications \texttt{passo0\_verificacao.py} through
+\texttt{passo6\_verificacao.py} and \texttt{prova\_L1\_verificacao.py}
+through \texttt{prova\_L6\_verificacao.py}; figures via
 \path{figuras_draft.py}. The forcing theorem is drafted standalone in
 \path{06-notas/t2-prova/teorema-forcing-draft.tex}, which is the mathematical
 source of \cref{sec:forcing,app:forcing}; its two adversarial referee reports
@@ -1876,7 +1907,11 @@ falsified schedule is \path{p5-relu-morte-v2/} (commit \texttt{190d94a}).
 \paragraph{Compute.}
 Every run is single-threaded CPU on an Intel Core i9-9900K, with 4 concurrent
 workers through Python \texttt{multiprocessing} at \texttt{nice 19} and no GPU;
-the only dependency is \texttt{numpy} (Python 3.14, numpy 2.4). The 4a.3
+the training engines require \texttt{PyTorch} and \texttt{NumPy}. The
+historical record reports Python 3.14 and NumPy 2.4 but does not pin the
+PyTorch version. Symbolic checks use SymPy; selected numerical and plotting
+scripts also use SciPy and Matplotlib. The timings below are historical
+measurements, not reruns performed for the public release. The 4a.3
 confirmatory, 400 runs at $H=5\cdot10^{5}$, took $4.9$ h wall-clock, that is
 $19.5$ CPU-hours at $175$ s per run. The transformer confirmatory, 800 runs at
 $H=2\cdot10^{5}$, took $13.9$ h wall-clock, which includes one stall of the
@@ -1895,10 +1930,12 @@ This work received no funding and was carried out independently. The author
 declares no competing interests.
 
 \section*{Data availability}
-Everything needed to reproduce every number and figure --- code, configs,
-per-run manifests and aggregate JSON --- is held at the commits cited in
-\cref{sec:repro}, under the trace-file policy stated there. The repository is
-not public at the time of writing; no external data were used.
+The public repository linked in \cref{sec:repro} includes the saved records
+and manifests needed to recalculate the central tables without retraining.
+The manuscript and original figures are licensed under CC BY 4.0; original
+software is licensed under MIT. Third-party dependencies and cited works
+retain their own licenses. The publication review and its limits are recorded
+in \path{docs/REVIEW.md}; the work has not been peer-reviewed.
 
 \section*{Declaration of LLM usage} Large language models were used throughout
 the work: to draft and copy-edit the text, to run the adversarial reviews, to
@@ -1907,17 +1944,17 @@ write the experiment and verification code, and to work out the derivations of
 decision to declare a design or a hypothesis dead, and the reading of the
 cited sources are the author's.
 
-A review that only re-read the derivation would be circular, so the checks
-that carry weight here are the ones that do not read it. Each lemma is
-re-derived symbolically from scratch by a committed script (SymPy), which
-recomputes the identity rather than confirming the prose; the convergence
-table \cref{tab:dt} refines the integrator until the measured coefficient
-meets the proved one; and the sweep of \cref{sec:sweep} confronts the release
-law with 600 independently drawn trajectories. These routes test the law
-against the dynamics, not against the text that describes it, and any of them
-can fail while the prose stands. The central identity, \cref{lem:gauge}, is in
-addition a computation of about ten lines and is presented in that form so
-that a reader can redo it by hand.
+The committed scripts check selected symbolic identities and numerical
+rates; they do not constitute a machine-checked proof of every lemma. LLM
+adversarial review is not independent external validation. During publication
+preparation, an additional AI-assisted review checked the archived numerical
+claims, performed selected adaptive integrations, and corrected the
+reproducibility text and several scope statements. It also corrected the
+chain-rule multiplier on the exponentially small other-margin remainder in
+\cref{eq:quadrature,eq:quadratureF}; the leading entry--exit statements are
+unchanged. A complete independent mathematical verification remains outstanding.
+The changes, executed checks, and historical drafts are documented in
+\path{docs/REVIEW.md}.
 
 \begin{thebibliography}{99}
 
@@ -2023,7 +2060,7 @@ are verified symbolically in \path{passo0_verificacao.py}.
 Let $w=e^{\beta z}$ and $u=1/w$, and set $\Psi(u)=\log u+u$. In fast time
 $\tau=\beta t$ the margin obeys
 \begin{equation*}
-\frac{dw}{d\tau}=c\,R(t)\,\frac{w^{2}}{1+w}\,(1+E_\beta),
+\frac{dw}{d\tau}=c\,R(t)\,\frac{w^{2}}{1+w}\,(1+E_\beta)+w\eta_\beta,
 \qquad
 |E_\beta|\le\frac{\log(1+w)}{\beta|R|},
 \tag{\ref{eq:normalform}}
@@ -2035,9 +2072,11 @@ identity
 \begin{equation*}
 \frac{d\Psi(u)}{dt}=-c\,\beta\,R(t)+c\log(1+w)+\mathcal{E}_{\eqref{H3}}(t),
 \qquad
-\bigl|\mathcal{E}_{\eqref{H3}}\bigr|\le C_3\,\beta\,e^{-\beta\delta_1}.
+\bigl|\mathcal{E}_{\eqref{H3}}\bigr|\le C_3\,\beta(1+u)\,e^{-\beta\delta_1}.
 \tag{\ref{eq:quadrature}}
 \end{equation*}
+Here $|\eta_\beta|\le C_3e^{-\beta\delta_1}$ is the other-margin
+forcing, and the multiplicative form is used only where $R\ne0$.
 Under \eqref{H1}--\eqref{H2} the additive correction satisfies
 $\int_{\thit}^{\trel}c\log(1+w)\,ds=O(\log\beta/\beta)$.
 \end{lemmarep}
@@ -2064,8 +2103,15 @@ $\Psi'(u)=(1+u)/u$; together with $\sigma(\beta z)=1/(1+u)$,
 
 \emph{Step 3 (additive identity).} Since $\beta\,g_\beta(z)=\log(1+e^{\beta z})
 =\log(1+w)$, substitution gives $d\Psi/dt=-c\beta R+c\log(1+w)$, plus the
-\eqref{H3} error of Step~1 carried through the same factors, which is bounded by
-$C_3\beta e^{-\beta\delta_1}$. This is \eqref{eq:quadrature}. No division by $R$
+\eqref{H3} error $\eta_\beta$ of Step~1, which becomes
+$-\beta(1+u)\eta_\beta$ under the chain rule. This gives the stated pointwise
+bound. On a finite episode initialized with $u=O(1)$ and bounded $|R|\le M$,
+\[
+\dot u\le c\beta M+c+\beta C_3e^{-\beta\delta_1}u,
+\]
+using $u\log(1+1/u)/(1+u)\le1$. Gr\"onwall therefore gives $u=O(\beta)$,
+so the accumulated error is $O(\beta^2e^{-\beta\delta_1})$, still smaller than
+every algebraic order. This is \eqref{eq:quadrature}. No division by $R$
 occurs, so the interior zero of $R$ forced by \eqref{H1}--\eqref{H2} through the
 intermediate value theorem is harmless.
 
@@ -2076,7 +2122,7 @@ $\log(1+w)\le w\le 1/(c\beta a_0)$, so that stretch contributes at most
 $\Tep/(\beta a_0)=O(\beta^{-1})$, where $\Tep=\texit-\thit$ is the duration of the
 episode, not the training horizon $H$: the bulk stretch lies inside the episode by
 construction. Near $\thit$ and $\texit$ the function $\Ar$ has
-transversal zeros, with derivatives $cR(\thit)\ne0$ and $cR(\texit)\ne0$, so
+transversal zeros, with derivatives $R(\thit)\ne0$ and $R(\texit)\ne0$, so
 $|\Ar(t)|\ge\kappa|t-t_\ast|$ locally and
 \[
 \int\log(1+w)\;\lesssim\;\int_{1/\beta}^{\epsilon}\frac{ds}{c\beta\kappa s}
@@ -2497,15 +2543,17 @@ $\sigma(\beta z)=1/(1+u)$ and $(1-\sigma(s))/\sigma(s)=e^{-s}$.
 \begin{lemma}[normal form and additive quadrature, forcing form]\label{lem:gaugeF}
 With $w=e^{\beta z}$, $u=1/w$, $\Psi(u)=\log u+u$ and $\tau=\beta t$,
 \begin{equation}\label{eq:normalformF}
-\frac{dw}{d\tau}=c\,R(t)\,\frac{w^2}{1+w}\,(1+E_\beta),
+\frac{dw}{d\tau}=c\,R(t)\,\frac{w^2}{1+w}\,(1+E_\beta)+w\eta_\beta,
 \qquad |E_\beta|\le\frac{\log(1+w)}{\beta|R|},
 \end{equation}
 and one has the exact additive identity
 \begin{equation}\label{eq:quadratureF}
 \frac{d\Psi(u)}{dt}=-c\beta R(t)+c\log(1+w)+\mathcal E(t),
 \qquad
-|\mathcal E(t)|\le C_3\beta e^{-\beta\delta_1}.
+|\mathcal E(t)|\le C_3\beta(1+u)e^{-\beta\delta_1}.
 \end{equation}
+Here $|\eta_\beta|\le C_3e^{-\beta\delta_1}$; the multiplicative
+form is restricted to $R\ne0$, while the additive identity is valid at $R=0$.
 Under \textup{\eqref{H1p}--\eqref{H2p}},
 $\int_{\thit}^{\trel}c\log(1+w)\,ds\le C_4\log\beta/\beta$ with $C_4$ as in
 \eqref{eq:M2F}.
@@ -2940,11 +2988,14 @@ $C_\varepsilon$ as above makes the inequality strict with a fixed margin: strict
 improvement of \eqref{indB}.
 \item[(4.3)] With \eqref{indB} strict on $[0,s]$, the three-window computation
 of step~4 of \cref{lem:gaugeF} applies with $R^\beta$ in place of $R$; by (4.2)
-its two transversality constants and its bulk constant $a_0$ are within a factor
-$2$ of the hybrid ones, so it returns
-$\int_{\thit}^{s}c\log(1+w)\le\tfrac32 C_4\log\beta/\beta$, the factor
-$\tfrac32$ absorbing the factor-$2$ degradation of the constants against the
-slack we left: strict improvement of \eqref{indC}.
+the forcing error tends to zero uniformly. On the endpoint collars and the
+bulk windows, the lower bounds used in the three-window calculation can thus
+be chosen arbitrarily close to the hybrid bounds by increasing $\beta_0$.
+Choose this relative loss small enough that the resulting constant is at most
+$\tfrac32 C_4$. Then
+$\int_{\thit}^{s}c\log(1+w)\le\tfrac32 C_4\log\beta/\beta$,
+which strictly improves \eqref{indC}. A factor-$2$ comparison alone would not
+justify this strict improvement.
 \end{itemize}
 Since \eqref{indA}--\eqref{indC} hold on $[0,s]$ with strict inequality and all
 three functionals are continuous in $s$, they persist on $[0,s+\eta)$ for some

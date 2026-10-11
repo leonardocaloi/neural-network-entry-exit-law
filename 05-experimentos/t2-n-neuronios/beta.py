@@ -1,8 +1,9 @@
+from pathlib import Path
 import json,sys,numpy as np
-sys.path.insert(0,'/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios')
+sys.path.insert(0,str(Path(__file__).resolve().parent / '.'))
 import verifica_forcing as V
 from multiprocessing import Pool
-rs=[json.loads(l) for l in open('/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios/forcing_m.jsonl')]
+rs=[json.loads(l) for l in open(str(Path(__file__).resolve().parent / 'forcing_m.jsonl'))]
 rs=[r for r in rs if r['passou'] and r['m']==8]
 rs=sorted(rs,key=lambda r:-r['erro_rel'])[:6]
 def job(a):

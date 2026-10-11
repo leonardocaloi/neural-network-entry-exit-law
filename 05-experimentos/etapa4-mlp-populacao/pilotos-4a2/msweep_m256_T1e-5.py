@@ -2,10 +2,11 @@
 de m para a 4a.2). softplus (física) + semgrad (null difusão pura), seeds 45-47.
 Importa treina() de harness_mlp SEM modificar. Salva em results-piloto/ no mesmo
 formato. Pool 2, nice-19."""
+from pathlib import Path
 import gzip, json, os, sys, time
 from concurrent.futures import ProcessPoolExecutor
 
-BASE = "/home/caloi/Projects/j-space/05-experimentos/etapa4-mlp-populacao"
+BASE = str(Path(__file__).resolve().parent / '..')
 OUT = os.path.join(BASE, "pilotos-4a2", "results-piloto")
 if BASE not in sys.path:
     sys.path.insert(0, BASE)

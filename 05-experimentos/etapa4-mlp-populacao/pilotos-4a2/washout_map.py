@@ -1,9 +1,10 @@
 """Mapa do washout: separação softplus/semgrad (completos dur>=50, H=2e5 casado)
 vs m em T=1e-5. m=16,128 (H2e5 nativo), m=64 (5e5 truncado a 2e5), m=256 (2e5)."""
+from pathlib import Path
 import gzip, json, os
 import numpy as np
 
-RES = "/home/caloi/Projects/j-space/05-experimentos/etapa4-mlp-populacao/pilotos-4a2/results-piloto"
+RES = str(Path(__file__).resolve().parent / 'results-piloto')
 H = 200000
 L = 50
 

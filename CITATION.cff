@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: >-
+  Please cite the manuscript and the specific repository version used.
+  This is an independent research manuscript, not peer-reviewed.
+type: software
+title: Neural-network entry-exit law: research software and artifacts
+version: 0.1.0
+date-released: '2026-10-11'
+authors:
+  - family-names: Caloi Santos
+    given-names: Leonardo
+    affiliation: Independent Researcher, Brazil
+repository-code: 'https://github.com/leonardocaloi/neural-network-entry-exit-law'
+url: 'https://github.com/leonardocaloi/neural-network-entry-exit-law'
+license: MIT
+keywords:
+  - neural networks
+  - gradient flow
+  - dead neurons
+  - singular perturbation
+  - softplus
+preferred-citation:
+  type: unpublished
+  title: An entry–exit law for the resurrection of dead neurons under smoothed ReLU activation
+  authors:
+    - family-names: Caloi Santos
+      given-names: Leonardo
+      affiliation: Independent Researcher, Brazil
+  year: 2026
+  version: 'v4, public-release revision'
+  date-released: '2026-10-11'
+  url: 'https://github.com/leonardocaloi/neural-network-entry-exit-law/blob/main/06-notas/paper/paper-v4.pdf'
+  notes: Independent research manuscript; not peer-reviewed. Manuscript licensed CC BY 4.0.

@@ -1,35 +1,8 @@
-"""Figure 7 (paper j-space): the analytic GELU barrier and the absence of a stratum.
+"""Figure 7: exact GELU derivative and activation values.
 
-Everything here is exact/analytic: no experimental data is used. The GELU is the
-exact (erf) form g(z)=z*Phi(z), so g'(z)=Phi(z)+z*phi(z); the sign change z* is
-found with brentq and checked against -0.7518.
-
-Left panel: g'(z) on z in [-3, 0.5], zero at z*, the self-trapped region z<z*
-shaded (own gradient pushes the pre-activation further down), and the shallow
-band (z*, 0) where the own gradient is still restorative. The two injection
-depths of the confirmatory experiment (z=-0.3 shallow, z=-2.0 deep) are marked.
-
-Right panel: the outputs g(z) for GELU, softplus(beta=3), softplus(beta=10) and
-ReLU. Reading: ReLU is exactly 0 for z<0 (an exact dead stratum), softplus is
-exponentially small but strictly positive (no stratum, only a near-stratum),
-GELU is strictly negative and bounded away from 0 (GELU(-0.3) = -0.115): there
-is no dead stratum at all for GELU.
-
-Suggested caption
------------------
-Figure 7. The analytic barrier and the non-stratum, for the activations of the
-confirmatory grid. Left: the GELU derivative g'(z)=Phi(z)+z phi(z) changes sign
-at z* = -0.75179 (brentq). For z<z* (shaded) the unit's own gradient is adverse
--- a self-trapping region -- while on the shallow band z* < z < 0 the own
-gradient still points back towards activity. The experiment injects at z=-0.3
-(inside the shallow band) and at z=-2.0 (deep inside the self-trapped region),
-which is exactly the analytic barrier the deep-injection cells of Figure 6 hit.
-Right: the activations themselves. ReLU vanishes identically for z<0, an exact
-dead stratum; softplus is exponentially small but strictly positive, so the
-stratum is only approached, never reached; GELU is strictly negative, with
-GELU(-0.3) = -0.1151, so for GELU there is no dead stratum in the first place
-and the deep-injection suppression must come from the sign of g', not from a
-loss of rank.
+Publication review: the negative derivative region is labeled by its sign.
+The full gradient direction also depends on residuals, readouts, and other
+inputs; this plot does not prove a universal self-trapping barrier.
 """
 import matplotlib
 matplotlib.use("Agg")
@@ -81,7 +54,7 @@ axL.plot([zstar], [0.0], "o", ms=4, mfc="white", mec=C_GELU, mew=1.0, zorder=4)
 axL.annotate(rf"$z^{{*}}={zstar:.4f}$", xy=(zstar, 0.0), xytext=(-2.55, 0.30),
              fontsize=6.6,
              arrowprops=dict(arrowstyle="->", lw=0.6, color="black"))
-axL.text(-1.75, 0.62, "self-trapped:\nadverse own-gradient", fontsize=6.4,
+axL.text(-1.75, 0.62, "negative activation\nderivative", fontsize=6.4,
          ha="center", va="center", color="#8c2540")
 axL.text(-0.20, 0.62, "shallow\nband", fontsize=6.4, ha="center", va="center",
          color="#0a6a52")
@@ -93,7 +66,7 @@ axL.set_xlim(-3.0, 0.5)
 axL.set_ylim(-0.22, 1.0)
 axL.set_xlabel("pre-activation $z$", fontsize=7.5)
 axL.set_ylabel(r"GELU derivative $g'(z)$", fontsize=7.5)
-axL.set_title("(a) analytic barrier", fontsize=8)
+axL.set_title("(a) derivative sign change", fontsize=8)
 axL.tick_params(labelsize=7)
 axL.legend(fontsize=6.2, loc="upper left", framealpha=0.9)
 

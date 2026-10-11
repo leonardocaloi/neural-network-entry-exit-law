@@ -10,8 +10,9 @@ tem t_area se delay_i <= dur_i (senão t_area=-1, cai do com_area — como no
 Regua). Usa as FUNÇÕES REAIS de analise.py (fracao_vitorias_placebo,
 teste_sinais) e os números do config (alpha, k_critico, MIN_SEED_PLACEBO).
 """
+from pathlib import Path
 import sys, os
-sys.path.insert(0, "/home/caloi/Projects/j-space/05-experimentos/etapa4-mlp-populacao")
+sys.path.insert(0, str(Path(__file__).resolve().parent / '.'))
 import numpy as np
 from analise import fracao_vitorias_placebo, teste_sinais, ALPHA, MIN_EP_SEED
 

@@ -2,10 +2,11 @@
 e teste de robustez (a física sobrevive sem o seed dominante?).
 Usa os dados m64 nativos (5e5) truncados corretamente a H=2e5 (só episódios com
 t_morte<H; ressuscita só se t_res-t_morte<=H)."""
+from pathlib import Path
 import gzip, json, os
 import numpy as np
 
-RES = "/home/caloi/Projects/j-space/05-experimentos/etapa4-mlp-populacao/pilotos-4a2/results-piloto"
+RES = str(Path(__file__).resolve().parent / 'results-piloto')
 H, L = 200000, 50
 
 

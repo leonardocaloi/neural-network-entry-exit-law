@@ -1,9 +1,10 @@
+from pathlib import Path
 import sys, json, numpy as np
 sys.path.insert(0,"/tmp/claude-1000/-home-caloi-Projects-j-space/552bb7fa-f3f0-42f8-8086-cb79faf68c7a/scratchpad")
-sys.path.insert(0,"/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios")
+sys.path.insert(0,str(Path(__file__).resolve().parent / '.'))
 from parecer15_o5 import run
 from verifica_forcing import sorteia, FACE
-recs=[json.loads(l) for l in open("/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios/forcing_m.jsonl")]
+recs=[json.loads(l) for l in open(str(Path(__file__).resolve().parent / 'forcing_m.jsonl'))]
 ok=[r for r in recs if r["passou"]]
 print(" m  seed        v       t_hit    b2*rhoB   b2*rhoB*v^2  b*rhoA*v")
 rows=[]

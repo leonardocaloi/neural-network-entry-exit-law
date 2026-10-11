@@ -1,0 +1,4 @@
+# Training engine tested on CPU during the publication review.
+# This is NOT a recovered lockfile for the July 2026 campaigns.
+-r requirements.txt
+torch==2.13.0

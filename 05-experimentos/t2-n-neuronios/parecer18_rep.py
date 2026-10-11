@@ -1,7 +1,8 @@
+from pathlib import Path
 import sys, os, json, time
 import numpy as np
-sys.path.insert(0,'/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios')
-os.chdir('/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios')
+sys.path.insert(0,str(Path(__file__).resolve().parent / '.'))
+os.chdir(str(Path(__file__).resolve().parent / '.'))
 from multiprocessing import Pool
 import degrau2_v0 as D
 D.SEED0 = 77770101          # SEEDS FRESCAS, independentes do run oficial

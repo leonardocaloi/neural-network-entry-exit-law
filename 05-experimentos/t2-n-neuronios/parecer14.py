@@ -1,6 +1,7 @@
 """Parecer 14 - testes adversariais sobre verifica_forcing.py (NAO edita nada do projeto)."""
+from pathlib import Path
 import json, os, sys, numpy as np
-sys.path.insert(0, "/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios")
+sys.path.insert(0, str(Path(__file__).resolve().parent / '.'))
 import verifica_forcing as V
 
 AQUI = "/tmp/claude-1000/-home-caloi-Projects-j-space/552bb7fa-f3f0-42f8-8086-cb79faf68c7a/scratchpad"
@@ -23,7 +24,7 @@ def lam_max_GB(X, P0, a):
 
 def carrega():
     regs = [json.loads(l) for l in open(
-        "/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios/forcing_m.jsonl")]
+        str(Path(__file__).resolve().parent / 'forcing_m.jsonl'))]
     return [r for r in regs if r["passou"]]
 
 

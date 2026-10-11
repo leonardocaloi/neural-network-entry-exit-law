@@ -1,0 +1,29 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+.env
+.env.*
+*.pem
+*.key
+*.pid
+*.tmp
+/build/
+/tmp/
+**/results-4a3-smoke/
+**/results-e5-smoke/
+06-notas/**/*.aux
+06-notas/**/*.log
+06-notas/**/*.out
+06-notas/**/*.toc
+06-notas/**/*.synctex.gz
+
+# Original synthetic result records are intentionally versioned.
+# Never add downloaded papers, model weights, or personal environments.
+**/papers/pdf/
+*.safetensors
+*.pt
+*.pth

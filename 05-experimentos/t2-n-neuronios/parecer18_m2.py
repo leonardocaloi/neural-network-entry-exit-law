@@ -1,6 +1,7 @@
+from pathlib import Path
 import sys,os,numpy as np,time
-sys.path.insert(0,'/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios')
-os.chdir('/home/caloi/Projects/j-space/05-experimentos/t2-n-neuronios')
+sys.path.insert(0,str(Path(__file__).resolve().parent / '.'))
+os.chdir(str(Path(__file__).resolve().parent / '.'))
 from multiprocessing import Pool
 from verifica_forcing import sorteia
 from degrau2_readout import hibrido
