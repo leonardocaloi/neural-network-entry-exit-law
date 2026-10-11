@@ -294,3 +294,9 @@ The manuscript PDF and LaTeX source are unchanged from version 0.2.0. No proof,
 scientific conclusion, archived result, preregistration commit, or provenance
 map was revised. Version 0.2.1 is a separate release; previous releases and
 tags are preserved. Its release notes link the actual automated check result.
+
+The [first automated run](https://github.com/leonardocaloi/neural-network-entry-exit-law/actions/runs/38114297450)
+passed both quick checks and the tracked-file integrity check in a 34-second
+job, including setup. The README badge was added only after this successful
+execution. Auxiliary import and output-routing checks, documentation links,
+citation metadata, and a staged-change secret scan also passed locally.

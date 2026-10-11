@@ -2,6 +2,8 @@
 
 **Leonardo Caloi Santos — Independent Researcher, Brazil**
 
+[![Quick verification](https://github.com/leonardocaloi/neural-network-entry-exit-law/actions/workflows/verification.yml/badge.svg?branch=main)](https://github.com/leonardocaloi/neural-network-entry-exit-law/actions/workflows/verification.yml)
+
 An independent mathematical and computational study of inactive units in
 artificial neural networks. The manuscript is **not peer-reviewed**; its
 proofs and experiments were developed with substantial LLM assistance.
