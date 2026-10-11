@@ -17,9 +17,9 @@ import numpy as np
 from scipy.stats import beta as beta_dist
 
 ROOT = Path(__file__).resolve().parents[1]
-MLP = ROOT / "05-experimentos/etapa4-mlp-populacao"
-TAXA = MLP / "pilotos-4a2/pressao/taxa"
-TRANSFORMER = ROOT / "05-experimentos/etapa5-transformer"
+MLP = ROOT / "experiments/mlp"
+TAXA = MLP / "pilots/pressure/rates"
+TRANSFORMER = ROOT / "experiments/transformer"
 
 
 def load_module(name, path):
@@ -43,8 +43,8 @@ def check_manifest(directory, manifest_name, count, config=None):
 
 
 def check_statistics():
-    a4 = load_module("analysis_mlp", TAXA / "analise_4a3.py")
-    a5 = load_module("analysis_transformer", TRANSFORMER / "analise_e5.py")
+    a4 = load_module("analysis_mlp", TAXA / "analyze_4a3.py")
+    a5 = load_module("analysis_transformer", TRANSFORMER / "analyze_e5.py")
     cfg4 = json.loads((TAXA / "config_4a3.json").read_text())
     cfg5 = json.loads((TRANSFORMER / "config_e5.json").read_text())
     runs4 = a4.carrega(str(TAXA / "results-4a3"))
@@ -75,7 +75,7 @@ def check_statistics():
             ref_hi = 1.0 if k == n else beta_dist.ppf(0.975, k+1, n-k)
             assert np.allclose([lo, hi], [ref_lo, ref_hi], rtol=0, atol=1e-11)
     print("PASS: complete grids, main denominators, negative controls, and CP intervals")
-    rows = [json.loads(x) for x in (ROOT / "05-experimentos/t2-sweep-instancias/sweep_instancias.jsonl").read_text().splitlines()]
+    rows = [json.loads(x) for x in (ROOT / "experiments/instance-sweep/sweep_instances.jsonl").read_text().splitlines()]
     retained = [r for r in rows if r["passou_H1H2"]]
     assert len(rows) == 600 and len(retained) == 57
     assert all(r.get("erro_rel") is not None for r in retained)
@@ -89,15 +89,15 @@ def check_engines():
     torch.set_num_threads(1)
     for directory in (MLP, TAXA.parent, TAXA, TRANSFORMER):
         sys.path.insert(0, str(directory))
-    import motor_4a3
-    import motor_e5_conf
-    motor_4a3._paridade()  # Existing five-case, 400-step instrumentation check.
+    import engine_4a3
+    import engine_e5_confirmatory
+    engine_4a3._paridade()  # Existing five-case, 400-step instrumentation check.
     kwargs = dict(passos=200, seed=42, ativ="softplus", beta=3., freeze_attn=True,
                   kill_depth=0.3, rec_cada=50)
-    first = motor_e5_conf.treina_e5_conf(**kwargs)
-    second = motor_e5_conf.treina_e5_conf(**kwargs)
+    first = engine_e5_confirmatory.treina_e5_conf(**kwargs)
+    second = engine_e5_confirmatory.treina_e5_conf(**kwargs)
     assert first == second
-    null = motor_e5_conf.treina_e5_conf(**{**kwargs, "ativ": "relu"})
+    null = engine_e5_confirmatory.treina_e5_conf(**{**kwargs, "ativ": "relu"})
     injected = [u for u in null["unidades"] if u["injetada"]]
     assert len(injected) == 1 and null["n_inj_sustained"] == 0
     assert injected[0]["own_move"] == 0

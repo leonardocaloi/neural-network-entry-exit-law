@@ -6,6 +6,11 @@ The review was performed with AI assistance (large language models operating
 the author's development environment) and is **not** independent peer review.
 Nothing below should be read as external validation of the mathematics.
 
+**Layout note (version 0.2.0):** sections 1–8 retain the paths and commands
+used during the original review. The current manuscript is `paper/paper-v4.pdf`.
+See [current reproduction commands](REPRODUCIBILITY.md) and the
+[migration guide](MIGRATION.md) for the English layout.
+
 The manuscript is `06-notas/paper/paper-v4.tex`; the compiled PDF is
 `06-notas/paper/paper-v4.pdf`. Historical drafts (`paper-v1` to `paper-v3`,
 `06-notas/t2-prova/draft-v0` to `draft-v3`) are kept unchanged as records.
@@ -225,3 +230,35 @@ The documentation follow-up is released as version 0.1.1. It also fixes an
 unquoted colon in the citation title so that `CITATION.cff` parses as YAML,
 and updates the software citation version. The manuscript PDF has the same
 SHA256 as the version 0.1.0 release asset.
+
+## 9. English organization and research navigation (version 0.2.0)
+
+Directories, script entry-point filenames, study guides, and Markdown navigation
+now use English. Historical Portuguese prose is represented by clearly labeled
+English reading guides linking the complete original records at the exact
+pre-migration commit. Mathematical derivations in the historical LaTeX sources,
+saved data, configurations, and preregistration chronology remain available.
+
+The research map connects the manuscript to dynamics, geometry, optimization,
+plasticity, and evaluation methodology, distinguishing evidence levels. The
+roadmap records proposed work rather than completed extensions. It does not
+promote the trainable-readout or multiple-margin drafts to established results.
+
+Code changes update filenames, imports, and paths. The current manuscript's
+artifact references follow the new layout. The interactive toy has an English
+interface, starts paused, and no longer describes noisy returns as verification
+of an area-zero theorem. Its numerical update equations are unchanged.
+
+The existing analysis-only smoke check passed after migration in approximately
+3.5 seconds: all 1,800 manifested records, configuration hashes, main counts,
+confidence intervals, and the sweep summary matched. An additional byte check
+confirmed that 2,390 data, configuration, log, and PNG artifacts were unchanged.
+All 99 Python files parsed successfully. No training campaign or new proof review
+was performed for this reorganization.
+
+The current PDF was rebuilt to 66 pages with no overfull boxes or unresolved
+references. Representative changed pages were visually inspected. One long
+inline equation was displayed on its own line without changing its content.
+JavaScript syntax checks passed for the English toy. An interactive browser
+was unavailable in the preparation environment, so a browser rendering check
+of that HTML file was not performed.

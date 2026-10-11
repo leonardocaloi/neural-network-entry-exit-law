@@ -126,7 +126,7 @@ def main():
     parser.add_argument("--output", type=Path, help="Optional JSON report; does not modify archived data")
     args = parser.parse_args()
     symbolic_identity()
-    records = [json.loads(x) for x in (ROOT / "05-experimentos/t2-n-neuronios/forcing_m.jsonl").read_text().splitlines()]
+    records = [json.loads(x) for x in (ROOT / "experiments/affine-forcing/forcing_m.jsonl").read_text().splitlines()]
     selected = [next(r for r in records if r["seed"] == seed) for seed in SEEDS]
     result = dict(method="DOP853 with event interpolation", rtol=2e-12, atol=2e-14,
                   max_step=.001, coupled=[coupled(r) for r in selected], from_face=from_face())

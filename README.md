@@ -6,11 +6,13 @@ An independent mathematical and computational study of inactive units in
 artificial neural networks. The manuscript is **not peer-reviewed**; its
 proofs and experiments were developed with substantial LLM assistance.
 
-[Read the manuscript (PDF, 66 pages)](06-notas/paper/paper-v4.pdf) ·
-[LaTeX source](06-notas/paper/paper-v4.tex) ·
+[Read the manuscript (PDF, 66 pages)](paper/paper-v4.pdf) ·
+[LaTeX source](paper/paper-v4.tex) ·
+[Research map](docs/RESEARCH-MAP.md) ·
+[Roadmap](docs/ROADMAP.md) ·
 [Reproduction guide](docs/REPRODUCIBILITY.md) ·
 [Review and corrections](docs/REVIEW.md) ·
-[Release](https://github.com/leonardocaloi/neural-network-entry-exit-law/releases/tag/v0.1.1)
+[Release](https://github.com/leonardocaloi/neural-network-entry-exit-law/releases/tag/v0.2.0)
 
 ## Research question
 
@@ -24,6 +26,21 @@ central result describes a limiting trajectory that becomes inactive,
 retains a memory of the residual, and returns when a signed residual integral
 reaches zero. The experiments investigate related behavior in small MLPs and
 a one-layer transformer. They concern artificial units, not biological neurons.
+
+## Broader research context
+
+This study connects **training dynamics, local geometry, optimization, and
+measurement**. Singular perturbation supplies the entry-exit question;
+live-system geometry controls the forcing; experiments examine the behavior
+of inactive units; negative controls test whether the measurements support
+that interpretation.
+
+The [research map](docs/RESEARCH-MAP.md) explains connections to contact mechanics,
+kernel and information geometry, singular learning theory, mean-field dynamics,
+tropical geometry, neural-network plasticity, and evaluation methodology. It
+distinguishes manuscript results from background and exploratory connections.
+The [roadmap](docs/ROADMAP.md) identifies the next proof obligations and bounded
+research questions, including trainable readouts, competing margins, and Adam.
 
 ## Contributions and scope
 
@@ -50,8 +67,9 @@ The proof arguments have not received independent mathematical verification.
 The review records corrections to a remainder bound and a bootstrap step,
 and narrows claims about Jacobian rank, nonsmooth branch selection, and GELU.
 See [the review record](docs/REVIEW.md) for the exact changes and remaining
-questions. Earlier drafts and Portuguese laboratory notes are historical
-artifacts; `paper-v4.tex` and its PDF are the current manuscript.
+questions. Earlier drafts are historical artifacts; `paper-v4.tex` and its PDF
+are the current manuscript. English reading guides link the complete original
+laboratory records through the [history catalog](docs/HISTORY.md).
 
 ## Mathematical intuition
 
@@ -111,24 +129,26 @@ establish a general terminal barrier: the deep-injection result remains
 confounded with depth. An Adam pilot is exploratory. Negative results include
 a falsified stochastic schedule and a 600-run instrument invalidated by its
 own null control. They are retained in
-[`05-experimentos/NEGATIVOS.md`](05-experimentos/NEGATIVOS.md).
+[`experiments/NEGATIVE-RESULTS.md`](experiments/NEGATIVE-RESULTS.md).
 
 ## Repository guide
 
-Historical Portuguese paths and protocol text are retained to preserve
-references and the original research record. The public introduction and
-reproduction guide are in English.
+The current directories, script entry-point filenames, and Markdown guides use
+English. Original records remain in the published history, with a complete
+[path migration map](docs/MIGRATION.md). Frozen data keys and internal research
+identifiers retain their original spelling to preserve reproducibility.
 
 | Path | Contents |
 |---|---|
-| [`06-notas/paper/`](06-notas/paper/) | Current manuscript, historical versions, figures, and figure scripts |
-| [`06-notas/t2-prova/`](06-notas/t2-prova/) | Proof notes, standalone drafts, symbolic and numerical verification scripts |
-| [`05-experimentos/t2-sweep-instancias/`](05-experimentos/t2-sweep-instancias/) | 600-instance sweep and its saved output |
-| [`05-experimentos/t2-n-neuronios/`](05-experimentos/t2-n-neuronios/) | Affine-extension numerics, controls, and exploratory extensions |
-| [`05-experimentos/etapa4-mlp-populacao/`](05-experimentos/etapa4-mlp-populacao/) | MLP pilots, invalidated instrument, and confirmatory `pilotos-4a2/pressao/taxa/` |
-| [`05-experimentos/etapa5-transformer/`](05-experimentos/etapa5-transformer/) | Transformer protocols, engines, analyses, and saved results |
+| [`paper/`](paper/) | Current manuscript, historical versions, figures, and figure scripts |
+| [`theory/`](theory/) | Proof notes, standalone drafts, symbolic and numerical verification scripts |
+| [`experiments/instance-sweep/`](experiments/instance-sweep/) | 600-instance sweep and its saved output |
+| [`experiments/affine-forcing/`](experiments/affine-forcing/) | Affine-extension numerics, controls, and exploratory extensions |
+| [`experiments/mlp/`](experiments/mlp/) | MLP pilots, invalidated instrument, and confirmatory `pilots/pressure/rates/` |
+| [`experiments/transformer/`](experiments/transformer/) | Transformer protocols, engines, analyses, and saved results |
 | [`verification/`](verification/) | Lightweight artifact checks and numerical comparison tools |
-| [`docs/`](docs/) | Reproduction instructions, review record, and original-to-public commit mapping |
+| [`visualizations/`](visualizations/) | English interactive toy explainer, with its stochastic scope stated |
+| [`docs/`](docs/) | Research map, roadmap, reproduction, review, history, and provenance |
 
 ## Quick start
 

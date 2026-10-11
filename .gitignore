@@ -15,11 +15,12 @@ __pycache__/
 /tmp/
 **/results-4a3-smoke/
 **/results-e5-smoke/
-06-notas/**/*.aux
-06-notas/**/*.log
-06-notas/**/*.out
-06-notas/**/*.toc
-06-notas/**/*.synctex.gz
+*.aux
+*.out
+*.toc
+*.synctex.gz
+/paper/*.log
+/theory/*.log
 
 # Original synthetic result records are intentionally versioned.
 # Never add downloaded papers, model weights, or personal environments.
